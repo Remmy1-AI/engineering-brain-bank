@@ -113,6 +113,7 @@
               <a href="./about.html#contact">Contact</a>
               <a href="./about.html#terms">Terms of Service</a>
               <a href="./about.html#privacy">Privacy Policy</a>
+              <a href="./admin.html" class="footer-admin-link" title="Owner">Admin</a>
             </div>
           </div>
           <div class="footer-bottom">
@@ -162,6 +163,149 @@
     clearTimeout(showToast._t);
     showToast._t = setTimeout(() => toast.classList.remove("show"), 3800);
   }
+
+
+  /* ---------- Live materials (Supabase) ---------- */
+  let _liveCache = null;
+  let _liveTried = false;
+
+  async function fetchLiveMaterials() {
+    if (_liveTried) return _liveCache || [];
+    _liveTried = true;
+    if (!window.EBBApi || !EBBApi.isConfigured()) {
+      _liveCache = [];
+      return _liveCache;
+    }
+    try {
+      const rows = await EBBApi.listPublishedMaterials();
+      _liveCache = (rows || []).map((r) => EBBApi.toUiMaterial(r));
+    } catch (err) {
+      console.warn("[EBB] live materials:", err.message || err);
+      _liveCache = [];
+    }
+    return _liveCache;
+  }
+
+  function formatBytesLabel(sizeStr) {
+    return sizeStr || "";
+  }
+
+  async function shareMaterial(m) {
+    const url = m.live && m.file_path
+      ? EBBApi.getPublicFileUrl(m.file_path)
+      : `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, "")}course.html?id=${m.courseId || ""}`;
+    const title = m.title || "Engineering Brain Bank material";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url, text: title });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        showToast("Link copied.");
+      } else {
+        showToast(url);
+      }
+      if (m.live && m.id) EBBApi.incrementShare(m.id);
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+          showToast("Link copied.");
+          if (m.live && m.id) EBBApi.incrementShare(m.id);
+        }
+      } catch (_) {
+        showToast("Could not share.");
+      }
+    }
+  }
+
+  async function openOrDownloadMaterial(m, mode) {
+    if (m.live && m.file_path && window.EBBApi) {
+      const url = EBBApi.getPublicFileUrl(m.file_path);
+      if (m.id) EBBApi.incrementDownload(m.id);
+      if (mode === "download") {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = m.fileName || "download";
+        a.target = "_blank";
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast("Download started: " + (m.fileName || "file"));
+      } else {
+        window.open(url, "_blank", "noopener");
+        showToast("Opening " + (m.fileName || "file") + "…");
+      }
+      return;
+    }
+    showToast(mode === "download"
+      ? ("Download started: " + (m.fileName || "file"))
+      : ("Opening preview for " + (m.fileName || "file") + "…"));
+  }
+
+  function materialRowHtml(m, opts) {
+    opts = opts || {};
+    const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
+    const courseLink = c ? `./course.html?id=${c.id}` : (opts.resources ? "#" : "#");
+    const metaExtra = opts.resources
+      ? `<span style="color:var(--gold);font-weight:700">${c ? c.code : escapeAttr(m.course_code || "")}</span>
+         <span>${c ? c.name : ""}</span>
+         <span>${escapeAttr(m.topic || "")}</span>
+         <span>${formatDate(m.date)}</span>`
+      : `${typeBadge(m.type)}
+         <span>${escapeAttr(m.lecturer || "KB4GESA")}</span>
+         <span>${formatDate(m.date)}</span>
+         <span>${escapeAttr(formatBytesLabel(m.size))}</span>
+         <span>${m.downloads || 0} downloads</span>`;
+    const titleInner = opts.resources
+      ? `<a href="${courseLink}" style="color:inherit">${escapeAttr(m.title)}</a>`
+      : escapeAttr(m.title);
+    const actions = opts.resources
+      ? (m.live
+          ? `<button class="btn btn-primary btn-sm" type="button" data-mat-action="open" data-mat-id="${escapeAttr(m.id)}">Open</button>
+             <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`
+          : `<a class="btn btn-primary btn-sm" href="${courseLink}">Open</a>`)
+      : `<button class="btn btn-ghost btn-sm" type="button" data-mat-action="view" data-mat-id="${escapeAttr(m.id)}">View</button>
+         <button class="btn btn-primary btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
+         <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`;
+    const typePart = opts.resources ? typeBadge(m.type) + " " : "";
+    return `<div class="material-row" data-mat-id="${escapeAttr(m.id)}">
+      <div>
+        <h3>${titleInner}</h3>
+        <div class="meta">${typePart}${metaExtra}</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">${actions}</div>
+    </div>`;
+  }
+
+  function escapeAttr(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function wireMaterialActions(root, materialsById) {
+    if (!root) return;
+    root._matMap = materialsById;
+    if (root.dataset.matWired === "1") return;
+    root.dataset.matWired = "1";
+    root.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-mat-action]");
+      if (!btn) return;
+      const id = btn.getAttribute("data-mat-id");
+      const action = btn.getAttribute("data-mat-action");
+      const map = root._matMap || new Map();
+      const m = map.get(id);
+      if (!m) return;
+      if (action === "view" || action === "open") openOrDownloadMaterial(m, "view");
+      else if (action === "download") openOrDownloadMaterial(m, "download");
+      else if (action === "share") shareMaterial(m);
+    });
+  }
+
 
   function wireSearch(formId, inputId, resultsId) {
     const form = qs("#" + formId);
@@ -268,6 +412,35 @@
     }
 
     wireSearch("hero-search-form", "hero-search", "search-results");
+
+    // Prefer live published materials for "Recently Added" when available
+    fetchLiveMaterials().then((live) => {
+      if (!recentList || !live.length) return;
+      const byCourse = new Map();
+      live.forEach((m) => {
+        const code = m.course_code || "";
+        const course = m.courseId ? EBB.getCourse(m.courseId) : (code ? EBB.getCourseByCode(code) : null);
+        if (course && !byCourse.has(course.id)) byCourse.set(course.id, course);
+      });
+      const liveCourses = [...byCourse.values()].slice(0, 6);
+      if (!liveCourses.length) {
+        // show live material titles as recent items
+        recentList.innerHTML = live.slice(0, 6).map((m) => {
+          const href = m.courseId ? `./course.html?id=${m.courseId}` : "./resources.html";
+          return `<a class="recent-item" href="${href}">
+            <span class="recent-code">${escapeAttr(m.course_code || "NEW")}</span>
+            <span class="recent-name">${escapeAttr(m.title)}</span>
+          </a>`;
+        }).join("");
+        return;
+      }
+      recentList.innerHTML = liveCourses.map((c) =>
+        `<a class="recent-item" href="./course.html?id=${c.id}">
+          <span class="recent-code">${c.code}</span>
+          <span class="recent-name">${c.name}</span>
+        </a>`
+      ).join("");
+    });
   }
 
   /* ---------- Courses ---------- */
@@ -342,15 +515,19 @@
       return;
     }
     const dept = EBB.getDepartment(course.department);
-    const materials = EBB.getMaterialsForCourse(course.id);
     document.title = `${course.code} · ${course.name} | Engineering Brain Bank`;
 
-    const byTopic = {};
-    materials.forEach((m) => {
-      (byTopic[m.topic] ||= []).push(m);
-    });
+    function normalizeCode(c) {
+      return String(c || "").toLowerCase().replace(/\s+/g, "");
+    }
 
-    root.innerHTML = `
+    function renderMaterials(materials) {
+      const byTopic = {};
+      materials.forEach((m) => {
+        (byTopic[m.topic || "Materials"] ||= []).push(m);
+      });
+      const map = new Map(materials.map((m) => [String(m.id), m]));
+      root.innerHTML = `
       <div class="breadcrumb">
         <a href="./index.html">Home</a><span>/</span>
         <a href="./courses.html">Courses</a><span>/</span>
@@ -375,31 +552,31 @@
       </p>
       <h2 class="section-title" style="margin-top:2rem">Materials (${materials.length})</h2>
       ${materials.length ? Object.entries(byTopic).map(([topic, mats]) => `
-        <h3 style="font-size:1rem;margin:1.25rem 0 0.65rem;color:var(--gold)">${topic}</h3>
+        <h3 style="font-size:1rem;margin:1.25rem 0 0.65rem;color:var(--gold)">${escapeAttr(topic)}</h3>
         <div class="material-list">
-          ${mats.map((m) => `
-            <div class="material-row">
-              <div>
-                <h3>${m.title}</h3>
-                <div class="meta">
-                  ${typeBadge(m.type)}
-                  <span>${m.lecturer}</span>
-                  <span>${formatDate(m.date)}</span>
-                  <span>${m.size}</span>
-                  <span>${m.downloads} downloads</span>
-                </div>
-              </div>
-              <div style="display:flex;gap:0.5rem">
-                <button class="btn btn-ghost btn-sm" type="button" data-toast="Opening preview for ${m.fileName}…">View</button>
-                <button class="btn btn-primary btn-sm" type="button" data-toast="Download started: ${m.fileName}">Download</button>
-              </div>
-            </div>`).join("")}
+          ${mats.map((m) => materialRowHtml(m, {})).join("")}
         </div>`).join("") : `<div class="empty-state">No materials yet. <a href="./upload.html">Upload the first one</a>.</div>`}
     `;
+      wireMaterialActions(root, map);
+    }
 
-    root.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-toast]");
-      if (btn) showToast(btn.getAttribute("data-toast"));
+    const mock = EBB.getMaterialsForCourse(course.id);
+    renderMaterials(mock);
+
+    fetchLiveMaterials().then((live) => {
+      const codeN = normalizeCode(course.code);
+      const liveForCourse = live.filter((m) => {
+        if (m.courseId === course.id) return true;
+        return normalizeCode(m.course_code) === codeN;
+      });
+      if (!liveForCourse.length) return;
+      // Prefer live; keep mock that don't collide by filename
+      const liveNames = new Set(liveForCourse.map((m) => (m.fileName || "").toLowerCase()));
+      const merged = [
+        ...liveForCourse,
+        ...mock.filter((m) => !liveNames.has((m.fileName || "").toLowerCase())),
+      ];
+      renderMaterials(merged);
     });
   }
 
@@ -412,6 +589,7 @@
     const deptSel = qs("#filter-dept");
     const levelSel = qs("#filter-level");
     const qInput = qs("#filter-q");
+    let liveMaterials = [];
 
     if (typeSel) {
       typeSel.innerHTML = `<option value="">All types</option>` +
@@ -429,13 +607,49 @@
     }
     if (qInput && p.get("q")) qInput.value = p.get("q");
 
+    function filterLive(listIn) {
+      const type = typeSel?.value || "";
+      const department = deptSel?.value || "";
+      const level = levelSel?.value || "";
+      const query = (qInput?.value || "").toLowerCase().trim();
+      return listIn.filter((m) => {
+        if (type && m.type !== type) return false;
+        if (department && m.department !== department) {
+          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
+          if (!c || c.department !== department) return false;
+        }
+        if (level && m.level !== level) {
+          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
+          if (!c || c.level !== level) return false;
+        }
+        if (query) {
+          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
+          const hay = [m.title, m.topic, m.type, m.course_code, c && c.code, c && c.name]
+            .filter(Boolean).join(" ").toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
+    }
+
     function render() {
-      const filtered = EBB.filterMaterials({
+      const mockFiltered = EBB.filterMaterials({
         type: typeSel?.value || "",
         department: deptSel?.value || "",
         level: levelSel?.value || "",
         query: qInput?.value || "",
-      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+      });
+      let filtered;
+      if (liveMaterials.length) {
+        const liveF = filterLive(liveMaterials);
+        const liveNames = new Set(liveF.map((m) => (m.fileName || "").toLowerCase()));
+        filtered = [
+          ...liveF,
+          ...mockFiltered.filter((m) => !liveNames.has((m.fileName || "").toLowerCase())),
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else {
+        filtered = mockFiltered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
 
       const countEl = qs("#resource-count");
       if (countEl) countEl.textContent = `${filtered.length} resource${filtered.length === 1 ? "" : "s"}`;
@@ -444,27 +658,19 @@
         list.innerHTML = `<div class="empty-state">No resources match your filters.</div>`;
         return;
       }
-      list.innerHTML = filtered.map((m) => {
-        const c = EBB.getCourse(m.courseId);
-        return `<div class="material-row">
-          <div>
-            <h3><a href="./course.html?id=${m.courseId}" style="color:inherit">${m.title}</a></h3>
-            <div class="meta">
-              ${typeBadge(m.type)}
-              <span style="color:var(--gold);font-weight:700">${c ? c.code : ""}</span>
-              <span>${c ? c.name : ""}</span>
-              <span>${m.topic}</span>
-              <span>${formatDate(m.date)}</span>
-            </div>
-          </div>
-          <a class="btn btn-primary btn-sm" href="./course.html?id=${m.courseId}">Open</a>
-        </div>`;
-      }).join("");
+      const map = new Map(filtered.map((m) => [String(m.id), m]));
+      list.innerHTML = filtered.map((m) => materialRowHtml(m, { resources: true })).join("");
+      wireMaterialActions(list, map);
     }
 
     [typeSel, deptSel, levelSel].forEach((el) => el && el.addEventListener("change", render));
     if (qInput) qInput.addEventListener("input", render);
     render();
+
+    fetchLiveMaterials().then((live) => {
+      liveMaterials = live || [];
+      render();
+    });
   }
 
   /* ---------- Upload ---------- */
@@ -507,6 +713,11 @@
       fileInput.addEventListener("change", () => showFile(fileInput.files?.[0]));
     }
 
+    // Enforce allowlist on public upload form (demo still — owner uses Admin)
+    if (fileInput && window.EBBApi) {
+      fileInput.setAttribute("accept", EBBApi.acceptAttr());
+    }
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const required = ["up-dept", "up-level", "up-sem", "up-code", "up-name", "up-topic", "up-type", "up-lecturer"];
@@ -522,7 +733,12 @@
         showToast("Please choose a file to upload.");
         return;
       }
-      showToast("Thanks! Your material was submitted for review. (Demo — nothing was uploaded.)");
+      const f = fileInput.files[0];
+      if (window.EBBApi && !EBBApi.isAllowedFile(f)) {
+        showToast("File type not allowed. Use PDF, PPT/PPTX, DOC/DOCX, TXT, or MD.");
+        return;
+      }
+      showToast("Thanks! Student uploads are demo-only for now. Owner publishes via Admin.");
       form.reset();
       showFile(null);
     });
@@ -537,7 +753,13 @@
     else if (page === "course") initCourse();
     else if (page === "resources") initResources();
     else if (page === "upload") initUpload();
+
+    // Track one page view per path per browser session when Supabase is configured
+    if (window.EBBApi && EBBApi.isConfigured()) {
+      const path = window.location.pathname || ("/" + (page || "home"));
+      EBBApi.recordPageViewOncePerSession(path);
+    }
   });
 
-  window.EBBApp = { showToast, CREST_SVG, SWOOSH_SVG };
+  window.EBBApp = { showToast, CREST_SVG, SWOOSH_SVG, fetchLiveMaterials };
 })();

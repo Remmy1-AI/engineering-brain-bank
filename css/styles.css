@@ -1070,3 +1070,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* Prevent horizontal page scroll */
 html, body { overflow-x: hidden; max-width: 100%; }
+
+
+/* Subtle owner admin footer link */
+.footer-admin-link {
+  opacity: 0.45;
+  font-size: 0.8rem !important;
+}
+.footer-admin-link:hover { opacity: 0.9; }

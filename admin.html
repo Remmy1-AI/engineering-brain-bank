@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Owner Admin | Engineering Brain Bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css?v=20260927g" />
+  <link rel="stylesheet" href="./css/admin.css?v=20260927g" />
+</head>
+<body data-page="admin" class="admin-body">
+  <a class="skip-link" href="#admin-main">Skip to content</a>
+  <header class="admin-topbar">
+    <div class="container admin-topbar-inner">
+      <a class="brand" href="./index.html" aria-label="Back to site">
+        <svg class="brand-crest" viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="crestGoldA" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFD54F"/>
+              <stop offset="55%" stop-color="#FFB800"/>
+              <stop offset="100%" stop-color="#E09A00"/>
+            </linearGradient>
+            <linearGradient id="crestRedA" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#E53935"/>
+              <stop offset="100%" stop-color="#8B1A1A"/>
+            </linearGradient>
+          </defs>
+          <path d="M32 2 L58 14 L58 38 C58 54 45 66 32 70 C19 66 6 54 6 38 L6 14 Z" fill="url(#crestGoldA)" stroke="#FFB800" stroke-width="1.2"/>
+          <path d="M32 8 L52 17 L52 37 C52 50 42 60 32 63.5 C22 60 12 50 12 37 L12 17 Z" fill="#0A0A0C"/>
+          <path d="M32 14 L46 21 L46 36 C46 45 39 52 32 55 C25 52 18 45 18 36 L18 21 Z" fill="url(#crestRedA)" opacity="0.95"/>
+          <path d="M26 30 L32 24 L38 30 L32 36 Z" fill="#FFD54F"/>
+          <circle cx="32" cy="42" r="3.2" fill="#FFD54F"/>
+        </svg>
+        <span class="brand-text">
+          <span class="brand-code">KB4GESA</span>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <span class="brand-name">Owner<br>Admin</span>
+        </span>
+      </a>
+      <div class="admin-topbar-actions">
+        <a class="btn btn-ghost btn-sm" href="./index.html">View site</a>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-logout" hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main admin-main" id="admin-main">
+    <!-- Setup / not configured -->
+    <section class="section" id="panel-setup" hidden>
+      <div class="container admin-narrow">
+        <div class="admin-card">
+          <h1>Connect Supabase</h1>
+          <p class="admin-lead">The owner dashboard needs your Supabase Project URL and anon (public) key.</p>
+          <ol class="admin-steps">
+            <li>Create a free project at <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>.</li>
+            <li>Open <strong>SQL Editor</strong> → paste and run <code>supabase/schema.sql</code> from this repo.</li>
+            <li>Authentication → Users → <strong>Add user</strong> (email + password for the owner).</li>
+            <li>Project Settings → API → copy <strong>Project URL</strong> and <strong>anon public</strong> key.</li>
+            <li>Paste them into <code>js/supabase-config.js</code>, commit &amp; push (or edit on GitHub).</li>
+          </ol>
+          <p class="admin-warn">Never put the <code>service_role</code> key in the front end or this repository.</p>
+          <p style="margin-top:1rem"><a class="btn btn-primary" href="./index.html">Back to site</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login -->
+    <section class="section" id="panel-login" hidden>
+      <div class="container admin-narrow">
+        <div class="admin-card">
+          <h1>Owner login</h1>
+          <p class="admin-lead">Sign in with the Supabase Auth user you created for this site.</p>
+          <form id="login-form" class="admin-form" novalidate>
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input id="login-email" class="form-control" type="email" autocomplete="username" required />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input id="login-password" class="form-control" type="password" autocomplete="current-password" required />
+            </div>
+            <p class="admin-error" id="login-error" hidden></p>
+            <button type="submit" class="btn btn-primary" id="login-submit">Sign in</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section class="section" id="panel-dash" hidden>
+      <div class="container">
+        <div class="admin-dash-head">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="admin-lead" id="dash-user">Signed in</p>
+          </div>
+        </div>
+
+        <div class="admin-stats" id="dash-stats">
+          <div class="admin-stat"><span class="admin-stat-val" id="stat-visits">—</span><span class="admin-stat-label">Site visits</span></div>
+          <div class="admin-stat"><span class="admin-stat-val" id="stat-downloads">—</span><span class="admin-stat-label">Downloads</span></div>
+          <div class="admin-stat"><span class="admin-stat-val" id="stat-shares">—</span><span class="admin-stat-label">Shares</span></div>
+          <div class="admin-stat"><span class="admin-stat-val" id="stat-materials">—</span><span class="admin-stat-label">Materials</span></div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h2>Upload material</h2>
+            <p class="admin-hint">Allowed: PDF, PPT/PPTX, DOC/DOCX, TXT, MD — no video.</p>
+            <form id="upload-form" class="admin-form" novalidate>
+              <div class="form-group">
+                <label for="up-title">Title *</label>
+                <input id="up-title" class="form-control" type="text" required maxlength="200" />
+              </div>
+              <div class="form-group">
+                <label for="up-desc">Description</label>
+                <textarea id="up-desc" class="form-control" rows="2" maxlength="1000"></textarea>
+              </div>
+              <div class="admin-form-row">
+                <div class="form-group">
+                  <label for="up-code">Course code</label>
+                  <input id="up-code" class="form-control" type="text" placeholder="e.g. CE 403" />
+                </div>
+                <div class="form-group">
+                  <label for="up-dept">Department</label>
+                  <select id="up-dept" class="form-control"></select>
+                </div>
+              </div>
+              <div class="admin-form-row">
+                <div class="form-group">
+                  <label for="up-level">Level</label>
+                  <select id="up-level" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                  <label for="up-type">Material type</label>
+                  <select id="up-type" class="form-control"></select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="up-file">File *</label>
+                <input id="up-file" class="form-control" type="file" required />
+              </div>
+              <label class="admin-check">
+                <input type="checkbox" id="up-published" checked />
+                Publish immediately
+              </label>
+              <p class="admin-error" id="upload-error" hidden></p>
+              <p class="admin-ok" id="upload-ok" hidden></p>
+              <button type="submit" class="btn btn-primary" id="upload-submit">Upload</button>
+            </form>
+          </div>
+
+          <div class="admin-card admin-card-wide">
+            <div class="admin-table-head">
+              <h2>All materials</h2>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-refresh">Refresh</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" id="materials-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Course</th>
+                    <th>Type</th>
+                    <th>↓</th>
+                    <th>↗</th>
+                    <th>Live</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="materials-tbody">
+                  <tr><td colspan="7" class="admin-muted">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/data.js?v=20260927g"></script>
+  <script src="./js/supabase-config.js?v=20260927g"></script>
+  <script src="./js/ebb-api.js?v=20260927g"></script>
+  <script src="./js/admin.js?v=20260927g"></script>
+</body>
+</html>

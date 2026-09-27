@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20260927f" />
+  <link rel="stylesheet" href="./css/styles.css?v=20260927g" />
 </head>
 <body data-page="upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -59,9 +59,9 @@
             <div class="form-group full">
               <label>File *</label>
               <div class="file-drop" id="file-drop" role="button" tabindex="0">
-                <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.zip,.png,.jpg" />
+                <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md" />
                 <p>Drop a file here or click to browse</p>
-                <p class="hint">PDF, PPT, DOC, ZIP — max demo size unlimited (client-only)</p>
+                <p class="hint">PDF, PPT/PPTX, DOC/DOCX, TXT, MD only — no video. Owner publishes via Admin.</p>
                 <div class="file-name" id="file-name"></div>
               </div>
             </div>
@@ -81,12 +81,17 @@
           <p style="margin-top:1.25rem;font-size:0.88rem;color:var(--text-dim)">
             Organization: Department → Level → Semester → Course → Topic → Material
           </p>
+          <p style="margin-top:1rem;font-size:0.85rem;color:var(--gold)">
+            Official library uploads are published by the owner via <a href="./admin.html">Admin</a>. This form is a student demo / request flow.
+          </p>
         </aside>
       </div>
     </section>
   </main>
   <footer class="site-footer" id="site-footer"></footer>
-  <script src="./js/data.js?v=20260927f"></script>
-  <script src="./js/app.js?v=20260927f"></script>
+  <script src="./js/data.js?v=20260927g"></script>
+  <script src="./js/supabase-config.js?v=20260927g"></script>
+  <script src="./js/ebb-api.js?v=20260927g"></script>
+  <script src="./js/app.js?v=20260927g"></script>
 </body>
 </html>
