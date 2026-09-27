@@ -690,6 +690,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
   color: #fff;
   outline: none;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.form-control[type="file"] {
+  padding: 0.55rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+textarea.form-control {
+  resize: vertical;
+  min-height: 4.5rem;
 }
 .toolbar select:focus,
 .toolbar input:focus,
@@ -703,7 +715,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Course cards ---------- */
 .course-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 1rem;
 }
 
@@ -1078,3 +1090,32 @@ html, body { overflow-x: hidden; max-width: 100%; }
   font-size: 0.8rem !important;
 }
 .footer-admin-link:hover { opacity: 0.9; }
+
+
+/* ---------- Mobile hardening (site-wide) ---------- */
+@media (max-width: 860px) {
+  .material-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  .material-row .actions,
+  .material-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .material-row .btn,
+  .material-actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+  }
+  .toolbar input[type="search"] {
+    min-width: 0;
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}

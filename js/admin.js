@@ -261,21 +261,21 @@
         }
         tbody.innerHTML = rows.map((m) => `
           <tr>
-            <td>
+            <td data-label="Title">
               <strong>${escapeHtml(m.title)}</strong>
               <div class="admin-muted">${escapeHtml(m.file_name || "")}</div>
             </td>
-            <td>${escapeHtml(m.course_code || "—")}</td>
-            <td>${escapeHtml(m.material_type || "—")}</td>
-            <td>${m.download_count || 0}</td>
-            <td>${m.share_count || 0}</td>
-            <td>
+            <td data-label="Course">${escapeHtml(m.course_code || "—")}</td>
+            <td data-label="Type">${escapeHtml(m.material_type || "—")}</td>
+            <td data-label="Downloads">${m.download_count || 0}</td>
+            <td data-label="Shares">${m.share_count || 0}</td>
+            <td data-label="Status">
               <button type="button" class="btn btn-ghost btn-sm"
                 data-action="toggle" data-id="${m.id}" data-published="${m.published ? "true" : "false"}">
                 ${m.published ? "Published" : "Hidden"}
               </button>
             </td>
-            <td class="admin-row-actions">
+            <td class="admin-row-actions" data-label="Actions">
               <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Open</button>
               <button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Delete</button>
             </td>
