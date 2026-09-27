@@ -61,21 +61,20 @@
               <span class="brand-name">Engineering<br>Brain Bank</span>
             </span>
           </a>
-          <nav class="nav" id="main-nav" aria-label="Primary">
-            <a href="./index.html" ${page === "home" ? 'class="active"' : ""}>Home</a>
-            <a href="./courses.html" ${page === "courses" || page === "course" ? 'class="active"' : ""}>Courses</a>
-            <a href="./resources.html" ${page === "resources" ? 'class="active"' : ""}>Resources</a>
-            <a href="./upload.html" ${page === "upload" ? 'class="active"' : ""}>Upload</a>
-            <a href="./about.html" ${page === "about" ? 'class="active"' : ""}>About</a>
-          </nav>
-          <div class="header-actions">
-            <a class="icon-btn" href="./resources.html" aria-label="Search resources" title="Search">${ICONS.search}</a>
-            <form class="header-search-form" action="./resources.html" method="get" role="search">
-              <input class="header-search" type="search" name="q" placeholder="" aria-label="Search" />
-            </form>
-            <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-            </button>
+          <div class="header-right">
+            <nav class="nav" id="main-nav" aria-label="Primary">
+              <a href="./index.html" ${page === "home" ? 'class="active"' : ""}>Home</a>
+              <a href="./courses.html" ${page === "courses" || page === "course" ? 'class="active"' : ""}>Courses</a>
+              <a href="./resources.html" ${page === "resources" ? 'class="active"' : ""}>Resources</a>
+              <a href="./upload.html" ${page === "upload" ? 'class="active"' : ""}>Upload</a>
+              <a href="./about.html" ${page === "about" ? 'class="active"' : ""}>About</a>
+            </nav>
+            <div class="header-actions">
+              <a class="icon-btn" href="./resources.html" aria-label="Search resources" title="Search">${ICONS.search}</a>
+              <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+              </button>
+            </div>
           </div>
         </div>`;
     }

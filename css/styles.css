@@ -74,7 +74,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
   height: var(--header-h);
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .brand {
@@ -124,7 +133,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: flex;
   align-items: center;
   gap: 0.1rem;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .nav a {
@@ -144,8 +153,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-left: 0.35rem;
+  gap: 0.35rem;
+  margin-left: 0;
   flex-shrink: 0;
 }
 
@@ -214,10 +223,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
-  opacity: 0.62;
+  object-position: center;
+  opacity: 0.85;
   display: block;
-  mix-blend-mode: screen;
+  filter: brightness(1.35) contrast(1.15);
 }
 .hero-chalk-left {
   left: 0;
@@ -241,8 +250,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* Soft center fade only — keeps side chalk readable */
-  background: radial-gradient(ellipse 48% 42% at 50% 38%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.18) 45%, transparent 72%);
+  background: radial-gradient(ellipse 50% 45% at 50% 42%, rgba(0,0,0,0.35) 0%, transparent 70%);
   opacity: 1;
 }
 
@@ -1001,8 +1009,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (max-width: 860px) {
   .container { width: min(100% - 2rem, var(--max)); }
   .header-inner { width: 100%; }
-  .header-actions { margin-left: auto; }
-  .header-search-form { display: none; }
+  .header-right { margin-left: auto; }
+  .header-actions { margin-left: 0; }
+  .header-search-form { display: none !important; }
+  .site-header .container { width: 100%; max-width: none; padding: 0 0.85rem; box-sizing: border-box; }
   .nav {
     display: none;
     position: absolute;
@@ -1025,16 +1035,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .upload-layout, .about-grid { grid-template-columns: 1fr; }
   .dept-grid { grid-template-columns: repeat(2, 1fr); }
   .hero { min-height: auto; padding: 3.5rem 0 2.75rem; }
-  .hero-chalk { width: min(48vw, 420px); display: block; }
-  .hero-chalk img { opacity: 0.5; }
+  .hero-chalk { width: min(62vw, 480px); display: block; }
+  .hero-chalk img { opacity: 0.75; filter: brightness(1.4) contrast(1.2); }
   .search-box { max-width: 100%; width: 100%; }
   .hero-title .hero-line { white-space: nowrap; }
 }
 
 @media (max-width: 560px) {
   .container { width: min(100% - 2rem, var(--max)); }
-  .hero-chalk { width: 58vw; display: block; opacity: 1; }
-  .hero-chalk img { opacity: 0.48; }
+  .hero-chalk { width: 70vw; display: block; opacity: 1; }
+  .hero-chalk img { opacity: 0.72; filter: brightness(1.45) contrast(1.25); }
   .hero-swoosh { left: -8%; right: -12%; }
   .hero-title { font-size: clamp(1.85rem, 11vw, 2.75rem); }
 

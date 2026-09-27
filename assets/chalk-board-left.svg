@@ -1,84 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="900" viewBox="0 0 480 900" fill="none">
-  <!-- Tall left chalk board: architectural CAD wireframe -->
-  <g stroke="#e8e8e8" stroke-opacity="0.55" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-    <!-- perspective box stack (axonometric) -->
-    <path d="M40 120 L160 70 L280 120 L160 170 Z"/>
-    <path d="M40 120 L40 220 L160 270 L160 170"/>
-    <path d="M280 120 L280 220 L160 270"/>
-    <path d="M40 170 L160 220 L280 170" stroke-opacity="0.35"/>
-    <!-- second box below -->
-    <path d="M70 280 L170 240 L270 280 L170 320 Z"/>
-    <path d="M70 280 L70 360 L170 400 L170 320"/>
-    <path d="M270 280 L270 360 L170 400"/>
-    <!-- structural frame / portal -->
-    <path d="M50 480 V620 H200 V480"/>
-    <path d="M50 480 L125 430 L200 480"/>
-    <path d="M125 430 V520"/>
-    <path d="M50 550 H200 M50 580 H200"/>
-    <!-- I-beam detail -->
-    <path d="M240 460 H360 M240 460 V500 H360 V460"/>
-    <path d="M240 480 H360" stroke-width="2"/>
-    <path d="M230 455 H370 M230 505 H370" stroke-opacity="0.4"/>
-    <!-- truss -->
-    <path d="M60 700 L140 650 L220 700 L140 750 Z"/>
-    <path d="M140 650 V750 M60 700 H220"/>
-    <path d="M100 675 L140 700 L180 675 M100 725 L140 700 L180 725" stroke-opacity="0.4"/>
+  <g stroke="#ffffff" stroke-opacity="0.92" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 90 L170 40 L310 90 L170 140 Z"/>
+    <path d="M30 90 L30 210 L170 260 L170 140"/>
+    <path d="M310 90 L310 210 L170 260"/>
+    <path d="M30 150 L170 200 L310 150" stroke-opacity="0.55"/>
+    <path d="M50 290 L180 240 L310 290 L180 340 Z"/>
+    <path d="M50 290 L50 390 L180 440 L180 340"/>
+    <path d="M310 290 L310 390 L180 440"/>
+    <path d="M40 500 V680 H230 V500"/>
+    <path d="M40 500 L135 440 L230 500"/>
+    <path d="M135 440 V560"/>
+    <path d="M40 580 H230 M40 620 H230 M40 650 H230"/>
+    <path d="M260 480 H420 M260 480 V540 H420 V480"/>
+    <path d="M260 510 H420" stroke-width="3"/>
+    <path d="M250 470 H430 M250 550 H430" stroke-opacity="0.6"/>
+    <path d="M50 740 L150 680 L250 740 L150 800 Z"/>
+    <path d="M150 680 V800 M50 740 H250"/>
+    <path d="M100 710 L150 740 L200 710 M100 770 L150 740 L200 770" stroke-opacity="0.65"/>
   </g>
-  <g stroke="#d0d0d0" stroke-opacity="0.4" stroke-width="1" stroke-linecap="round">
-    <!-- circles / targets -->
-    <circle cx="360" cy="160" r="42"/>
-    <circle cx="360" cy="160" r="26"/>
-    <circle cx="360" cy="160" r="8"/>
-    <circle cx="360" cy="160" r="2" fill="#d0d0d0" fill-opacity="0.5" stroke="none"/>
-    <path d="M360 118 V202 M318 160 H402"/>
-    <circle cx="420" cy="260" r="18"/>
-    <circle cx="300" cy="300" r="14"/>
-    <path d="M360 160 L420 260 L300 300 L360 160"/>
-    <!-- dimension ticks -->
-    <path d="M40 820 H220"/>
-    <path d="M40 815 V825 M220 815 V825"/>
-    <path d="M80 820 V810 M120 820 V810 M160 820 V810 M200 820 V810"/>
-    <path d="M250 780 V860"/>
-    <path d="M245 780 H255 M245 860 H255"/>
-    <path d="M250 800 H242 M250 820 H242 M250 840 H242"/>
-    <!-- angle / arc annotations -->
-    <path d="M100 80 A40 40 0 0 1 140 100" stroke-dasharray="3 4"/>
-    <path d="M100 80 L130 50 M140 100 L175 85"/>
+  <g stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.6">
+    <circle cx="380" cy="170" r="48"/>
+    <circle cx="380" cy="170" r="30"/>
+    <circle cx="380" cy="170" r="10"/>
+    <path d="M380 122 V218 M332 170 H428"/>
+    <circle cx="430" cy="280" r="22"/>
+    <circle cx="310" cy="320" r="16"/>
+    <path d="M380 170 L430 280 L310 320 Z"/>
+    <path d="M30 850 H250"/>
+    <path d="M30 842 V858 M250 842 V858"/>
+    <path d="M80 850 V835 M130 850 V835 M180 850 V835 M220 850 V835"/>
+    <path d="M280 820 H450 M280 820 V860 M450 820 V860"/>
+    <path d="M320 840 H410" stroke-dasharray="6 4"/>
   </g>
-  <g stroke="#ffffff" stroke-opacity="0.22" stroke-width="0.8">
-    <!-- fine grid patches -->
-    <path d="M20 40 H160 M20 55 H160 M20 70 H160 M20 85 H160 M20 100 H160"/>
-    <path d="M35 30 V115 M50 30 V115 M65 30 V115 M80 30 V115 M95 30 V115 M110 30 V115 M125 30 V115 M140 30 V115"/>
-    <path d="M300 520 H440 M300 535 H440 M300 550 H440 M300 565 H440 M300 580 H440"/>
-    <path d="M315 510 V595 M330 510 V595 M345 510 V595 M360 510 V595 M375 510 V595 M390 510 V595 M405 510 V595 M420 510 V595"/>
-    <!-- dashed construction lines -->
-    <path d="M20 400 H200" stroke-dasharray="5 7"/>
-    <path d="M280 380 V480" stroke-dasharray="4 6"/>
-    <path d="M30 250 C80 270 120 290 160 340" stroke-dasharray="3 5"/>
-  </g>
-  <g stroke="#c8c8c8" stroke-opacity="0.45" stroke-width="1.1" stroke-linecap="round">
-    <!-- column elevation -->
-    <rect x="320" y="620" width="28" height="160" rx="1"/>
-    <path d="M310 620 H358 M310 780 H358"/>
-    <path d="M320 660 H348 M320 700 H348 M320 740 H348" stroke-opacity="0.3"/>
-    <!-- staircase sketch -->
-    <path d="M380 650 H430 V670 H400 V690 H430 V710 H400 V730 H430 V750 H380"/>
-    <!-- small floor plan inset -->
-    <rect x="40" y="40" width="70" height="50"/>
-    <path d="M40 65 H110 M75 40 V90"/>
-    <path d="M55 55 H70 V75 H55 Z" stroke-opacity="0.5"/>
-  </g>
-  <g stroke="#b8b8b8" stroke-opacity="0.35" stroke-width="0.9">
-    <!-- perspective vanishing rays -->
-    <path d="M480 450 L200 200"/>
-    <path d="M480 450 L180 500"/>
-    <path d="M480 450 L220 700"/>
-    <!-- bolt circle detail -->
-    <circle cx="400" cy="400" r="32"/>
-    <circle cx="400" cy="400" r="6"/>
-    <circle cx="400" cy="378" r="3"/>
-    <circle cx="400" cy="422" r="3"/>
-    <circle cx="378" cy="400" r="3"/>
-    <circle cx="422" cy="400" r="3"/>
+  <g stroke="#ffffff" stroke-opacity="0.35" stroke-width="1">
+    <path d="M20 20 H460 M20 60 H400 M20 880 H460"/>
+    <path d="M20 20 V880 M460 40 V860"/>
   </g>
 </svg>
