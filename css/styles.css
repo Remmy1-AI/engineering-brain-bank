@@ -1035,16 +1035,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .upload-layout, .about-grid { grid-template-columns: 1fr; }
   .dept-grid { grid-template-columns: repeat(2, 1fr); }
   .hero { min-height: auto; padding: 3.5rem 0 2.75rem; }
-  .hero-chalk { width: min(62vw, 480px); display: block; }
-  .hero-chalk img { opacity: 0.75; filter: brightness(1.4) contrast(1.2); }
+  .hero-chalk,
+  .hero-chalk-left,
+  .hero-chalk-right { display: none !important; }
   .search-box { max-width: 100%; width: 100%; }
   .hero-title .hero-line { white-space: nowrap; }
 }
 
 @media (max-width: 560px) {
   .container { width: min(100% - 2rem, var(--max)); }
-  .hero-chalk { width: 70vw; display: block; opacity: 1; }
-  .hero-chalk img { opacity: 0.72; filter: brightness(1.45) contrast(1.25); }
+  .hero-chalk,
+  .hero-chalk-left,
+  .hero-chalk-right { display: none !important; }
   .hero-swoosh { left: -8%; right: -12%; }
   .hero-title { font-size: clamp(1.85rem, 11vw, 2.75rem); }
 
