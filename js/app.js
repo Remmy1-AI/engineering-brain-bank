@@ -26,17 +26,23 @@
 </svg>`;
 
   const SWOOSH_SVG = `
-<svg class="swoosh" viewBox="0 0 420 28" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M4 18 C60 8, 140 6, 210 10 C280 14, 350 8, 416 14 L410 22 C340 14, 270 22, 200 18 C130 14, 60 16, 8 24 Z"
-        fill="#FFB800" opacity="0.95"/>
+<svg class="swoosh" viewBox="0 0 520 56" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path fill="#FFB800" d="M8 34 C40 22,78 16,120 18 C170 20,210 28,260 30 C320 32,370 22,420 18 C450 16,480 20,508 28 L512 34 C490 42,460 48,430 46 C380 44,340 52,290 50 C240 48,190 40,140 36 C100 34,60 36,28 44 C18 46,10 42,8 34 Z"/>
+  <path fill="#FFB800" opacity="0.92" d="M90 16 C100 10,112 12,118 18 C108 20,98 20,90 16 Z M200 22 C212 14,228 16,234 24 C220 26,208 26,200 22 Z M340 16 C352 8,370 10,378 18 C362 22,348 22,340 16 Z M450 14 C462 8,478 12,484 20 C470 22,456 20,450 14 Z"/>
+  <path fill="#FFB800" opacity="0.88" d="M60 40 C70 48,82 50,90 44 C78 42,68 40,60 40 Z M180 44 C192 52,208 54,216 46 C200 44,188 42,180 44 Z M300 48 C314 56,330 54,338 46 C322 46,308 46,300 48 Z M410 44 C424 52,442 50,450 42 C434 42,418 42,410 44 Z M480 36 C492 44,504 42,510 34 C498 34,486 34,480 36 Z"/>
+  <path fill="#FFB800" d="M500 22 L518 18 L514 32 L500 30 Z"/>
 </svg>`;
 
   const ICONS = {
-    slides: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M7 8l1.2 1.2L10.5 7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    notes: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"/><path d="M9 9h6M9 13h6"/></svg>`,
-    "past-questions": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="3.5"/><circle cx="16" cy="14" r="3"/><path d="M3.5 19c.8-2.2 2.8-3.5 5.5-3.5s4.7 1.3 5.5 3.5M13 10.5c.6-1.5 2-2.5 3.5-2.5"/></svg>`,
-    shared: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7h8v3H8zM8 14h8v3H8z"/><path d="M12 3v18M5 12h14"/></svg>`,
-    search: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>`,
+    // checklist / clipboard with ticks
+    slides: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3.5h6v2.5H9z"/><path d="M8.5 11l1.5 1.5 3-3"/><path d="M8.5 16l1.5 1.5 3-3"/></svg>`,
+    // circular seal / medallion
+    notes: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><path d="M12 8.5v3l2 1.5"/><path d="M12 3.2v1.6M12 19.2v1.6M3.2 12h1.6M19.2 12h1.6"/></svg>`,
+    // people / two silhouettes
+    "past-questions": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><circle cx="16.5" cy="9.5" r="2.6"/><path d="M3.5 19.5c.7-2.8 3-4.5 5.5-4.5s4.8 1.7 5.5 4.5"/><path d="M13.8 15.2c.9-1.5 2.4-2.4 4.2-2.4 1.5 0 2.8.5 3.7 1.5"/></svg>`,
+    // structural H-beam / bridge
+    shared: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 18h16"/><path d="M6 6v12M18 6v12"/><path d="M6 12h12"/><path d="M9 9v6M15 9v6"/><path d="M3 20c2-3 5-4.5 9-4.5S19 17 21 20" opacity="0.85"/></svg>`,
+    search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>`,
   };
 
   function injectChrome() {
@@ -64,7 +70,9 @@
           </nav>
           <div class="header-actions">
             <a class="icon-btn" href="./resources.html" aria-label="Search resources" title="Search">${ICONS.search}</a>
-            <span class="icon-btn pill" aria-hidden="true">Student</span>
+            <form class="header-search-form" action="./resources.html" method="get" role="search">
+              <input class="header-search" type="search" name="q" placeholder="" aria-label="Search" />
+            </form>
             <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
@@ -246,17 +254,16 @@
         }
       });
       recentList.innerHTML = ordered.slice(0, 6).map((c) => {
-        const dept = EBB.getDepartment(c.department);
         return `<a class="recent-item" href="./course.html?id=${c.id}">
           <span class="recent-code">${c.code}</span>
           <span class="recent-name">${c.name}</span>
-          <span class="recent-meta">${dept ? dept.short : ""} · L${c.level}</span>
         </a>`;
       }).join("");
     }
 
     // Inject swoosh into hero title if present
-    const swooshWord = qs(".swoosh-word");
+    const swooshWord = null; // PNG swoosh in HTML; skip SVG inject
+    const _swooshWordUnused = qs(".swoosh-word");
     if (swooshWord && !swooshWord.querySelector(".swoosh")) {
       swooshWord.insertAdjacentHTML("beforeend", SWOOSH_SVG);
     }

@@ -7,7 +7,7 @@
   <meta name="description" content="Your one-stop platform for engineering course slides, notes, and past questions. Learn • Share • Succeed." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
 <body data-page="home">
@@ -16,12 +16,24 @@
 
   <main class="main" id="main">
     <section class="hero">
+      <div class="hero-chalk hero-chalk-left" aria-hidden="true">
+        <img src="./assets/hero-chalk-left.png" alt="" />
+      </div>
+      <div class="hero-chalk hero-chalk-right" aria-hidden="true">
+        <img src="./assets/hero-chalk-right.png" alt="" />
+      </div>
       <div class="hero-blueprint" aria-hidden="true"></div>
       <div class="container">
-        <h1 class="hero-title">
-          ENGINEERING<br />
-          <span class="swoosh-wrap swoosh-word">BRAIN BANK</span>
-        </h1>
+        <div class="hero-title-block">
+          <div class="hero-swoosh" aria-hidden="true">
+            <img src="./assets/hero-gold-swoosh.png" alt="" />
+          </div>
+          <div class="hero-glow" aria-hidden="true"></div>
+          <h1 class="hero-title">
+            <span class="hero-line">ENGINEERING</span>
+            <span class="hero-line">BRAIN BANK</span>
+          </h1>
+        </div>
         <p class="hero-tagline">Learn<span class="dot"> • </span>Share<span class="dot"> • </span>Succeed</p>
         <p class="hero-purpose">Your one-stop platform for engineering course slides, notes, and past questions.</p>
 
@@ -36,7 +48,7 @@
               aria-controls="search-results"
             />
             <button type="submit" class="search-submit" aria-label="Search">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.6" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
               </svg>
             </button>
@@ -52,7 +64,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" style="padding-top:1.25rem;padding-bottom:1.75rem">
       <div class="container">
         <div class="feature-grid" id="feature-grid"></div>
       </div>

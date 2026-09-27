@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" fill="none">
+  <g stroke="#ffffff" stroke-opacity="0.11" stroke-width="1">
+    <!-- left structural frame -->
+    <circle cx="120" cy="180" r="48"/>
+    <circle cx="120" cy="180" r="28"/>
+    <circle cx="120" cy="180" r="4" fill="#ffffff" fill-opacity="0.12" stroke="none"/>
+    <circle cx="260" cy="110" r="22"/>
+    <circle cx="300" cy="280" r="34"/>
+    <circle cx="80" cy="340" r="16"/>
+    <path d="M120 180 L260 110 L300 280 L120 180"/>
+    <path d="M120 180 L80 340 M300 280 L200 400 M200 400 L80 340"/>
+    <circle cx="200" cy="400" r="8"/>
+    <path d="M40 520 L160 460 L220 580 L100 640 Z"/>
+    <path d="M260 500 Q360 420 420 560"/>
+    <rect x="300" y="140" width="90" height="60" rx="2"/>
+    <path d="M345 140 V90 H420"/>
+    <path d="M60 80 H180 M60 80 V160"/>
+    <path d="M40 40 H220 M40 40 V120"/>
+    <!-- dimension ticks -->
+    <path d="M50 700 H280 M50 695 V705 M280 695 V705"/>
+    <path d="M320 650 H520 M320 645 V655 M520 645 V655"/>
+    <!-- truss -->
+    <path d="M80 750 L160 680 L240 750 L160 820 Z"/>
+    <path d="M160 680 V820 M80 750 H240"/>
+    <!-- right side schematics -->
+    <circle cx="1180" cy="160" r="40"/>
+    <circle cx="1180" cy="160" r="18"/>
+    <circle cx="1280" cy="260" r="24"/>
+    <circle cx="1080" cy="300" r="30"/>
+    <path d="M1180 160 L1280 260 L1080 300 L1180 160"/>
+    <path d="M1280 260 L1340 360 M1080 300 L1000 400 L1120 460"/>
+    <circle cx="1000" cy="400" r="7"/>
+    <path d="M1220 420 L1320 480 L1260 580 L1160 520 Z"/>
+    <rect x="1040" y="520" width="80" height="50"/>
+    <path d="M1100 80 L1220 50 L1300 120"/>
+    <path d="M980 80 H1200 M980 80 V200"/>
+    <!-- center faint arcs -->
+    <circle cx="700" cy="420" r="180"/>
+    <circle cx="700" cy="420" r="120"/>
+    <path d="M520 420 H880 M700 240 V600"/>
+    <!-- beam detail mid-left -->
+    <path d="M380 360 H520 V400 H380 Z M380 380 H520"/>
+    <path d="M450 320 V440"/>
+    <!-- handwritten-ish annotation lines -->
+    <path d="M180 220 C220 240 240 260 260 300" stroke-dasharray="4 6"/>
+    <path d="M1100 340 C1140 360 1180 380 1220 420" stroke-dasharray="4 6"/>
+    <!-- grid patches -->
+    <path d="M980 620 H1180 M980 640 H1180 M980 660 H1180 M980 680 H1180 M1000 600 V700 M1020 600 V700 M1040 600 V700 M1060 600 V700"/>
+    <path d="M160 560 H320 M160 580 H320 M160 600 H320 M180 540 V620 M200 540 V620 M220 540 V620"/>
+  </g>
+  <g stroke="#ffffff" stroke-opacity="0.07" stroke-width="0.8">
+    <!-- fine grid overlay patches -->
+    <path d="M0 200 H400 M0 220 H400 M0 240 H400 M0 260 H400 M20 180 V280 M40 180 V280 M60 180 V280 M80 180 V280"/>
+    <path d="M1000 100 H1400 M1000 120 H1400 M1000 140 H1400 M1020 80 V180 M1040 80 V180 M1060 80 V180"/>
+  </g>
+</svg>
