@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Engineering Brain Bank | KB4GESA · Korle Boye</title>
+  <meta name="description" content="Your one-stop platform for engineering course slides, notes, and past questions. Learn • Share • Succeed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="site-header"></header>
+
+  <main class="main" id="main">
+    <section class="hero">
+      <div class="hero-blueprint" aria-hidden="true"></div>
+      <div class="container">
+        <h1 class="hero-title">
+          ENGINEERING<br />
+          <span class="swoosh-wrap swoosh-word">BRAIN BANK</span>
+        </h1>
+        <p class="hero-tagline">Learn<span class="dot"> • </span>Share<span class="dot"> • </span>Succeed</p>
+        <p class="hero-purpose">Your one-stop platform for engineering course slides, notes, and past questions.</p>
+
+        <div class="search-box">
+          <form id="hero-search-form" role="search" aria-label="Ask the Brain Bank">
+            <input
+              id="hero-search"
+              type="search"
+              placeholder="Ask the Brain Bank / search course codes"
+              autocomplete="off"
+              aria-autocomplete="list"
+              aria-controls="search-results"
+            />
+            <button type="submit" class="search-submit" aria-label="Search">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+              </svg>
+            </button>
+          </form>
+          <div id="search-results" class="search-results" role="listbox" aria-label="Search results"></div>
+        </div>
+
+        <div class="hero-ctas">
+          <a class="btn btn-primary btn-lg" href="./courses.html">Browse Courses</a>
+          <a class="btn btn-ghost btn-lg" href="./upload.html">Upload Material</a>
+        </div>
+        <p class="hero-closing">From Korle Boye, For Korle Boye.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="feature-grid" id="feature-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0.5rem">
+      <div class="container">
+        <h2 class="section-title">Browse by Department</h2>
+        <div class="dept-grid" id="dept-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0.75rem">
+      <div class="container">
+        <h2 class="section-title">Recently Added</h2>
+        <div class="recent-list" id="recent-list"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="contribute-band">
+          <div>
+            <h2>Contribute to the Brain Bank</h2>
+            <p>Have lecture slides or useful academic materials? Help another engineering student by sharing.</p>
+          </div>
+          <a class="btn btn-primary" href="./upload.html">Upload Material</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload Material | Engineering Brain Bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body data-page="upload">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="site-header"></header>
+  <main class="main" id="main">
+    <section class="page-hero">
+      <div class="hero-blueprint" aria-hidden="true"></div>
+      <div class="container" style="position:relative;z-index:1">
+        <h1>Upload Material</h1>
+        <p>Share slides, notes, or past questions. Submissions go through a light review before publishing.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container upload-layout">
+        <form class="form-card" id="upload-form" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="up-dept">Department *</label>
+              <select id="up-dept" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-level">Level *</label>
+              <select id="up-level" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-sem">Semester *</label>
+              <select id="up-sem" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-type">Material Type *</label>
+              <select id="up-type" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-code">Course Code *</label>
+              <input id="up-code" class="form-control" type="text" placeholder="e.g. CE 403" required />
+            </div>
+            <div class="form-group">
+              <label for="up-name">Course Name *</label>
+              <input id="up-name" class="form-control" type="text" placeholder="e.g. Structural Analysis" required />
+            </div>
+            <div class="form-group full">
+              <label for="up-topic">Topic *</label>
+              <input id="up-topic" class="form-control" type="text" placeholder="e.g. Slope Stability" required />
+            </div>
+            <div class="form-group full">
+              <label for="up-lecturer">Lecturer *</label>
+              <input id="up-lecturer" class="form-control" type="text" placeholder="Lecturer name" required />
+            </div>
+            <div class="form-group full">
+              <label>File *</label>
+              <div class="file-drop" id="file-drop" role="button" tabindex="0">
+                <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.zip,.png,.jpg" />
+                <p>Drop a file here or click to browse</p>
+                <p class="hint">PDF, PPT, DOC, ZIP — max demo size unlimited (client-only)</p>
+                <div class="file-name" id="file-name"></div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button type="submit" class="btn btn-primary">Submit for Review</button>
+            <button type="reset" class="btn btn-ghost">Clear</button>
+          </div>
+        </form>
+        <aside class="info-card">
+          <h3>Why contribute?</h3>
+          <ul>
+            <li><strong style="color:#fff">Easy upload</strong> — fill the form, attach your file, done.</li>
+            <li><strong style="color:#fff">Review process</strong> — materials are checked before going live.</li>
+            <li><strong style="color:#fff">Help others</strong> — one share can save a classmate hours.</li>
+          </ul>
+          <p style="margin-top:1.25rem;font-size:0.88rem;color:var(--text-dim)">
+            Organization: Department → Level → Semester → Course → Topic → Material
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" id="site-footer"></footer>
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

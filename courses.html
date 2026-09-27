@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Courses | Engineering Brain Bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body data-page="courses">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="site-header"></header>
+  <main class="main" id="main">
+    <section class="page-hero">
+      <div class="hero-blueprint" aria-hidden="true"></div>
+      <div class="container" style="position:relative;z-index:1">
+        <h1>Courses</h1>
+        <p>Browse by department → level → semester → course. Find slides, notes, and past questions fast.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="toolbar">
+          <select id="filter-dept" class="form-control" aria-label="Department"></select>
+          <select id="filter-level" class="form-control" aria-label="Level"></select>
+          <input id="filter-q" type="search" class="form-control" placeholder="Search course code or name…" />
+          <span id="course-count" style="color:var(--text-dim);font-size:0.9rem;margin-left:auto"></span>
+        </div>
+        <div class="course-grid" id="course-grid"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" id="site-footer"></footer>
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
