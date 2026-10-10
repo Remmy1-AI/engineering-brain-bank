@@ -1,0 +1,20 @@
+ LINKS TO ALGEBRA TUTORIAL VIDEOS
+
+1. Likely examinble questions from former teaching assistant: https://youtube.com/playlist?list=PLP2H0OX7dwyIE7_bxG4JFmq5ie7ZCTen6
+
+
+2. Complex numbers
+
+	Imaginary number ; https://youtu.be/vRJqPo_zcnQ
+	
+	Complex numbers(Basic Operations) ; https://youtu.be/OQz1ydBcQSA
+	
+	Complex numbers( Practice problems) ; https://youtu.be/y2wPAZwZTng
+	
+	De Moivre's Theorem ; https://youtu.be/J6TnZxUUzqU
+
+3. Eigen values and vectors ; https://youtu.be/G4N8vJpf7hM
+					https://youtu.be/IdsV0RaC9jM
+
+4. Mathematics algebra for engineers ;Playlist ; https://youtube.com/playlist?list=PLkZjai-2Jcxlg-Z1roB0pUwFU-P58tvOx
+
