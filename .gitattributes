@@ -1,1 +1,5 @@
 materials/year-1/MATH-152-Calculus-with-several-variables/notes/Kreyszig[[:space:]]-[[:space:]]Advanced[[:space:]]Engineering[[:space:]]Mathematics[[:space:]]9e[[:space:]]-[[:space:]]BW.pdf filter=lfs diff=lfs merge=lfs -text
+materials/year-2/ME-255-Strength-of-Materials-I/notes/Machine[[:space:]]Elements[[:space:]]In[[:space:]]Mechanical[[:space:]]Design.pdf filter=lfs diff=lfs merge=lfs -text
+materials/year-2/ME-255-Strength-of-Materials-I/notes/Mechanics[[:space:]]of[[:space:]]Materials[[:space:]]8th[[:space:]]Edition,[[:space:]]R.C.[[:space:]]Hibbeler.pdf filter=lfs diff=lfs merge=lfs -text
+materials/year-2/EE-252-Electrical-Engineering-Machines/notes/-B._Teraja-_Textbook_of_Electrical_Technology_AC_(BookFi)[[:space:]]-[[:space:]]Copy.pdf filter=lfs diff=lfs merge=lfs -text
+materials/year-2/ME-259-Applications-of-Computer-Graphics/videos/20220510[[:space:]]Simulation[[:space:]]for[[:space:]]Cantilever.camrec filter=lfs diff=lfs merge=lfs -text

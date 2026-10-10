@@ -1,0 +1,79 @@
+CALCULUS WITH ANALYSIS
+
+NB: COPY AND PASTE LINK IN BROWSER
+
+1. INTRODUCTION TO REAL NUMBERS, INEQUALITIES, ABSOLUTE VALUE :  https://youtu.be/97aBhFxlLWg
+
+
+2. Introduction to limits :  https://youtu.be/YNstP0ESndU
+
+   Limits of multivariable functions:  https://youtu.be/E1lMMBpz8YM
+
+
+3. Domain and Range of Functions :  https://youtu.be/KyOQhC8ctxc
+
+
+4. Derivatives of Exponential Functions & Logarithmic Differentiation Calculus lnx, e^2x, x^x, x^sinx :
+						
+	https://youtu.be/zmnh448y_ZU
+
+
+5. Derivatives of Composite Functions - Chain Rule, Product & Quotient Rule
+
+	https://youtu.be/vNXjMTv4vHs
+
+
+6, Partial Derivatives- Multivariable calculus :  https://youtu.be/JAf_aSIJryg
+
+
+7. Chain Rule With Partial Derivatives - Multivariable Calculus :  https://youtu.be/XipB_uEexF0
+
+
+8. Derivatives of Trigonometric Functions - Product Rule Quotient & Chain Rule - Calculus Tutorial
+
+	https://youtu.be/_niP0JaOgHY
+
+
+
+9. Implicit Differentiation Explained - Product Rule, Quotient & Chain Rule - Calculus
+
+	https://youtu.be/LGY-DjFsALc
+
+
+10. Implicit Differentiation Second Derivative Trig Functions & Examples- Calculus
+
+	https://youtu.be/A9CR6XOuQkk
+
+
+11. Basic Integration:  https://youtu.be/o75AqTInKDU
+
+
+12. Integation by U substituton:  https://youtu.be/sdYdnpYn-1o
+
+
+13. Definite Integrals :  https://youtu.be/rCWOdfQ3cwQ
+
+
+14. Local Extrema, Critical Points, & Saddle Points of Multivariable Functions
+
+	https://youtu.be/UID893EosM8
+
+
+15. Lagrange Multiplier :  https://youtu.be/5-CUqogfPLY
+
+
+16. Triple Integrals :  https://youtu.be/7iy83x8bv6o
+
+
+17. Directional derivative:  https://youtu.be/CnVes9TdnPo
+
+
+18. Divergence and curl operator :  https://youtube.com/playlist?list=PLX2gX-ftPVXX8zTeJvCQXPeubJC8HSFYm
+
+
+19. Gradient operator: https://youtu.be/tIpKfDc295M
+
+ 
+20.. Laplacian operator:  https://youtu.be/X6TYgvh0lEY
+
+	

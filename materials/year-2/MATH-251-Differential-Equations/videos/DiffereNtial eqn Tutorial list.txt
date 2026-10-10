@@ -1,0 +1,38 @@
+LIST OF TUTORIAL VIDEOS FOR DIFFERENTIAL EQUATIONS
+
+NB: COPY AND PASTE LINK TO BROWSER
+
+1. 1st order linear diffrential equation :  https://youtu.be/gd1FYn86P0c
+
+							  https://youtu.be/Et4Y41ZNyao
+
+2. Bernoulli's eqn :  https://youtu.be/BoI_ej-T0V4
+
+3. Separation of variables : https://youtu.be/C7nuJcJriWM
+
+4. Homogeneous differential eqns :  https://youtu.be/ZEJVyybsiT4
+
+5. Exact differential eqns :  https://youtu.be/bwASJWS8ltM
+
+					https://youtu.be/_c3iEPReTVQ
+
+					https://youtu.be/7zOMnC-BAFY
+
+6. Non Exact differential equations :  https://youtu.be/eP9UZGwbVZM
+					
+
+7. 2nd order linear diffential eqns :  https://youtu.be/uI2xt8nTOlQ
+
+8. Non homogeneous differential eqns : Method of undetermined coefficients  :  https://youtu.be/P3fc6v191mA
+
+						   	Variation of Parameters :            https://youtu.be/Ik3YW1JGr_A
+
+
+9. Applications of Differential eqns (Full palylist) :  https://youtube.com/playlist?list=PLROOIV7hGpZjBLjSR3Bizjodk2oPIIRa0
+
+	I. Exponential Growth and Decay Calculus, Relative Growth Rate, Differential Equations, Word Problems : https://youtu.be/M9rcYTuFG4w
+
+	II. Newton's Law of Cooling Calculus, Example Problems, Differential Equations :  https://youtu.be/ejEXSjdMpck
+
+
+10. Laplace Transform :  https://youtube.com/playlist?list=PLnVYEpTNGNtVH5YLVJsA2WxWXk6bAps-D
