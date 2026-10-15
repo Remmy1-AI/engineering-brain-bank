@@ -1,15 +1,18 @@
-/* Engineering Brain Bank — AceWithBoye share card (canvas)
-   Custom layout: Boye hero ON TOP over engineering drawings,
-   course/file details in a gold-ruled band below. */
+/* Engineering Brain Bank — AceWithBoye share card (from-scratch layout)
+   Left: Boye in a cool blueprint panel (inset, not edge-pinned)
+   Right: mist accent + oversized course code + name + brand */
 (function () {
   "use strict";
 
   const W = 1200;
   const H = 630;
-  const GOLD = "#FFB800";
-  const WHITE = "#FFFFFF";
-  const BG = "#050507";
-  const HERO_H = 360;
+  const LEFT = 540;
+  const BG = "#080a0e";
+  const PANEL = "#0b0e14";
+  const MIST = "#78c8dc";
+  const WHITE = "#f8fafc";
+  const MUTE = "#828c96";
+  const FOOT = "#555f69";
 
   const TYPE_LABELS = {
     slides: "Course Slides",
@@ -60,32 +63,8 @@
     return _loading;
   }
 
-  function titleLines(ctx, title, maxWidth) {
-    const raw = String(title || "").trim();
-    const split = raw.split(/\s*[—–-]\s*/);
-    if (split.length >= 2 && split[0].length <= 18) {
-      const first = split[0] + " —";
-      const rest = split.slice(1).join(" — ");
-      if (ctx.measureText(first + " " + rest).width <= maxWidth) {
-        return [first + " " + rest];
-      }
-      const lines = [first];
-      const words = rest.split(/\s+/);
-      let cur = "";
-      for (const word of words) {
-        const test = cur ? cur + " " + word : word;
-        if (ctx.measureText(test).width <= maxWidth) cur = test;
-        else {
-          if (cur) lines.push(cur);
-          cur = word;
-          if (lines.length >= 2) break;
-        }
-      }
-      if (cur && lines.length < 2) lines.push(cur);
-      return lines.slice(0, 2);
-    }
-    if (ctx.measureText(raw).width <= maxWidth) return [raw];
-    const words = raw.split(/\s+/).filter(Boolean);
+  function wrapLines(ctx, text, maxWidth, maxLines) {
+    const words = String(text || "").split(/\s+/).filter(Boolean);
     const lines = [];
     let cur = "";
     for (const word of words) {
@@ -94,25 +73,26 @@
       else {
         if (cur) lines.push(cur);
         cur = word;
-        if (lines.length >= 2) break;
+        if (lines.length >= maxLines) break;
       }
     }
-    if (cur && lines.length < 2) lines.push(cur);
-    return lines.length ? lines : [raw.slice(0, 40)];
+    if (cur && lines.length < maxLines) lines.push(cur);
+    return lines.length ? lines : [String(text || "").slice(0, 36)];
   }
 
-  function drawGoldGlow(ctx, cx, cy) {
-    const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 320);
-    g.addColorStop(0, "rgba(255,184,0,0.22)");
-    g.addColorStop(0.45, "rgba(255,184,0,0.06)");
-    g.addColorStop(1, "rgba(255,184,0,0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, HERO_H + 40);
+  function splitCodeName(title) {
+    const raw = String(title || "").trim();
+    const m = raw.match(/^([A-Za-z]{1,6}\s*\d{2,4})\s*[—–-]\s*(.+)$/);
+    if (m) return { code: m[1].replace(/\s+/g, " ").trim(), name: m[2].trim() };
+    const parts = raw.split(/\s*[—–-]\s*/);
+    if (parts.length >= 2 && parts[0].length <= 16) {
+      return { code: parts[0].trim(), name: parts.slice(1).join(" — ").trim() };
+    }
+    return { code: raw.slice(0, 18) || "EBB", name: raw };
   }
 
   /**
    * @param {{ typeLabel?: string, type?: string, title: string, footer?: string }} opts
-   * @returns {Promise<HTMLCanvasElement>}
    */
   async function renderCard(opts) {
     await ensureAssets();
@@ -121,92 +101,117 @@
     canvas.height = H;
     const ctx = canvas.getContext("2d");
 
+    // Base
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, W, H);
 
-    // Engineering drawings across the hero zone
+    // Left panel
+    ctx.fillStyle = PANEL;
+    ctx.fillRect(0, 0, LEFT, H);
+
+    // Blueprint inside left panel only
     if (_blueprint) {
       ctx.save();
-      ctx.globalAlpha = 0.42;
-      // mirror-tile across width
-      const bpW = Math.ceil(W / 2);
-      ctx.drawImage(_blueprint, 0, 0, bpW, HERO_H + 40);
-      ctx.save();
-      ctx.translate(W, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(_blueprint, 0, 0, bpW, HERO_H + 40);
-      ctx.restore();
+      ctx.globalAlpha = 0.32;
+      ctx.drawImage(_blueprint, 0, 0, LEFT, H);
       ctx.restore();
     }
 
-    drawGoldGlow(ctx, W / 2, HERO_H * 0.55);
+    // Soft left vignette
+    const vig = ctx.createLinearGradient(0, 0, LEFT, 0);
+    vig.addColorStop(0, "rgba(0,0,0,0.35)");
+    vig.addColorStop(0.2, "rgba(0,0,0,0)");
+    vig.addColorStop(0.8, "rgba(0,0,0,0)");
+    vig.addColorStop(1, "rgba(0,0,0,0.25)");
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, LEFT, H);
 
-    // Boye — large, centered on TOP, tucked into the gold rule
-    const bw = 460;
-    const bh = (_boye.naturalHeight / _boye.naturalWidth) * bw;
-    const bx = (W - bw) / 2;
-    const by = HERO_H - bh + 36;
-    // soft ground shadow
+    // Boye — centered in left panel, not flush to edge
+    let bh = H * 0.93;
+    let bw = (_boye.naturalWidth / _boye.naturalHeight) * bh;
+    const maxBw = LEFT * 0.78;
+    if (bw > maxBw) {
+      const s = maxBw / bw;
+      bw *= s;
+      bh *= s;
+    }
+    let bx = (LEFT - bw) / 2;
+    if (bx < 40) bx = 40;
+    const by = H - bh;
     ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
     ctx.beginPath();
-    ctx.ellipse(W / 2, HERO_H + 6, bw * 0.38, 16, 0, 0, Math.PI * 2);
+    ctx.ellipse(bx + bw / 2, H - 8, bw * 0.36, 14, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     ctx.drawImage(_boye, bx, by, bw, bh);
 
-    // AceWithBoye wordmark — top left
-    const wh = 34;
-    const wr = wh / _wordmark.naturalHeight;
-    const ww = _wordmark.naturalWidth * wr;
-    ctx.drawImage(_wordmark, 36, 22, ww, wh);
-
-    // Bottom info band
-    ctx.fillStyle = "rgba(8,8,10,0.98)";
-    ctx.fillRect(0, HERO_H, W, H - HERO_H);
-    ctx.fillStyle = GOLD;
-    ctx.fillRect(0, HERO_H, W, 4);
-
-    // Corner bracket
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 2;
+    // Seam hairline
+    ctx.strokeStyle = "rgba(120,200,220,0.28)";
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(W - 34, HERO_H + 14);
-    ctx.lineTo(W - 14, HERO_H + 14);
-    ctx.lineTo(W - 14, HERO_H + 34);
+    ctx.moveTo(LEFT, 56);
+    ctx.lineTo(LEFT, H - 56);
     ctx.stroke();
 
     const typeLabel =
       opts.typeLabel ||
       TYPE_LABELS[opts.type] ||
       (opts.type ? String(opts.type) : "Material");
-    const title = opts.title || "Engineering Brain Bank";
+    const { code, name } = splitCodeName(opts.title || "Engineering Brain Bank");
     const footer = opts.footer || "Engineering Brain Bank · KB4GESA";
 
-    const pad = 44;
-    let y = HERO_H + 22;
-
+    // Giant mist watermark
+    ctx.save();
+    ctx.globalAlpha = 0.09;
+    ctx.fillStyle = MIST;
+    ctx.font = "800 150px Inter, system-ui, sans-serif";
     ctx.textBaseline = "top";
-    ctx.fillStyle = GOLD;
-    ctx.font = "600 22px Inter, system-ui, sans-serif";
-    ctx.fillText(typeLabel, pad, y);
-    const typeW = ctx.measureText(typeLabel).width;
-    ctx.fillRect(pad, y + 26, Math.max(40, typeW), 2);
-    y += 40;
+    ctx.fillText(code, LEFT + 20, 200);
+    ctx.restore();
+
+    // Right stack
+    const tx = LEFT + 56;
+    const maxTextW = W - tx - 48;
+    ctx.textBaseline = "top";
+    ctx.font = "700 15px ui-monospace, SFMono-Regular, Menlo, monospace";
+    const nameLines = (() => {
+      ctx.font = "500 27px Inter, system-ui, sans-serif";
+      return wrapLines(ctx, name, maxTextW, 3);
+    })();
+
+    const stackH = 26 + 22 + 84 + nameLines.length * 34;
+    let y = (H - stackH) / 2 - 10;
+
+    ctx.fillStyle = MIST;
+    ctx.font = "700 15px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.fillText(String(typeLabel).toUpperCase(), tx, y);
+    y += 26;
+    ctx.fillRect(tx, y, 56, 3);
+    y += 22;
 
     ctx.fillStyle = WHITE;
-    ctx.font = "italic 800 42px Inter, system-ui, sans-serif";
-    const lines = titleLines(ctx, title, W - pad * 2 - 160);
-    lines.forEach((line) => {
-      ctx.fillText(line, pad, y);
-      y += 48;
+    ctx.font = "800 68px Inter, system-ui, sans-serif";
+    ctx.fillText(code, tx, y);
+    y += 84;
+
+    ctx.fillStyle = MUTE;
+    ctx.font = "500 27px Inter, system-ui, sans-serif";
+    nameLines.forEach((line) => {
+      ctx.fillText(line, tx, y);
+      y += 34;
     });
 
-    ctx.fillStyle = "rgba(180,180,180,0.95)";
-    ctx.font = "500 15px Inter, system-ui, sans-serif";
+    // Brand
+    const wh = 38;
+    const wr = wh / _wordmark.naturalHeight;
+    const ww = _wordmark.naturalWidth * wr;
+    ctx.drawImage(_wordmark, tx, H - 78, ww, wh);
+
+    ctx.fillStyle = FOOT;
+    ctx.font = "500 13px Inter, system-ui, sans-serif";
     ctx.textBaseline = "bottom";
-    const fw = ctx.measureText(footer).width;
-    ctx.fillText(footer, W - fw - 36, H - 22);
+    ctx.fillText(footer, tx, H - 24);
 
     return canvas;
   }
@@ -243,8 +248,14 @@
     const file = new File([blob], `acewithboye-${safe}.jpg`, {
       type: "image/jpeg",
     });
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
-    return { blob, file, dataUrl, title, typeLabel, canvas };
+    return {
+      blob,
+      file,
+      dataUrl: canvas.toDataURL("image/jpeg", 0.92),
+      title,
+      typeLabel,
+      canvas,
+    };
   }
 
   window.EBBOgCard = {
