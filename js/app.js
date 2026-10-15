@@ -247,26 +247,32 @@
     if (title) title.textContent = m.title || m.fileName || "Material";
     const downloadUrl = resolveDownloadUrl(m) || url;
     if (dl) {
-      dl.href = downloadUrl;
-      dl.setAttribute("download", m.fileName || "download");
+      // Stay on-site: trigger our download handler, don't navigate away
+      dl.removeAttribute("href");
+      dl.removeAttribute("target");
+      dl.onclick = (e) => {
+        e.preventDefault();
+        openOrDownloadMaterial(m, "download");
+      };
     }
     const isVideo = EBBApi.isVideoMaterial(m);
     const isImage = EBBApi.isImageMaterial(m);
-    const isDrive = /drive\.google\.com/i.test(url);
-    if (isVideo && isDrive) {
-      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}" allow="autoplay" allowfullscreen title="Video"></iframe>
-        <p class="media-modal__hint">Watch here, or download the file to keep offline.</p>`;
-    } else if (isVideo) {
-      body.innerHTML = `<video class="media-modal__video" controls playsinline src="${escapeAttr(url)}"></video>
-        <p class="media-modal__hint">Watch here, or download the file to keep offline.</p>`;
-    } else if (isImage && !isDrive) {
+    const name = (m.fileName || "").toLowerCase();
+    const isPdf = (m.mime_type || "").includes("pdf") || name.endsWith(".pdf");
+    if (isVideo) {
+      body.innerHTML = `<video class="media-modal__video" controls playsinline preload="metadata" src="${escapeAttr(url)}"></video>
+        <p class="media-modal__hint">Playing on Engineering Brain Bank. Download anytime.</p>`;
+    } else if (isImage) {
       body.innerHTML = `<img class="media-modal__img" src="${escapeAttr(url)}" alt="${escapeAttr(m.title || "")}" />`;
-    } else if (isDrive) {
-      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}" allowfullscreen title="Document"></iframe>
+    } else if (isPdf) {
+      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}#toolbar=1" title="PDF preview"></iframe>
         <p class="media-modal__hint">Preview on site. Use Download to save a copy.</p>`;
     } else {
-      body.innerHTML = `<p class="media-modal__hint">Preview opens in a new tab. You can also download.</p>
-        <p><a class="btn btn-primary" href="${escapeAttr(url)}" target="_blank" rel="noopener">Open file</a></p>`;
+      body.innerHTML = `<p class="media-modal__hint">This file type previews best after download (still stays on our flow).</p>
+        <button type="button" class="btn btn-primary" data-mat-inline-dl="1">Download ${escapeAttr(m.fileName || "file")}</button>`;
+      body.querySelector("[data-mat-inline-dl]")?.addEventListener("click", () => {
+        openOrDownloadMaterial(m, "download");
+      });
     }
     modal.hidden = false;
     document.body.classList.add("modal-open");
@@ -301,6 +307,34 @@
     }
   }
 
+  async function downloadOnSite(m, url) {
+    const name = m.fileName || "download";
+    showToast("Preparing download: " + name);
+    try {
+      const res = await fetch(url, { mode: "cors" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const blob = await res.blob();
+      const obj = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = obj;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(obj), 4000);
+      showToast("Download started: " + name);
+    } catch (err) {
+      // CORS fallback: hidden iframe keeps the SPA in place (no Drive tab)
+      console.warn("[EBB] blob download fallback:", err.message || err);
+      const iframe = document.createElement("iframe");
+      iframe.hidden = true;
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      setTimeout(() => iframe.remove(), 60000);
+      showToast("Download started: " + name);
+    }
+  }
+
   async function openOrDownloadMaterial(m, mode) {
     if (m.live && window.EBBApi) {
       const url = resolveMaterialUrl(m);
@@ -308,32 +342,19 @@
         showToast("File URL missing.");
         return;
       }
+      // Never send users to Drive or other sites
+      if (/drive\.google\.com/i.test(url)) {
+        showToast("This file still points at Drive. Make the GitHub repo public and re-seed.");
+        return;
+      }
       if (mode === "download") {
         if (m.id) EBBApi.incrementDownload(m.id);
         const dl = resolveDownloadUrl(m) || url;
-        const a = document.createElement("a");
-        a.href = dl;
-        a.download = m.fileName || "download";
-        a.target = "_blank";
-        a.rel = "noopener";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        showToast("Download started: " + (m.fileName || "file"));
+        await downloadOnSite(m, dl);
         return;
       }
-      // Watch / open — prefer in-page viewer for video + Drive previews
-      if (
-        EBBApi.isVideoMaterial(m) ||
-        EBBApi.isImageMaterial(m) ||
-        /drive\.google\.com/i.test(url)
-      ) {
-        openMediaViewer(m, url);
-        return;
-      }
-      if (m.id) EBBApi.incrementDownload(m.id);
-      window.open(url, "_blank", "noopener");
-      showToast("Opening " + (m.fileName || "file") + "…");
+      // Watch / open entirely in our modal (video, PDF, images)
+      openMediaViewer(m, url);
       return;
     }
     showToast(mode === "download"

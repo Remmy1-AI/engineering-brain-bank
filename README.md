@@ -72,10 +72,11 @@ PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploa
 
 ### Hybrid file hosting (catalog in Supabase)
 
-- **Supabase** holds the materials **catalog** (metadata, publish flag, download/share counts).
-- **File bytes** are linked from `materials/manifest.csv` **Google Drive** URLs (`source = external`), because this GitHub repo is **private** (anonymous `raw.githubusercontent.com` 404s).
-- If the repo is made **public** later, re-seed can fall back to GitHub raw URLs (`source = github`).
-- UI: **Watch / Open** uses Drive preview embeds; **Download** uses Drive `uc?export=download`.
+- **Supabase** = materials **catalog** (metadata, publish flag, download/share counts).
+- **GitHub** `materials/` = file warehouse via  
+  `https://raw.githubusercontent.com/Remmy1-AI/engineering-brain-bank/main/{path}`
+- The repo must be **public** so students can watch/download without logging into GitHub.
+- UI stays on Engineering Brain Bank: in-page **Watch** (video/PDF/image modal) + **Download** (blob save). No Drive redirects.
 
 Re-seed catalog (owner machine; secrets in `~/.config/ebb/supabase.env`, not in repo):
 

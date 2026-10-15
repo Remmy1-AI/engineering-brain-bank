@@ -208,17 +208,10 @@ def main() -> int:
             mtype = TYPE_MAP.get((r.get("type") or "").strip(), "shared")
             name = path.rsplit("/", 1)[-1]
             size = int(r.get("size_bytes") or 0)
-            src_url = (r.get("source_url") or "").strip()
-            drive_view, drive_dl = drive_urls(src_url)
-            if drive_view:
-                # Private GitHub repos cannot serve raw files anonymously.
-                source = "external"
-                external = drive_view
-                download = drive_dl
-            else:
-                source = "github"
-                external = github_url(path)
-                download = external
+            # Always index GitHub raw URLs so Watch/Download stay on our site
+            # (repo must be public for anonymous raw.githubusercontent.com access).
+            # Drive source_url is ignored for serving — kept only in git history/manifest.
+            gh = github_url(path)
             by_path[path] = {
                 "title": title_from_name(name),
                 "description": f"{folder} · {r.get('type') or ''}".strip(" ·")[:1000],
@@ -231,9 +224,9 @@ def main() -> int:
                 "mime_type": mime_for(name),
                 "file_size": size,
                 "published": True,
-                "source": source,
-                "external_url": external,
-                "download_url": download,
+                "source": "github",
+                "external_url": gh,
+                "download_url": gh,
             }
 
     rows_out = list(by_path.values())
