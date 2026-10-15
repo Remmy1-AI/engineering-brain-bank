@@ -1,4 +1,6 @@
-/* Engineering Brain Bank — AceWithBoye share / Open Graph card (canvas) */
+/* Engineering Brain Bank — AceWithBoye share / Open Graph card (canvas)
+   Layout: two halves — Boye centered in LEFT (blueprint behind, not flush),
+   text block centered in RIGHT. */
 (function () {
   "use strict";
 
@@ -6,7 +8,7 @@
   const H = 630;
   const GOLD = "#FFB800";
   const WHITE = "#FFFFFF";
-  const BG = "#080808";
+  const BG = "#000000";
 
   const TYPE_LABELS = {
     slides: "Course Slides",
@@ -19,6 +21,7 @@
 
   let _boye = null;
   let _wordmark = null;
+  let _blueprint = null;
   let _loading = null;
 
   function assetUrl(path) {
@@ -40,75 +43,60 @@
   }
 
   async function ensureAssets() {
-    if (_boye && _wordmark) return;
+    if (_boye && _wordmark && _blueprint) return;
     if (_loading) return _loading;
     _loading = Promise.all([
       loadImage(assetUrl("./assets/og/boye-cutout.png")),
       loadImage(assetUrl("./assets/og/ace-wordmark.png")),
-    ]).then(([boye, wordmark]) => {
+      loadImage(assetUrl("./assets/og/blueprint-left-clean.png")).catch(() =>
+        loadImage(assetUrl("./assets/og/blueprint-from-svg.png"))
+      ),
+    ]).then(([boye, wordmark, blueprint]) => {
       _boye = boye;
       _wordmark = wordmark;
+      _blueprint = blueprint;
     });
     return _loading;
   }
 
-  function wrapText(ctx, text, maxWidth, maxLines) {
-    const words = String(text || "").split(/\s+/).filter(Boolean);
+  /** Prefer "CODE — Name" as two lines, else wrap. */
+  function titleLines(ctx, title, maxWidth) {
+    const raw = String(title || "").trim();
+    const split = raw.split(/\s*[—–-]\s*/);
+    if (split.length >= 2 && split[0].length <= 18) {
+      const first = split[0] + " —";
+      const rest = split.slice(1).join(" — ");
+      const lines = [first];
+      // wrap rest if needed
+      const words = rest.split(/\s+/);
+      let cur = "";
+      for (const word of words) {
+        const test = cur ? cur + " " + word : word;
+        if (ctx.measureText(test).width <= maxWidth) cur = test;
+        else {
+          if (cur) lines.push(cur);
+          cur = word;
+          if (lines.length >= 3) break;
+        }
+      }
+      if (cur && lines.length < 3) lines.push(cur);
+      return lines.slice(0, 3);
+    }
+    // generic wrap
+    const words = raw.split(/\s+/).filter(Boolean);
     const lines = [];
     let cur = "";
     for (const word of words) {
       const test = cur ? cur + " " + word : word;
-      if (ctx.measureText(test).width <= maxWidth) {
-        cur = test;
-      } else {
+      if (ctx.measureText(test).width <= maxWidth) cur = test;
+      else {
         if (cur) lines.push(cur);
         cur = word;
-        if (lines.length >= maxLines) break;
+        if (lines.length >= 3) break;
       }
     }
-    if (cur && lines.length < maxLines) lines.push(cur);
-    if (words.length && lines.length === maxLines) {
-      // ellipsis if truncated
-      let last = lines[maxLines - 1];
-      while (last.length > 3 && ctx.measureText(last + "…").width > maxWidth) {
-        last = last.slice(0, -1);
-      }
-      if (String(text).split(/\s+/).length > words.slice(0, lines.join(" ").split(/\s+/).length).length) {
-        lines[maxLines - 1] = last.replace(/\s+$/, "") + "…";
-      }
-    }
-    return lines.length ? lines : [String(text || "").slice(0, 40)];
-  }
-
-  function drawGrid(ctx) {
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.045)";
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= W; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, H);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= H; y += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
-      ctx.stroke();
-    }
-    // faint blueprint rings
-    ctx.strokeStyle = "rgba(255,255,255,0.07)";
-    ctx.lineWidth = 2;
-    [
-      [920, 180, 110],
-      [1080, 420, 70],
-      [760, 520, 55],
-    ].forEach(([cx, cy, r]) => {
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.stroke();
-    });
-    ctx.restore();
+    if (cur && lines.length < 3) lines.push(cur);
+    return lines.length ? lines : [raw.slice(0, 36)];
   }
 
   /**
@@ -122,15 +110,38 @@
     canvas.height = H;
     const ctx = canvas.getContext("2d");
 
+    // Solid black
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, W, H);
-    drawGrid(ctx);
 
-    // Boye — left, bottom-aligned, slight bleed left (match mockup)
-    const bh = H * 0.98;
-    const br = bh / _boye.naturalHeight;
-    const bw = _boye.naturalWidth * br;
-    const bx = -bw * 0.06;
+    // Engineering drawings — LEFT half only, behind Boye
+    if (_blueprint) {
+      const bpW = Math.round(W * 0.52);
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(_blueprint, 0, 0, bpW, H);
+      ctx.restore();
+    }
+
+    // Boye — centered in LEFT half, breathing room from left edge
+    const leftCenter = W / 4;
+    const minPad = Math.round(W * 0.05);
+    let bh = H * 0.92;
+    let br = bh / _boye.naturalHeight;
+    let bw = _boye.naturalWidth * br;
+    const maxBw = (W / 2) * 0.78;
+    if (bw > maxBw) {
+      const s = maxBw / bw;
+      bw *= s;
+      bh *= s;
+    }
+    let bx = leftCenter - bw / 2;
+    if (bx < minPad) bx = minPad;
+    // keep inside left half with a little gap to the midline
+    if (bx + bw > W / 2 - 8) {
+      bw = W / 2 - 8 - bx;
+      bh = bw * (_boye.naturalHeight / _boye.naturalWidth);
+    }
     const by = H - bh;
     ctx.drawImage(_boye, bx, by, bw, bh);
 
@@ -141,71 +152,97 @@
     const title = opts.title || "Engineering Brain Bank";
     const footer = opts.footer || "Engineering Brain Bank • KB4GESA";
 
-    const tx = Math.round(W * 0.42);
-    const maxTextW = W - tx - 48;
+    // RIGHT half: text column centered inside the half
+    const rightLeft = W / 2;
+    const rightW = W / 2;
+    const colW = rightW * 0.72;
+    const colX = rightLeft + (rightW - colW) / 2;
 
-    // Type label + gold underline
-    ctx.fillStyle = GOLD;
-    ctx.font = "600 28px Inter, system-ui, sans-serif";
     ctx.textBaseline = "top";
-    ctx.fillText(typeLabel, tx, 88);
+    ctx.fillStyle = GOLD;
+    ctx.font = "600 26px Inter, system-ui, sans-serif";
     const typeW = ctx.measureText(typeLabel).width;
-    ctx.fillRect(tx, 126, Math.max(40, typeW), 3);
 
-    // Title (italic weight)
+    ctx.font = "italic 800 50px Inter, system-ui, sans-serif";
+    const lines = titleLines(ctx, title, colW);
+    const titleLineH = 58;
+    const typeBlockH = 34;
+    const gapAfterType = 20;
+    const gapBeforeMark = 26;
+
+    const wh = 46;
+    const wr = wh / _wordmark.naturalHeight;
+    const ww = _wordmark.naturalWidth * wr;
+
+    const blockH =
+      typeBlockH + gapAfterType + lines.length * titleLineH + gapBeforeMark + wh;
+    let y = (H - blockH) / 2;
+
+    // Type + underline
+    ctx.fillStyle = GOLD;
+    ctx.font = "600 26px Inter, system-ui, sans-serif";
+    ctx.fillText(typeLabel, colX, y);
+    ctx.fillRect(colX, y + 30, Math.max(48, typeW), 2.5);
+    y += typeBlockH + gapAfterType;
+
+    // Title lines (italic)
     ctx.fillStyle = WHITE;
-    ctx.font = "italic 800 52px Inter, system-ui, sans-serif";
-    const lines = wrapText(ctx, title, maxTextW, 3);
-    let ty = 150;
+    ctx.font = "italic 800 50px Inter, system-ui, sans-serif";
     lines.forEach((line) => {
-      ctx.fillText(line, tx, ty);
-      ty += 62;
+      ctx.fillText(line, colX, y);
+      y += titleLineH;
     });
 
     // AceWithBoye wordmark
-    const wh = 50;
-    const wr = wh / _wordmark.naturalHeight;
-    const ww = _wordmark.naturalWidth * wr;
-    ctx.drawImage(_wordmark, tx, ty + 20, ww, wh);
+    y += gapBeforeMark;
+    ctx.drawImage(_wordmark, colX, y, ww, wh);
 
-    // Footer bottom-right
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.font = "500 18px Inter, system-ui, sans-serif";
+    // Footer — bottom right corner
+    ctx.fillStyle = "rgba(255,255,255,0.88)";
+    ctx.font = "500 17px Inter, system-ui, sans-serif";
     ctx.textBaseline = "bottom";
     const fw = ctx.measureText(footer).width;
-    ctx.fillText(footer, W - fw - 36, H - 28);
+    ctx.fillText(footer, W - fw - 40, H - 28);
 
     return canvas;
   }
 
   async function canvasToBlob(canvas, type, quality) {
     return new Promise((resolve) => {
-      canvas.toBlob((b) => resolve(b), type || "image/jpeg", quality == null ? 0.9 : quality);
+      canvas.toBlob(
+        (b) => resolve(b),
+        type || "image/jpeg",
+        quality == null ? 0.9 : quality
+      );
     });
   }
 
   /**
-   * Build a shareable AceWithBoye card for a material (or course-like payload).
    * @returns {Promise<{ blob: Blob, file: File, dataUrl: string, title: string, typeLabel: string }>}
    */
   async function buildMaterialCard(m, course) {
     const typeId = m.type || m.material_type || "shared";
     const typeLabel = TYPE_LABELS[typeId] || "Material";
     const code = (course && course.code) || m.course_code || "";
-    const name = (m.title || m.fileName || "").trim();
     const courseName = course && course.name ? course.name : "";
+    const fileTitle = (m.title || m.fileName || "").trim();
+
+    // Prefer course-style headline like the mockup; fall back to file title
     let title;
-    if (code && name) title = code + " – " + name;
-    else if (code && courseName) title = code + " – " + courseName;
-    else title = name || courseName || code || "Engineering Brain Bank";
+    if (code && courseName) title = code + " — " + courseName;
+    else if (code && fileTitle) title = code + " — " + fileTitle;
+    else title = fileTitle || courseName || code || "Engineering Brain Bank";
 
     const canvas = await renderCard({ typeLabel, title, type: typeId });
     const blob = await canvasToBlob(canvas, "image/jpeg", 0.92);
-    const safe = String(code || "ebb")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "ebb";
-    const file = new File([blob], `acewithboye-${safe}.jpg`, { type: "image/jpeg" });
+    const safe =
+      String(code || "ebb")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "ebb";
+    const file = new File([blob], `acewithboye-${safe}.jpg`, {
+      type: "image/jpeg",
+    });
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
     return { blob, file, dataUrl, title, typeLabel, canvas };
   }
