@@ -1,0 +1,10 @@
+# File warehouse stays on GitHub raw — do not ship to Vercel (≈2GB+)
+materials/**
+scripts/**
+supabase/**
+.git/**
+*.md
+.env
+.env.*
+**/*.pyc
+**/__pycache__
