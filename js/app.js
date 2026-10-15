@@ -234,18 +234,35 @@
     const modal = qs("#media-modal");
     if (!modal) return;
     const body = modal.querySelector(".media-modal__body");
+    if (modal._blobUrl) {
+      try { URL.revokeObjectURL(modal._blobUrl); } catch (_) { /* ignore */ }
+      modal._blobUrl = null;
+    }
     if (body) body.innerHTML = "";
     modal.hidden = true;
     document.body.classList.remove("modal-open");
   }
 
-  function openMediaViewer(m, url) {
+  /** Fetch bytes and show via blob URL — GitHub raw sets X-Frame-Options: deny. */
+  async function blobUrlForPreview(url, mimeHint) {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const buf = await res.arrayBuffer();
+    const type = mimeHint || res.headers.get("content-type") || "application/octet-stream";
+    // GitHub often serves PDFs as octet-stream; force PDF so the browser renders it
+    const forced =
+      /pdf/i.test(mimeHint || "") || /\.pdf(\?|#|$)/i.test(url)
+        ? "application/pdf"
+        : type;
+    return URL.createObjectURL(new Blob([buf], { type: forced }));
+  }
+
+  async function openMediaViewer(m, url) {
     const modal = ensureMediaModal();
     const title = modal.querySelector(".media-modal__title");
     const body = modal.querySelector(".media-modal__body");
     const dl = modal.querySelector("#media-modal-download");
     if (title) title.textContent = m.title || m.fileName || "Material";
-    const downloadUrl = resolveDownloadUrl(m) || url;
     if (dl) {
       // Stay on-site: trigger our download handler, don't navigate away
       dl.removeAttribute("href");
@@ -257,25 +274,43 @@
     }
     const isVideo = EBBApi.isVideoMaterial(m);
     const isImage = EBBApi.isImageMaterial(m);
-    const name = (m.fileName || "").toLowerCase();
+    const name = (m.fileName || m.file_path || "").toLowerCase();
     const isPdf = (m.mime_type || "").includes("pdf") || name.endsWith(".pdf");
+
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+
     if (isVideo) {
       body.innerHTML = `<video class="media-modal__video" controls playsinline preload="metadata" src="${escapeAttr(url)}"></video>
         <p class="media-modal__hint">Playing on Engineering Brain Bank. Download anytime.</p>`;
-    } else if (isImage) {
-      body.innerHTML = `<img class="media-modal__img" src="${escapeAttr(url)}" alt="${escapeAttr(m.title || "")}" />`;
-    } else if (isPdf) {
-      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}#toolbar=1" title="PDF preview"></iframe>
-        <p class="media-modal__hint">Preview on site. Use Download to save a copy.</p>`;
-    } else {
-      body.innerHTML = `<p class="media-modal__hint">This file type previews best after download (still stays on our flow).</p>
-        <button type="button" class="btn btn-primary" data-mat-inline-dl="1">Download ${escapeAttr(m.fileName || "file")}</button>`;
-      body.querySelector("[data-mat-inline-dl]")?.addEventListener("click", () => {
-        openOrDownloadMaterial(m, "download");
-      });
+      return;
     }
-    modal.hidden = false;
-    document.body.classList.add("modal-open");
+    if (isImage) {
+      body.innerHTML = `<img class="media-modal__img" src="${escapeAttr(url)}" alt="${escapeAttr(m.title || "")}" />`;
+      return;
+    }
+    if (isPdf) {
+      body.innerHTML = `<p class="media-modal__hint">Loading preview…</p>`;
+      try {
+        const blobUrl = await blobUrlForPreview(url, m.mime_type || "application/pdf");
+        modal._blobUrl = blobUrl;
+        body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(blobUrl)}#toolbar=1" title="PDF preview"></iframe>
+          <p class="media-modal__hint">Preview on site. Use Download to save a copy.</p>`;
+      } catch (err) {
+        console.warn("[EBB] PDF preview:", err.message || err);
+        body.innerHTML = `<p class="media-modal__hint">Preview unavailable here — download still stays on our flow.</p>
+          <button type="button" class="btn btn-primary" data-mat-inline-dl="1">Download ${escapeAttr(m.fileName || "file")}</button>`;
+        body.querySelector("[data-mat-inline-dl]")?.addEventListener("click", () => {
+          openOrDownloadMaterial(m, "download");
+        });
+      }
+      return;
+    }
+    body.innerHTML = `<p class="media-modal__hint">This file type previews best after download (still stays on our flow).</p>
+      <button type="button" class="btn btn-primary" data-mat-inline-dl="1">Download ${escapeAttr(m.fileName || "file")}</button>`;
+    body.querySelector("[data-mat-inline-dl]")?.addEventListener("click", () => {
+      openOrDownloadMaterial(m, "download");
+    });
   }
 
   async function shareMaterial(m) {
