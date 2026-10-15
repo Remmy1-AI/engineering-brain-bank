@@ -313,28 +313,81 @@
     });
   }
 
-  async function shareMaterial(m) {
-    const url = m.live
-      ? resolveMaterialUrl(m)
-      : `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, "")}course.html?id=${m.courseId || ""}`;
-    const title = m.title || "Engineering Brain Bank material";
+  function absoluteShareUrl(pathQuery) {
     try {
-      if (navigator.share) {
-        await navigator.share({ title, url, text: title });
-      } else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-        showToast("Link copied.");
-      } else {
-        showToast(url);
+      return new URL(pathQuery, window.location.href).href;
+    } catch (_) {
+      return pathQuery;
+    }
+  }
+
+  async function shareMaterial(m) {
+    const course =
+      (m.courseId && EBB.getCourse(m.courseId)) ||
+      (m.course_code && EBB.getCourseByCode(m.course_code)) ||
+      null;
+    const sharePath = m.live && m.id
+      ? `./share.html?m=${encodeURIComponent(m.id)}`
+      : `./course.html?id=${encodeURIComponent(m.courseId || "")}`;
+    const url = absoluteShareUrl(sharePath);
+    const title = m.title || "Engineering Brain Bank material";
+
+    showToast("Preparing AceWithBoye card…");
+
+    let card = null;
+    try {
+      if (window.EBBOgCard) {
+        card = await EBBOgCard.buildMaterialCard(m, course);
       }
-      if (m.live && m.id) EBBApi.incrementShare(m.id);
+    } catch (err) {
+      console.warn("[EBB] og card:", err.message || err);
+    }
+
+    const shareText = card
+      ? `${card.typeLabel}: ${card.title}\n${url}`
+      : `${title}\n${url}`;
+
+    try {
+      if (card && navigator.share && navigator.canShare && navigator.canShare({ files: [card.file] })) {
+        await navigator.share({
+          files: [card.file],
+          title: card.title,
+          text: shareText,
+        });
+      } else if (navigator.share) {
+        await navigator.share({ title: card ? card.title : title, url, text: shareText });
+      } else {
+        if (card) {
+          const a = document.createElement("a");
+          a.href = card.dataUrl;
+          a.download = card.file.name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+          showToast(card ? "Card saved · link copied." : "Link copied.");
+        } else {
+          showToast(url);
+        }
+      }
+      if (m.live && m.id && window.EBBApi) EBBApi.incrementShare(m.id);
     } catch (err) {
       if (err && err.name === "AbortError") return;
       try {
+        if (card) {
+          const a = document.createElement("a");
+          a.href = card.dataUrl;
+          a.download = card.file.name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(url);
-          showToast("Link copied.");
-          if (m.live && m.id) EBBApi.incrementShare(m.id);
+          showToast(card ? "Card saved · link copied." : "Link copied.");
+          if (m.live && m.id && window.EBBApi) EBBApi.incrementShare(m.id);
         }
       } catch (_) {
         showToast("Could not share.");
@@ -846,6 +899,71 @@
     });
   }
 
+  /* ---------- Share landing (AceWithBoye card + open/download) ---------- */
+  async function initShare() {
+    const root = qs("#share-root");
+    if (!root) return;
+    const id = params().get("m");
+    if (!id) {
+      root.innerHTML = `<div class="empty-state"><p>No material specified.</p><a class="btn btn-primary" href="./resources.html">Browse resources</a></div>`;
+      return;
+    }
+    const m = EBB.materials.find((x) => String(x.id) === String(id));
+    if (!m) {
+      root.innerHTML = `<div class="empty-state"><p>This material is not available.</p><a class="btn btn-primary" href="./resources.html">Browse resources</a></div>`;
+      return;
+    }
+    const course =
+      (m.courseId && EBB.getCourse(m.courseId)) ||
+      (m.course_code && EBB.getCourseByCode(m.course_code)) ||
+      null;
+    const typeMeta = EBB.getTypeMeta(m.type);
+    const headline = course ? `${course.code} – ${m.title}` : m.title;
+
+    document.title = `${m.title || "Material"} | Engineering Brain Bank`;
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute("content", headline);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+      ogDesc.setAttribute(
+        "content",
+        `${typeMeta ? typeMeta.name : "Material"} · AceWithBoye · KB4GESA`
+      );
+    }
+
+    let cardHtml = "";
+    try {
+      if (window.EBBOgCard) {
+        const card = await EBBOgCard.buildMaterialCard(m, course);
+        cardHtml = `<img class="share-card-preview" src="${card.dataUrl}" alt="${escapeAttr(headline)}" width="1200" height="630" style="width:min(100%,720px);height:auto;border-radius:12px;margin:0 0 1.5rem;box-shadow:0 12px 40px rgba(0,0,0,.45)" />`;
+      }
+    } catch (err) {
+      console.warn("[EBB] share card preview:", err.message || err);
+    }
+
+    const map = new Map([[String(m.id), m]]);
+    root.innerHTML = `
+      <div class="breadcrumb">
+        <a href="./index.html">Home</a><span>/</span>
+        <a href="./resources.html">Resources</a><span>/</span>
+        Shared
+      </div>
+      ${cardHtml}
+      <div class="course-header-block" style="margin-bottom:1.25rem">
+        <div class="code">${escapeAttr(course ? course.code : m.course_code || "")}</div>
+        <h1 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(m.title)}</h1>
+        <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · AceWithBoye · Engineering Brain Bank</p>
+      </div>
+      <div class="material-list" id="share-mat-list">
+        ${materialRowHtml(m, { resources: true })}
+      </div>
+      <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+        ${course ? `<a class="btn btn-ghost" href="./course.html?id=${encodeURIComponent(course.id)}">View course</a>` : ""}
+        <a class="btn btn-ghost" href="./resources.html">All resources</a>
+      </div>`;
+    wireMaterialActions(qs("#share-mat-list"), map);
+  }
+
   /* ---------- Boot (live catalog only) ---------- */
   async function boot() {
     injectChrome();
@@ -880,6 +998,7 @@
     else if (page === "course") initCourse();
     else if (page === "resources") initResources();
     else if (page === "upload") initUpload();
+    else if (page === "share") await initShare();
 
     if (window.EBBApi && EBBApi.isConfigured()) {
       const path = window.location.pathname || ("/" + (page || "home"));
