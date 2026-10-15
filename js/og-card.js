@@ -1,6 +1,6 @@
-/* Engineering Brain Bank — AceWithBoye share / Open Graph card (canvas)
-   Layout: two halves — Boye centered in LEFT (blueprint behind, not flush),
-   text block centered in RIGHT. */
+/* Engineering Brain Bank — AceWithBoye share card (canvas)
+   Custom layout: Boye hero ON TOP over engineering drawings,
+   course/file details in a gold-ruled band below. */
 (function () {
   "use strict";
 
@@ -8,7 +8,8 @@
   const H = 630;
   const GOLD = "#FFB800";
   const WHITE = "#FFFFFF";
-  const BG = "#000000";
+  const BG = "#050507";
+  const HERO_H = 360;
 
   const TYPE_LABELS = {
     slides: "Course Slides",
@@ -59,15 +60,16 @@
     return _loading;
   }
 
-  /** Prefer "CODE — Name" as two lines, else wrap. */
   function titleLines(ctx, title, maxWidth) {
     const raw = String(title || "").trim();
     const split = raw.split(/\s*[—–-]\s*/);
     if (split.length >= 2 && split[0].length <= 18) {
       const first = split[0] + " —";
       const rest = split.slice(1).join(" — ");
+      if (ctx.measureText(first + " " + rest).width <= maxWidth) {
+        return [first + " " + rest];
+      }
       const lines = [first];
-      // wrap rest if needed
       const words = rest.split(/\s+/);
       let cur = "";
       for (const word of words) {
@@ -76,13 +78,13 @@
         else {
           if (cur) lines.push(cur);
           cur = word;
-          if (lines.length >= 3) break;
+          if (lines.length >= 2) break;
         }
       }
-      if (cur && lines.length < 3) lines.push(cur);
-      return lines.slice(0, 3);
+      if (cur && lines.length < 2) lines.push(cur);
+      return lines.slice(0, 2);
     }
-    // generic wrap
+    if (ctx.measureText(raw).width <= maxWidth) return [raw];
     const words = raw.split(/\s+/).filter(Boolean);
     const lines = [];
     let cur = "";
@@ -92,11 +94,20 @@
       else {
         if (cur) lines.push(cur);
         cur = word;
-        if (lines.length >= 3) break;
+        if (lines.length >= 2) break;
       }
     }
-    if (cur && lines.length < 3) lines.push(cur);
-    return lines.length ? lines : [raw.slice(0, 36)];
+    if (cur && lines.length < 2) lines.push(cur);
+    return lines.length ? lines : [raw.slice(0, 40)];
+  }
+
+  function drawGoldGlow(ctx, cx, cy) {
+    const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 320);
+    g.addColorStop(0, "rgba(255,184,0,0.22)");
+    g.addColorStop(0.45, "rgba(255,184,0,0.06)");
+    g.addColorStop(1, "rgba(255,184,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, HERO_H + 40);
   }
 
   /**
@@ -110,99 +121,92 @@
     canvas.height = H;
     const ctx = canvas.getContext("2d");
 
-    // Solid black
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, W, H);
 
-    // Engineering drawings — LEFT half only, behind Boye
+    // Engineering drawings across the hero zone
     if (_blueprint) {
-      const bpW = Math.round(W * 0.52);
       ctx.save();
-      ctx.globalAlpha = 0.55;
-      ctx.drawImage(_blueprint, 0, 0, bpW, H);
+      ctx.globalAlpha = 0.42;
+      // mirror-tile across width
+      const bpW = Math.ceil(W / 2);
+      ctx.drawImage(_blueprint, 0, 0, bpW, HERO_H + 40);
+      ctx.save();
+      ctx.translate(W, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(_blueprint, 0, 0, bpW, HERO_H + 40);
+      ctx.restore();
       ctx.restore();
     }
 
-    // Boye — centered in LEFT half, breathing room from left edge
-    const leftCenter = W / 4;
-    const minPad = Math.round(W * 0.05);
-    let bh = H * 0.92;
-    let br = bh / _boye.naturalHeight;
-    let bw = _boye.naturalWidth * br;
-    const maxBw = (W / 2) * 0.78;
-    if (bw > maxBw) {
-      const s = maxBw / bw;
-      bw *= s;
-      bh *= s;
-    }
-    let bx = leftCenter - bw / 2;
-    if (bx < minPad) bx = minPad;
-    // keep inside left half with a little gap to the midline
-    if (bx + bw > W / 2 - 8) {
-      bw = W / 2 - 8 - bx;
-      bh = bw * (_boye.naturalHeight / _boye.naturalWidth);
-    }
-    const by = H - bh;
+    drawGoldGlow(ctx, W / 2, HERO_H * 0.55);
+
+    // Boye — large, centered on TOP, tucked into the gold rule
+    const bw = 460;
+    const bh = (_boye.naturalHeight / _boye.naturalWidth) * bw;
+    const bx = (W - bw) / 2;
+    const by = HERO_H - bh + 36;
+    // soft ground shadow
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.beginPath();
+    ctx.ellipse(W / 2, HERO_H + 6, bw * 0.38, 16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
     ctx.drawImage(_boye, bx, by, bw, bh);
+
+    // AceWithBoye wordmark — top left
+    const wh = 34;
+    const wr = wh / _wordmark.naturalHeight;
+    const ww = _wordmark.naturalWidth * wr;
+    ctx.drawImage(_wordmark, 36, 22, ww, wh);
+
+    // Bottom info band
+    ctx.fillStyle = "rgba(8,8,10,0.98)";
+    ctx.fillRect(0, HERO_H, W, H - HERO_H);
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(0, HERO_H, W, 4);
+
+    // Corner bracket
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(W - 34, HERO_H + 14);
+    ctx.lineTo(W - 14, HERO_H + 14);
+    ctx.lineTo(W - 14, HERO_H + 34);
+    ctx.stroke();
 
     const typeLabel =
       opts.typeLabel ||
       TYPE_LABELS[opts.type] ||
       (opts.type ? String(opts.type) : "Material");
     const title = opts.title || "Engineering Brain Bank";
-    const footer = opts.footer || "Engineering Brain Bank • KB4GESA";
+    const footer = opts.footer || "Engineering Brain Bank · KB4GESA";
 
-    // RIGHT half: text column centered inside the half
-    const rightLeft = W / 2;
-    const rightW = W / 2;
-    const colW = rightW * 0.72;
-    const colX = rightLeft + (rightW - colW) / 2;
+    const pad = 44;
+    let y = HERO_H + 22;
 
     ctx.textBaseline = "top";
     ctx.fillStyle = GOLD;
-    ctx.font = "600 26px Inter, system-ui, sans-serif";
+    ctx.font = "600 22px Inter, system-ui, sans-serif";
+    ctx.fillText(typeLabel, pad, y);
     const typeW = ctx.measureText(typeLabel).width;
+    ctx.fillRect(pad, y + 26, Math.max(40, typeW), 2);
+    y += 40;
 
-    ctx.font = "italic 800 50px Inter, system-ui, sans-serif";
-    const lines = titleLines(ctx, title, colW);
-    const titleLineH = 58;
-    const typeBlockH = 34;
-    const gapAfterType = 20;
-    const gapBeforeMark = 26;
-
-    const wh = 46;
-    const wr = wh / _wordmark.naturalHeight;
-    const ww = _wordmark.naturalWidth * wr;
-
-    const blockH =
-      typeBlockH + gapAfterType + lines.length * titleLineH + gapBeforeMark + wh;
-    let y = (H - blockH) / 2;
-
-    // Type + underline
-    ctx.fillStyle = GOLD;
-    ctx.font = "600 26px Inter, system-ui, sans-serif";
-    ctx.fillText(typeLabel, colX, y);
-    ctx.fillRect(colX, y + 30, Math.max(48, typeW), 2.5);
-    y += typeBlockH + gapAfterType;
-
-    // Title lines (italic)
     ctx.fillStyle = WHITE;
-    ctx.font = "italic 800 50px Inter, system-ui, sans-serif";
+    ctx.font = "italic 800 42px Inter, system-ui, sans-serif";
+    const lines = titleLines(ctx, title, W - pad * 2 - 160);
     lines.forEach((line) => {
-      ctx.fillText(line, colX, y);
-      y += titleLineH;
+      ctx.fillText(line, pad, y);
+      y += 48;
     });
 
-    // AceWithBoye wordmark
-    y += gapBeforeMark;
-    ctx.drawImage(_wordmark, colX, y, ww, wh);
-
-    // Footer — bottom right corner
-    ctx.fillStyle = "rgba(255,255,255,0.88)";
-    ctx.font = "500 17px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "rgba(180,180,180,0.95)";
+    ctx.font = "500 15px Inter, system-ui, sans-serif";
     ctx.textBaseline = "bottom";
     const fw = ctx.measureText(footer).width;
-    ctx.fillText(footer, W - fw - 40, H - 28);
+    ctx.fillText(footer, W - fw - 36, H - 22);
 
     return canvas;
   }
@@ -217,9 +221,6 @@
     });
   }
 
-  /**
-   * @returns {Promise<{ blob: Blob, file: File, dataUrl: string, title: string, typeLabel: string }>}
-   */
   async function buildMaterialCard(m, course) {
     const typeId = m.type || m.material_type || "shared";
     const typeLabel = TYPE_LABELS[typeId] || "Material";
@@ -227,7 +228,6 @@
     const courseName = course && course.name ? course.name : "";
     const fileTitle = (m.title || m.fileName || "").trim();
 
-    // Prefer course-style headline like the mockup; fall back to file title
     let title;
     if (code && courseName) title = code + " — " + courseName;
     else if (code && fileTitle) title = code + " — " + fileTitle;
