@@ -19,6 +19,8 @@ const EBB = {
     { id: "computer", name: "Computer Engineering", short: "Computer", code: "COE", icon: "💻", count: 89 },
     { id: "chemical", name: "Chemical Engineering", short: "Chemical", code: "CHE", icon: "⚗", count: 12 },
     { id: "industrial", name: "Industrial Engineering", short: "Industrial", code: "IE", icon: "🏭", count: 27 },
+    { id: "agricultural", name: "Agricultural Engineering", short: "Agricultural", code: "AE", icon: "🌾", count: 0 },
+    { id: "general", name: "General / Shared", short: "General", code: "GEN", icon: "📚", count: 0 },
   ],
 
   levels: [
@@ -37,6 +39,8 @@ const EBB = {
     { id: "slides", name: "Course Slides", icon: "📊" },
     { id: "notes", name: "Lecture Notes", icon: "📝" },
     { id: "past-questions", name: "Past Questions", icon: "📋" },
+    { id: "tutorials", name: "Tutorials", icon: "🧮" },
+    { id: "videos", name: "Videos", icon: "🎬" },
     { id: "shared", name: "Shared by Students", icon: "🤝" },
   ],
 
@@ -463,8 +467,11 @@ const EBB = {
 /* ---------- Helper accessors ---------- */
 EBB.getDepartment = (id) => EBB.departments.find((d) => d.id === id);
 EBB.getCourse = (id) => EBB.courses.find((c) => c.id === id);
-EBB.getCourseByCode = (code) =>
-  EBB.courses.find((c) => c.code.toLowerCase() === code.toLowerCase().trim());
+EBB.getCourseByCode = (code) => {
+  const n = String(code || "").toLowerCase().replace(/\s+/g, "");
+  if (!n) return null;
+  return EBB.courses.find((c) => c.code.toLowerCase().replace(/\s+/g, "") === n);
+};
 EBB.getMaterialsForCourse = (courseId) =>
   EBB.materials.filter((m) => m.courseId === courseId);
 EBB.getTypeMeta = (typeId) => EBB.materialTypes.find((t) => t.id === typeId);

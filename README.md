@@ -66,13 +66,27 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 
 6. Commit and push to `main` (or edit the file on GitHub). After Pages rebuilds, open `/admin.html`, sign in, and upload materials.
 
-### Allowed uploads
+### Allowed uploads (Admin)
 
-PDF, PPT/PPTX, DOC/DOCX, TXT, MD only — **no video**. Enforced in Admin/public file inputs and documented in `schema.sql`.
+PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploads. The bulk course library is **not** stored in Supabase Storage.
 
-### Public URLs
+### Hybrid file hosting (catalog in Supabase)
 
-Storage bucket `materials` is public-read. Object URL:
+- **Supabase** = materials **catalog** (metadata, publish flag, download/share counts).
+- **GitHub** `materials/` = file warehouse via  
+  `https://raw.githubusercontent.com/Remmy1-AI/engineering-brain-bank/main/{path}`
+- The repo must be **public** so students can watch/download without logging into GitHub.
+- UI stays on Engineering Brain Bank: in-page **Watch** (video/PDF/image modal) + **Download** (blob save). No Drive redirects.
+
+Re-seed catalog (owner machine; secrets in `~/.config/ebb/supabase.env`, not in repo):
+
+```bash
+python3 scripts/seed_github_materials.py
+```
+
+Schema patch: [`supabase/schema_github_hybrid.sql`](supabase/schema_github_hybrid.sql).
+
+### Public Storage URLs (optional admin uploads)
 
 `{SUPABASE_URL}/storage/v1/object/public/materials/{file_path}`
 

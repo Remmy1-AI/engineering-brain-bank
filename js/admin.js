@@ -214,7 +214,13 @@
           await refreshAll();
         } else if (action === "open") {
           const path = btn.getAttribute("data-path");
-          const url = EBBApi.getPublicFileUrl(path);
+          const ext = btn.getAttribute("data-external") || "";
+          const source = btn.getAttribute("data-source") || "";
+          const url = EBBApi.getFileUrl({
+            file_path: path,
+            external_url: ext,
+            source: source || (String(path || "").startsWith("materials/") ? "github" : "storage"),
+          }) || EBBApi.getPublicFileUrl(path);
           if (url) window.open(url, "_blank", "noopener");
         }
       } catch (err) {
@@ -276,7 +282,7 @@
               </button>
             </td>
             <td class="admin-row-actions" data-label="Actions">
-              <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Open</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}" data-source="${escapeHtml(m.source || "")}" data-external="${escapeHtml(m.external_url || "")}">Open</button>
               <button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Delete</button>
             </td>
           </tr>`).join("");
