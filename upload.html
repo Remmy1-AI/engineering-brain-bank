@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20261015h" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261015r" />
 </head>
 <body data-page="upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -17,7 +17,7 @@
       <div class="hero-blueprint" aria-hidden="true"></div>
       <div class="container" style="position:relative;z-index:1">
         <h1>Upload Material</h1>
-        <p>Share slides, notes, or past questions. Submissions go through a light review before publishing.</p>
+        <p>The library is live from the KB4GESA archive. Use this form to request a new file — the owner publishes via Admin.</p>
       </div>
     </section>
     <section class="section">
@@ -59,9 +59,9 @@
             <div class="form-group full">
               <label>File *</label>
               <div class="file-drop" id="file-drop" role="button" tabindex="0">
-                <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md" />
+                <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.mp4,.webm,.mov,.jpg,.jpeg,.png,.gif,.webp,.xlsx,.csv,.zip,.rtf" />
                 <p>Drop a file here or click to browse</p>
-                <p class="hint">PDF, PPT/PPTX, DOC/DOCX, TXT, MD only — no video. Owner publishes via Admin.</p>
+                <p class="hint">PDF, Office, images, MP4 video, and common notes formats. Owner publishes via Admin.</p>
                 <div class="file-name" id="file-name"></div>
               </div>
             </div>
@@ -82,16 +82,16 @@
             Organization: Department → Level → Semester → Course → Topic → Material
           </p>
           <p style="margin-top:1rem;font-size:0.85rem;color:var(--gold)">
-            Official library uploads are published by the owner via <a href="./admin.html">Admin</a>. This form is a student demo / request flow.
+            Browse the live library on <a href="./resources.html">Resources</a>. Official publishes go through <a href="./admin.html">Admin</a>.
           </p>
         </aside>
       </div>
     </section>
   </main>
   <footer class="site-footer" id="site-footer"></footer>
-  <script src="./js/data.js?v=20261015h"></script>
-  <script src="./js/supabase-config.js?v=20261015h"></script>
-  <script src="./js/ebb-api.js?v=20261015h"></script>
-  <script src="./js/app.js?v=20261015h"></script>
+  <script src="./js/data.js?v=20261015r"></script>
+  <script src="./js/supabase-config.js?v=20261015r"></script>
+  <script src="./js/ebb-api.js?v=20261015r"></script>
+  <script src="./js/app.js?v=20261015r"></script>
 </body>
 </html>

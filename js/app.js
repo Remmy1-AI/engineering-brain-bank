@@ -475,14 +475,21 @@
         videos: "Watch lecture clips on the site — download optional.",
         shared: "Peer uploads — tutorials, solutions, and study packs.",
       };
-      featureGrid.innerHTML = EBB.materialTypes.map((t) => `
+      const typesWithContent = EBB.materialTypes.filter(
+        (t) => EBB.materials.some((m) => m.type === t.id)
+      );
+      const types = typesWithContent.length ? typesWithContent : EBB.materialTypes;
+      featureGrid.innerHTML = types.map((t) => {
+        const n = EBB.materials.filter((m) => m.type === t.id).length;
+        return `
         <a class="feature-card" href="./resources.html?type=${t.id}">
           <span class="feature-icon">${ICONS[t.id] || ICONS.slides}</span>
           <div>
             <h3>${t.name}</h3>
-            <p>${copy[t.id] || ""}</p>
+            <p>${copy[t.id] || ""} ${n ? `(${n})` : ""}</p>
           </div>
-        </a>`).join("");
+        </a>`;
+      }).join("");
     }
 
     const deptGrid = qs("#dept-grid");
@@ -494,8 +501,11 @@
         computer: "DSA, networks, embedded, AI, and software.",
         chemical: "Reactors, transport, and process control.",
         industrial: "OR, quality, production, and ergonomics.",
+        agricultural: "Ag machines, soils, and farm systems.",
+        general: "Math, communication skills, and shared packs.",
       };
-      deptGrid.innerHTML = EBB.departments.map((d) => `
+      const depts = EBB.departments.filter((d) => d.count > 0);
+      deptGrid.innerHTML = (depts.length ? depts : EBB.departments).map((d) => `
         <a class="dept-card" href="./courses.html?dept=${d.id}">
           <span class="dept-badge">${d.count}</span>
           <h3>${d.name}</h3>
@@ -505,65 +515,23 @@
 
     const recentList = qs("#recent-list");
     if (recentList) {
-      // Prefer mock-matching order: CE 403, ME 321 first, then other recent course hits
-      const prefer = ["ce-403", "me-321", "ce-405", "ge-402", "coe-457", "ee-401"];
-      const seen = new Set();
-      const ordered = [];
-      prefer.forEach((id) => {
-        const c = EBB.getCourse(id);
-        if (c) { ordered.push(c); seen.add(id); }
-      });
-      EBB.recentMaterials(12).forEach((m) => {
-        if (!seen.has(m.courseId)) {
-          const c = EBB.getCourse(m.courseId);
-          if (c) { ordered.push(c); seen.add(m.courseId); }
-        }
-      });
-      recentList.innerHTML = ordered.slice(0, 6).map((c) => {
-        return `<a class="recent-item" href="./course.html?id=${c.id}">
-          <span class="recent-code">${c.code}</span>
-          <span class="recent-name">${c.name}</span>
-        </a>`;
-      }).join("");
-    }
-
-    // Inject swoosh into hero title if present
-    const swooshWord = null; // PNG swoosh in HTML; skip SVG inject
-    const _swooshWordUnused = qs(".swoosh-word");
-    if (swooshWord && !swooshWord.querySelector(".swoosh")) {
-      swooshWord.insertAdjacentHTML("beforeend", SWOOSH_SVG);
-    }
-
-    wireSearch("hero-search-form", "hero-search", "search-results");
-
-    // Prefer live published materials for "Recently Added" when available
-    fetchLiveMaterials().then((live) => {
-      if (!recentList || !live.length) return;
-      const byCourse = new Map();
-      live.forEach((m) => {
-        const code = m.course_code || "";
-        const course = m.courseId ? EBB.getCourse(m.courseId) : (code ? EBB.getCourseByCode(code) : null);
-        if (course && !byCourse.has(course.id)) byCourse.set(course.id, course);
-      });
-      const liveCourses = [...byCourse.values()].slice(0, 6);
-      if (!liveCourses.length) {
-        // show live material titles as recent items
-        recentList.innerHTML = live.slice(0, 6).map((m) => {
-          const href = m.courseId ? `./course.html?id=${m.courseId}` : "./resources.html";
+      const recent = EBB.recentMaterials(8);
+      if (!recent.length) {
+        recentList.innerHTML = `<div class="empty-state">Library loading…</div>`;
+      } else {
+        recentList.innerHTML = recent.map((m) => {
+          const href = m.courseId
+            ? `./course.html?id=${encodeURIComponent(m.courseId)}`
+            : "./resources.html";
           return `<a class="recent-item" href="${href}">
-            <span class="recent-code">${escapeAttr(m.course_code || "NEW")}</span>
+            <span class="recent-code">${escapeAttr(m.course_code || "FILE")}</span>
             <span class="recent-name">${escapeAttr(m.title)}</span>
           </a>`;
         }).join("");
-        return;
       }
-      recentList.innerHTML = liveCourses.map((c) =>
-        `<a class="recent-item" href="./course.html?id=${c.id}">
-          <span class="recent-code">${c.code}</span>
-          <span class="recent-name">${c.name}</span>
-        </a>`
-      ).join("");
-    });
+    }
+
+    wireSearch("hero-search-form", "hero-search", "search-results");
   }
 
   /* ---------- Courses ---------- */
@@ -575,9 +543,11 @@
     const levelSel = qs("#filter-level");
     const qInput = qs("#filter-q");
 
+    const deptsWithContent = EBB.departments.filter((d) => d.count > 0);
     if (deptSel) {
       deptSel.innerHTML = `<option value="">All departments</option>` +
-        EBB.departments.map((d) => `<option value="${d.id}">${d.name}</option>`).join("");
+        (deptsWithContent.length ? deptsWithContent : EBB.departments)
+          .map((d) => `<option value="${d.id}">${d.name} (${d.count})</option>`).join("");
       if (p.get("dept")) deptSel.value = p.get("dept");
     }
     if (levelSel) {
@@ -594,30 +564,30 @@
       let list = [...EBB.courses];
       if (dept) list = list.filter((c) => c.department === dept);
       if (level) list = list.filter((c) => c.level === level);
-      if (q) list = list.filter((c) =>
-        c.code.toLowerCase().includes(q) ||
-        c.name.toLowerCase().includes(q) ||
-        c.lecturer.toLowerCase().includes(q)
-      );
+      if (q) {
+        list = list.filter((c) =>
+          c.code.toLowerCase().includes(q) ||
+          c.name.toLowerCase().includes(q)
+        );
+      }
       const countEl = qs("#course-count");
       if (countEl) countEl.textContent = `${list.length} course${list.length === 1 ? "" : "s"}`;
       if (!list.length) {
-        grid.innerHTML = `<div class="empty-state">No courses match your filters.</div>`;
+        grid.innerHTML = `<div class="empty-state">No courses in the live library match your filters.</div>`;
         return;
       }
       grid.innerHTML = list.map((c) => {
         const deptMeta = EBB.getDepartment(c.department);
-        const mats = EBB.getMaterialsForCourse(c.id).length;
-        return `<a class="course-card" href="./course.html?id=${c.id}">
-          <span class="code">${c.code}</span>
-          <h3>${c.name}</h3>
+        const mats = c.materialCount || EBB.getMaterialsForCourse(c.id).length;
+        return `<a class="course-card" href="./course.html?id=${encodeURIComponent(c.id)}">
+          <span class="code">${escapeAttr(c.code)}</span>
+          <h3>${escapeAttr(c.name)}</h3>
           <div class="meta">
             <span>${deptMeta ? deptMeta.short : ""}</span>
-            <span>Level ${c.level}</span>
-            <span>Sem ${c.semester}</span>
+            <span>Level ${escapeAttr(c.level)}</span>
             <span>${mats} material${mats === 1 ? "" : "s"}</span>
           </div>
-          <p class="desc">${c.description}</p>
+          <p class="desc">${escapeAttr(c.description)}</p>
         </a>`;
       }).join("");
     }
@@ -632,75 +602,49 @@
     const root = qs("#course-root");
     if (!root) return;
     const id = params().get("id");
-    const course = EBB.getCourse(id);
+    const codeParam = params().get("code");
+    const course = EBB.getCourse(id) || (codeParam ? EBB.getCourseByCode(codeParam) : null);
     if (!course) {
-      root.innerHTML = `<div class="empty-state"><p>Course not found.</p><a class="btn btn-primary" href="./courses.html">Browse courses</a></div>`;
+      root.innerHTML = `<div class="empty-state"><p>Course not found in the live library.</p><a class="btn btn-primary" href="./courses.html">Browse courses</a></div>`;
       return;
     }
     const dept = EBB.getDepartment(course.department);
     document.title = `${course.code} · ${course.name} | Engineering Brain Bank`;
 
-    function normalizeCode(c) {
-      return String(c || "").toLowerCase().replace(/\s+/g, "");
-    }
-
-    function renderMaterials(materials) {
-      const byTopic = {};
-      materials.forEach((m) => {
-        (byTopic[m.topic || "Materials"] ||= []).push(m);
-      });
-      const map = new Map(materials.map((m) => [String(m.id), m]));
-      root.innerHTML = `
+    const materials = EBB.getMaterialsForCourse(course.id)
+      .sort((a, b) => (a.type || "").localeCompare(b.type || "") || (a.title || "").localeCompare(b.title || ""));
+    const byTopic = {};
+    materials.forEach((m) => {
+      (byTopic[m.topic || "Materials"] ||= []).push(m);
+    });
+    const map = new Map(materials.map((m) => [String(m.id), m]));
+    root.innerHTML = `
       <div class="breadcrumb">
         <a href="./index.html">Home</a><span>/</span>
         <a href="./courses.html">Courses</a><span>/</span>
-        <a href="./courses.html?dept=${course.department}">${dept ? dept.short : ""}</a><span>/</span>
-        ${course.code}
+        <a href="./courses.html?dept=${encodeURIComponent(course.department)}">${dept ? escapeAttr(dept.short) : ""}</a><span>/</span>
+        ${escapeAttr(course.code)}
       </div>
       <div class="course-header-block">
         <div>
-          <div class="code">${course.code}</div>
-          <h1 style="font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;margin:0.35rem 0 0.5rem">${course.name}</h1>
-          <p style="color:var(--text-muted);max-width:40rem">${course.description}</p>
+          <div class="code">${escapeAttr(course.code)}</div>
+          <h1 style="font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(course.name)}</h1>
+          <p style="color:var(--text-muted);max-width:40rem">${escapeAttr(course.description)}</p>
         </div>
         <div class="stat-pills">
-          <span class="stat-pill"><strong>${dept ? dept.name : ""}</strong></span>
-          <span class="stat-pill">Level <strong>${course.level}</strong></span>
-          <span class="stat-pill">Semester <strong>${course.semester}</strong></span>
-          <span class="stat-pill"><strong>${course.lecturer}</strong></span>
+          <span class="stat-pill"><strong>${dept ? escapeAttr(dept.name) : ""}</strong></span>
+          <span class="stat-pill">Level <strong>${escapeAttr(course.level)}</strong></span>
+          <span class="stat-pill"><strong>${materials.length}</strong> materials</span>
         </div>
       </div>
-      <p style="margin:1.25rem 0 0.5rem;font-size:0.82rem;color:var(--text-dim)">
-        Org: ${dept ? dept.name : ""} → Level ${course.level} → Semester ${course.semester} → ${course.code} → Topic → Material
-      </p>
       <h2 class="section-title" style="margin-top:2rem">Materials (${materials.length})</h2>
       ${materials.length ? Object.entries(byTopic).map(([topic, mats]) => `
         <h3 style="font-size:1rem;margin:1.25rem 0 0.65rem;color:var(--gold)">${escapeAttr(topic)}</h3>
         <div class="material-list">
           ${mats.map((m) => materialRowHtml(m, {})).join("")}
-        </div>`).join("") : `<div class="empty-state">No materials yet. <a href="./upload.html">Upload the first one</a>.</div>`}
+        </div>`).join("") : `<div class="empty-state">No materials yet.</div>`}
     `;
-      wireMaterialActions(root, map);
-    }
-
-    const mock = EBB.getMaterialsForCourse(course.id);
-    renderMaterials(mock);
-
-    fetchLiveMaterials().then((live) => {
-      const codeN = normalizeCode(course.code);
-      const liveForCourse = live.filter((m) => {
-        if (m.courseId === course.id) return true;
-        return normalizeCode(m.course_code) === codeN;
-      });
-      if (!liveForCourse.length) return;
-      // Prefer live; keep mock that don't collide by filename
-      const liveNames = new Set(liveForCourse.map((m) => (m.fileName || "").toLowerCase()));
-      const merged = [
-        ...liveForCourse,
-        ...mock.filter((m) => !liveNames.has((m.fileName || "").toLowerCase())),
-      ];
-      renderMaterials(merged);
-    });
+    wireMaterialActions(root, map);
   }
 
   /* ---------- Resources ---------- */
@@ -712,88 +656,88 @@
     const deptSel = qs("#filter-dept");
     const levelSel = qs("#filter-level");
     const qInput = qs("#filter-q");
-    let liveMaterials = [];
+    const PAGE = 60;
+    let pageIdx = 0;
 
     if (typeSel) {
       typeSel.innerHTML = `<option value="">All types</option>` +
-        EBB.materialTypes.map((t) => `<option value="${t.id}">${t.name}</option>`).join("");
+        EBB.materialTypes.map((t) => {
+          const n = EBB.materials.filter((m) => m.type === t.id).length;
+          return `<option value="${t.id}">${t.name}${n ? ` (${n})` : ""}</option>`;
+        }).join("");
       if (p.get("type")) typeSel.value = p.get("type");
     }
     if (deptSel) {
+      const depts = EBB.departments.filter((d) => d.count > 0);
       deptSel.innerHTML = `<option value="">All departments</option>` +
-        EBB.departments.map((d) => `<option value="${d.id}">${d.name}</option>`).join("");
+        (depts.length ? depts : EBB.departments)
+          .map((d) => `<option value="${d.id}">${d.name} (${d.count})</option>`).join("");
       if (p.get("dept")) deptSel.value = p.get("dept");
     }
     if (levelSel) {
       levelSel.innerHTML = `<option value="">All levels</option>` +
         EBB.levels.map((l) => `<option value="${l.id}">${l.name}</option>`).join("");
+      if (p.get("level")) levelSel.value = p.get("level");
     }
     if (qInput && p.get("q")) qInput.value = p.get("q");
 
-    function filterLive(listIn) {
-      const type = typeSel?.value || "";
-      const department = deptSel?.value || "";
-      const level = levelSel?.value || "";
-      const query = (qInput?.value || "").toLowerCase().trim();
-      return listIn.filter((m) => {
-        if (type && m.type !== type) return false;
-        if (department && m.department !== department) {
-          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
-          if (!c || c.department !== department) return false;
-        }
-        if (level && m.level !== level) {
-          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
-          if (!c || c.level !== level) return false;
-        }
-        if (query) {
-          const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
-          const hay = [m.title, m.topic, m.type, m.course_code, c && c.code, c && c.name]
-            .filter(Boolean).join(" ").toLowerCase();
-          if (!hay.includes(query)) return false;
-        }
-        return true;
-      });
-    }
-
     function render() {
-      const mockFiltered = EBB.filterMaterials({
+      const filtered = EBB.filterMaterials({
         type: typeSel?.value || "",
         department: deptSel?.value || "",
         level: levelSel?.value || "",
         query: qInput?.value || "",
-      });
-      let filtered;
-      if (liveMaterials.length) {
-        const liveF = filterLive(liveMaterials);
-        const liveNames = new Set(liveF.map((m) => (m.fileName || "").toLowerCase()));
-        filtered = [
-          ...liveF,
-          ...mockFiltered.filter((m) => !liveNames.has((m.fileName || "").toLowerCase())),
-        ].sort((a, b) => new Date(b.date) - new Date(a.date));
-      } else {
-        filtered = mockFiltered.sort((a, b) => new Date(b.date) - new Date(a.date));
-      }
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
       const countEl = qs("#resource-count");
-      if (countEl) countEl.textContent = `${filtered.length} resource${filtered.length === 1 ? "" : "s"}`;
+      if (countEl) {
+        countEl.textContent = `${filtered.length} resource${filtered.length === 1 ? "" : "s"}`;
+      }
 
       if (!filtered.length) {
         list.innerHTML = `<div class="empty-state">No resources match your filters.</div>`;
         return;
       }
-      const map = new Map(filtered.map((m) => [String(m.id), m]));
-      list.innerHTML = filtered.map((m) => materialRowHtml(m, { resources: true })).join("");
+
+      const maxPage = Math.max(0, Math.ceil(filtered.length / PAGE) - 1);
+      if (pageIdx > maxPage) pageIdx = 0;
+      const slice = filtered.slice(pageIdx * PAGE, pageIdx * PAGE + PAGE);
+      const map = new Map(slice.map((m) => [String(m.id), m]));
+      list.innerHTML =
+        slice.map((m) => materialRowHtml(m, { resources: true })).join("") +
+        (filtered.length > PAGE
+          ? `<div class="pager" style="display:flex;gap:0.75rem;align-items:center;justify-content:center;margin:1.5rem 0;flex-wrap:wrap">
+              <button type="button" class="btn btn-ghost btn-sm" id="page-prev" ${pageIdx === 0 ? "disabled" : ""}>Previous</button>
+              <span style="color:var(--text-dim);font-size:0.9rem">Page ${pageIdx + 1} / ${maxPage + 1}</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="page-next" ${pageIdx >= maxPage ? "disabled" : ""}>Next</button>
+            </div>`
+          : "");
       wireMaterialActions(list, map);
+      qs("#page-prev")?.addEventListener("click", () => {
+        pageIdx = Math.max(0, pageIdx - 1);
+        render();
+        list.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      qs("#page-next")?.addEventListener("click", () => {
+        pageIdx = Math.min(maxPage, pageIdx + 1);
+        render();
+        list.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     }
 
-    [typeSel, deptSel, levelSel].forEach((el) => el && el.addEventListener("change", render));
-    if (qInput) qInput.addEventListener("input", render);
+    [typeSel, deptSel, levelSel].forEach((el) =>
+      el && el.addEventListener("change", () => {
+        pageIdx = 0;
+        render();
+      })
+    );
+    if (qInput) {
+      qInput.addEventListener("input", () => {
+        pageIdx = 0;
+        render();
+      });
+    }
     render();
-
-    fetchLiveMaterials().then((live) => {
-      liveMaterials = live || [];
-      render();
-    });
   }
 
   /* ---------- Upload ---------- */
@@ -836,7 +780,7 @@
       fileInput.addEventListener("change", () => showFile(fileInput.files?.[0]));
     }
 
-    // Enforce allowlist on public upload form (demo still — owner uses Admin)
+    // Enforce allowlist on public upload form (owner publishes via Admin)
     if (fileInput && window.EBBApi) {
       fileInput.setAttribute("accept", EBBApi.acceptAttr());
     }
@@ -861,28 +805,56 @@
         showToast("File type not allowed. Use PDF, PPT/PPTX, DOC/DOCX, TXT, or MD.");
         return;
       }
-      showToast("Thanks! Student uploads are demo-only for now. Owner publishes via Admin.");
+      showToast("Thanks — request noted. The live library is published by KB4GESA via Admin.");
       form.reset();
       showFile(null);
     });
   }
 
-  /* ---------- Boot ---------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  /* ---------- Boot (live catalog only) ---------- */
+  async function boot() {
     injectChrome();
     const page = document.body.dataset.page;
+
+    const loading = document.createElement("div");
+    loading.id = "ebb-boot-status";
+    loading.className = "empty-state";
+    loading.style.cssText = "padding:1.25rem;text-align:center;color:var(--text-dim)";
+    loading.textContent = "Loading live library…";
+    const main = document.getElementById("main");
+    if (main && page !== "upload" && page !== "about" && page !== "admin") {
+      main.prepend(loading);
+    }
+
+    try {
+      const live = await fetchLiveMaterials();
+      const stats = EBB.hydrateFromLive(live);
+      console.info("[EBB] live catalog", stats);
+      if (!live.length) {
+        loading.textContent = "No published materials yet. Check Supabase / Admin.";
+      } else {
+        loading.remove();
+      }
+    } catch (err) {
+      console.error(err);
+      loading.textContent = "Could not load the live library.";
+    }
+
     if (page === "home") initHome();
     else if (page === "courses") initCourses();
     else if (page === "course") initCourse();
     else if (page === "resources") initResources();
     else if (page === "upload") initUpload();
 
-    // Track one page view per path per browser session when Supabase is configured
     if (window.EBBApi && EBBApi.isConfigured()) {
       const path = window.location.pathname || ("/" + (page || "home"));
       EBBApi.recordPageViewOncePerSession(path);
     }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    boot().catch((err) => console.error("[EBB] boot failed", err));
   });
 
-  window.EBBApp = { showToast, CREST_SVG, SWOOSH_SVG, fetchLiveMaterials };
+  window.EBBApp = { showToast, CREST_SVG, SWOOSH_SVG, fetchLiveMaterials, boot };
 })();

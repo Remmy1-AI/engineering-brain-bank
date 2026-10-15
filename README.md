@@ -20,7 +20,7 @@ Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 | Courses | `courses.html` |
 | Course detail | `course.html?id=` |
 | Resources / Ask the Brain Bank | `resources.html` |
-| Upload (student demo) | `upload.html` |
+| Upload (request) | `upload.html` |
 | About | `about.html` |
 | Owner Admin | `admin.html` |
 

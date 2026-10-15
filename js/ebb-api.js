@@ -157,32 +157,43 @@
     return /\.(jpe?g|png|gif|webp)$/.test(name);
   }
 
-  async function listPublishedMaterials({ limit = 2500 } = {}) {
+  /** Page through PostgREST (server max-rows is often 1000). */
+  async function fetchAllRows(buildQuery, { pageSize = 1000, maxRows = 20000 } = {}) {
+    const out = [];
+    for (let from = 0; from < maxRows; from += pageSize) {
+      const to = from + pageSize - 1;
+      const { data, error } = await buildQuery().range(from, to);
+      if (error) throw error;
+      const batch = data || [];
+      out.push(...batch);
+      if (batch.length < pageSize) break;
+    }
+    return out;
+  }
+
+  async function listPublishedMaterials() {
     const sb = await getClient();
     if (!sb) return [];
-    const { data, error } = await sb
-      .from("materials")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    if (error) {
-      console.warn("[EBB API] listPublishedMaterials:", error.message);
+    try {
+      return await fetchAllRows(() =>
+        sb
+          .from("materials")
+          .select("*")
+          .eq("published", true)
+          .order("created_at", { ascending: false })
+      );
+    } catch (error) {
+      console.warn("[EBB API] listPublishedMaterials:", error.message || error);
       return [];
     }
-    return data || [];
   }
 
   async function listAllMaterials() {
     const sb = await getClient();
     if (!sb) return [];
-    const { data, error } = await sb
-      .from("materials")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5000);
-    if (error) throw error;
-    return data || [];
+    return fetchAllRows(() =>
+      sb.from("materials").select("*").order("created_at", { ascending: false })
+    );
   }
 
   async function recordPageViewOncePerSession(path) {
@@ -223,7 +234,7 @@
     }
   }
 
-  /** Map a Supabase materials row to the mock EBB.materials shape used by the UI. */
+  /** Map a Supabase materials row to the UI material shape. */
   function toUiMaterial(row) {
     const course = window.EBB && row.course_code
       ? EBB.getCourseByCode(row.course_code)
