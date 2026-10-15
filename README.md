@@ -66,13 +66,26 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 
 6. Commit and push to `main` (or edit the file on GitHub). After Pages rebuilds, open `/admin.html`, sign in, and upload materials.
 
-### Allowed uploads
+### Allowed uploads (Admin)
 
-PDF, PPT/PPTX, DOC/DOCX, TXT, MD only — **no video**. Enforced in Admin/public file inputs and documented in `schema.sql`.
+PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploads. The bulk course library is **not** stored in Supabase Storage.
 
-### Public URLs
+### Hybrid file hosting (catalog in Supabase)
 
-Storage bucket `materials` is public-read. Object URL:
+- **Supabase** holds the materials **catalog** (metadata, publish flag, download/share counts).
+- **File bytes** are linked from `materials/manifest.csv` **Google Drive** URLs (`source = external`), because this GitHub repo is **private** (anonymous `raw.githubusercontent.com` 404s).
+- If the repo is made **public** later, re-seed can fall back to GitHub raw URLs (`source = github`).
+- UI: **Watch / Open** uses Drive preview embeds; **Download** uses Drive `uc?export=download`.
+
+Re-seed catalog (owner machine; secrets in `~/.config/ebb/supabase.env`, not in repo):
+
+```bash
+python3 scripts/seed_github_materials.py
+```
+
+Schema patch: [`supabase/schema_github_hybrid.sql`](supabase/schema_github_hybrid.sql).
+
+### Public Storage URLs (optional admin uploads)
 
 `{SUPABASE_URL}/storage/v1/object/public/materials/{file_path}`
 

@@ -190,9 +190,91 @@
     return sizeStr || "";
   }
 
+  function resolveMaterialUrl(m) {
+    if (!m || !window.EBBApi) return "";
+    return EBBApi.getFileUrl(m) || EBBApi.getPublicFileUrl(m.file_path || "");
+  }
+
+  function resolveDownloadUrl(m) {
+    if (!m || !window.EBBApi) return "";
+    return EBBApi.getDownloadUrl(m) || resolveMaterialUrl(m);
+  }
+
+  function ensureMediaModal() {
+    let modal = qs("#media-modal");
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.id = "media-modal";
+    modal.className = "media-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="media-modal__backdrop" data-close="1"></div>
+      <div class="media-modal__panel" role="dialog" aria-modal="true" aria-labelledby="media-modal-title">
+        <div class="media-modal__head">
+          <h2 id="media-modal-title" class="media-modal__title"></h2>
+          <button type="button" class="icon-btn media-modal__close" data-close="1" aria-label="Close">✕</button>
+        </div>
+        <div class="media-modal__body"></div>
+        <div class="media-modal__actions">
+          <a class="btn btn-primary" id="media-modal-download" href="#" download target="_blank" rel="noopener">Download</a>
+          <button type="button" class="btn btn-ghost" data-close="1">Close</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener("click", (e) => {
+      if (e.target.closest("[data-close]")) closeMediaModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.hidden) closeMediaModal();
+    });
+    return modal;
+  }
+
+  function closeMediaModal() {
+    const modal = qs("#media-modal");
+    if (!modal) return;
+    const body = modal.querySelector(".media-modal__body");
+    if (body) body.innerHTML = "";
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  function openMediaViewer(m, url) {
+    const modal = ensureMediaModal();
+    const title = modal.querySelector(".media-modal__title");
+    const body = modal.querySelector(".media-modal__body");
+    const dl = modal.querySelector("#media-modal-download");
+    if (title) title.textContent = m.title || m.fileName || "Material";
+    const downloadUrl = resolveDownloadUrl(m) || url;
+    if (dl) {
+      dl.href = downloadUrl;
+      dl.setAttribute("download", m.fileName || "download");
+    }
+    const isVideo = EBBApi.isVideoMaterial(m);
+    const isImage = EBBApi.isImageMaterial(m);
+    const isDrive = /drive\.google\.com/i.test(url);
+    if (isVideo && isDrive) {
+      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}" allow="autoplay" allowfullscreen title="Video"></iframe>
+        <p class="media-modal__hint">Watch here, or download the file to keep offline.</p>`;
+    } else if (isVideo) {
+      body.innerHTML = `<video class="media-modal__video" controls playsinline src="${escapeAttr(url)}"></video>
+        <p class="media-modal__hint">Watch here, or download the file to keep offline.</p>`;
+    } else if (isImage && !isDrive) {
+      body.innerHTML = `<img class="media-modal__img" src="${escapeAttr(url)}" alt="${escapeAttr(m.title || "")}" />`;
+    } else if (isDrive) {
+      body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}" allowfullscreen title="Document"></iframe>
+        <p class="media-modal__hint">Preview on site. Use Download to save a copy.</p>`;
+    } else {
+      body.innerHTML = `<p class="media-modal__hint">Preview opens in a new tab. You can also download.</p>
+        <p><a class="btn btn-primary" href="${escapeAttr(url)}" target="_blank" rel="noopener">Open file</a></p>`;
+    }
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
   async function shareMaterial(m) {
-    const url = m.live && m.file_path
-      ? EBBApi.getPublicFileUrl(m.file_path)
+    const url = m.live
+      ? resolveMaterialUrl(m)
       : `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, "")}course.html?id=${m.courseId || ""}`;
     const title = m.title || "Engineering Brain Bank material";
     try {
@@ -220,12 +302,17 @@
   }
 
   async function openOrDownloadMaterial(m, mode) {
-    if (m.live && m.file_path && window.EBBApi) {
-      const url = EBBApi.getPublicFileUrl(m.file_path);
-      if (m.id) EBBApi.incrementDownload(m.id);
+    if (m.live && window.EBBApi) {
+      const url = resolveMaterialUrl(m);
+      if (!url) {
+        showToast("File URL missing.");
+        return;
+      }
       if (mode === "download") {
+        if (m.id) EBBApi.incrementDownload(m.id);
+        const dl = resolveDownloadUrl(m) || url;
         const a = document.createElement("a");
-        a.href = url;
+        a.href = dl;
         a.download = m.fileName || "download";
         a.target = "_blank";
         a.rel = "noopener";
@@ -233,10 +320,20 @@
         a.click();
         a.remove();
         showToast("Download started: " + (m.fileName || "file"));
-      } else {
-        window.open(url, "_blank", "noopener");
-        showToast("Opening " + (m.fileName || "file") + "…");
+        return;
       }
+      // Watch / open — prefer in-page viewer for video + Drive previews
+      if (
+        EBBApi.isVideoMaterial(m) ||
+        EBBApi.isImageMaterial(m) ||
+        /drive\.google\.com/i.test(url)
+      ) {
+        openMediaViewer(m, url);
+        return;
+      }
+      if (m.id) EBBApi.incrementDownload(m.id);
+      window.open(url, "_blank", "noopener");
+      showToast("Opening " + (m.fileName || "file") + "…");
       return;
     }
     showToast(mode === "download"
@@ -261,12 +358,15 @@
     const titleInner = opts.resources
       ? `<a href="${courseLink}" style="color:inherit">${escapeAttr(m.title)}</a>`
       : escapeAttr(m.title);
+    const isVid = m.live && window.EBBApi && EBBApi.isVideoMaterial(m);
+    const openLabel = isVid ? "Watch" : "Open";
     const actions = opts.resources
       ? (m.live
-          ? `<button class="btn btn-primary btn-sm" type="button" data-mat-action="open" data-mat-id="${escapeAttr(m.id)}">Open</button>
+          ? `<button class="btn btn-primary btn-sm" type="button" data-mat-action="open" data-mat-id="${escapeAttr(m.id)}">${openLabel}</button>
+             <button class="btn btn-ghost btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
              <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`
           : `<a class="btn btn-primary btn-sm" href="${courseLink}">Open</a>`)
-      : `<button class="btn btn-ghost btn-sm" type="button" data-mat-action="view" data-mat-id="${escapeAttr(m.id)}">View</button>
+      : `<button class="btn btn-ghost btn-sm" type="button" data-mat-action="view" data-mat-id="${escapeAttr(m.id)}">${isVid ? "Watch" : "View"}</button>
          <button class="btn btn-primary btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
          <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`;
     const typePart = opts.resources ? typeBadge(m.type) + " " : "";
@@ -350,6 +450,8 @@
         slides: "Lecture decks organized by department, level, and course.",
         notes: "Detailed notes to revise topics before exams and labs.",
         "past-questions": "Past papers and mid-sems to sharpen exam prep.",
+        tutorials: "Worked examples and tutorial sets for practice.",
+        videos: "Watch lecture clips on the site — download optional.",
         shared: "Peer uploads — tutorials, solutions, and study packs.",
       };
       featureGrid.innerHTML = EBB.materialTypes.map((t) => `

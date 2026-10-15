@@ -5,15 +5,11 @@
 -- ============================================================
 
 -- Allowed upload MIME types (client + admin enforce; document here):
---   application/pdf
---   application/vnd.ms-powerpoint
---   application/vnd.openxmlformats-officedocument.presentationml.presentation
---   application/msword
---   application/vnd.openxmlformats-officedocument.wordprocessingml.document
---   text/plain
---   text/markdown
---   text/x-markdown
--- Extensions: .pdf .ppt .pptx .doc .docx .txt .md  (NO video)
+--   application/pdf, office docs, text/markdown
+--   video/mp4 (and related) — watch on site + download
+--   image/jpeg, image/png, …
+-- Bulk library files live on GitHub materials/; see schema_github_hybrid.sql
+-- Extensions include: .pdf .ppt .pptx .doc .docx .txt .md .mp4 .jpg …
 
 create extension if not exists "pgcrypto";
 
