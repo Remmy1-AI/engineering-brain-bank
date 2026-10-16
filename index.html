@@ -16,8 +16,8 @@
   <meta name="description" content="Your one-stop platform for engineering course slides, notes, and past questions. Learn • Share • Succeed." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20261015b1" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261016a1" />
 </head>
 <body data-page="home">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -25,39 +25,28 @@
 
   <main class="main" id="main">
     <section class="hero">
-      <div class="hero-chalk hero-chalk-left" aria-hidden="true">
-        <img src="./assets/chalk-board-left.svg?v=20261015b1" alt="" />
+      <div class="hero-media" aria-hidden="true">
+        <img class="hero-photo" src="./assets/hero-archive.jpg?v=20261016a1" alt="" />
+        <div class="hero-shade"></div>
+        <div class="hero-grain"></div>
       </div>
-      <div class="hero-chalk hero-chalk-right" aria-hidden="true">
-        <img src="./assets/chalk-board-right.svg?v=20261015b1" alt="" />
-      </div>
-      <div class="hero-blueprint" aria-hidden="true"></div>
-      <div class="container">
-        <div class="hero-title-block">
-          <div class="hero-swoosh" aria-hidden="true">
-            <img src="./assets/hero-gold-swoosh.png?v=20261015b1" alt="" />
-          </div>
-          <div class="hero-glow" aria-hidden="true"></div>
-          <h1 class="hero-title">
-            <span class="hero-line">ENGINEERING</span>
-            <span class="hero-line">BRAIN BANK</span>
-          </h1>
-        </div>
-        <p class="hero-tagline">Learn<span class="dot"> • </span>Share<span class="dot"> • </span>Succeed</p>
-        <p class="hero-purpose">Your one-stop platform for engineering course slides, notes, and past questions.</p>
+      <div class="container hero-copy">
+        <p class="hero-brand">KB4GESA</p>
+        <h1 class="hero-title">Engineering Brain Bank</h1>
+        <p class="hero-purpose">Course slides, notes, and past questions for Korle Boye engineers.</p>
 
         <div class="search-box">
           <form id="hero-search-form" role="search" aria-label="Ask the Brain Bank">
             <input
               id="hero-search"
               type="search"
-              placeholder="Ask the Brain Bank / search course codes"
+              placeholder="Search course codes or topics"
               autocomplete="off"
               aria-autocomplete="list"
               aria-controls="search-results"
             />
             <button type="submit" class="search-submit" aria-label="Search">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.6" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.6" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
               </svg>
             </button>
@@ -67,29 +56,27 @@
 
         <div class="hero-ctas">
           <a class="btn btn-primary btn-lg" href="./courses.html">Browse Courses</a>
-          <a class="btn btn-ghost btn-lg" href="./upload.html">Upload Material</a>
         </div>
-        <p class="hero-closing">From Korle Boye, For Korle Boye.</p>
       </div>
     </section>
 
-    <section class="section" style="padding-top:1.25rem;padding-bottom:1.75rem">
+    <section class="section section-tight">
       <div class="container">
         <div class="feature-grid" id="feature-grid"></div>
       </div>
     </section>
 
-    <section class="section" style="padding-top:0.5rem">
+    <section class="section">
       <div class="container">
         <h2 class="section-title">Browse by Department</h2>
         <div class="dept-grid" id="dept-grid"></div>
       </div>
     </section>
 
-    <section class="section" style="padding-top:0.75rem">
+    <section class="section">
       <div class="container">
         <h2 class="section-title">Recently Added</h2>
-        <div class="recent-list" id="recent-list"></div>
+        <div class="recent-rail" id="recent-list"></div>
       </div>
     </section>
 
@@ -107,10 +94,10 @@
   </main>
 
   <footer class="site-footer" id="site-footer"></footer>
-  <script src="./js/data.js?v=20261015b1"></script>
-  <script src="./js/supabase-config.js?v=20261015b1"></script>
-  <script src="./js/ebb-api.js?v=20261015b1"></script>
-  <script src="./js/og-card.js?v=20261015b1"></script>
-  <script src="./js/app.js?v=20261015b1"></script>
+  <script src="./js/data.js?v=20261016a1"></script>
+  <script src="./js/supabase-config.js?v=20261016a1"></script>
+  <script src="./js/ebb-api.js?v=20261016a1"></script>
+  <script src="./js/og-card.js?v=20261016a1"></script>
+  <script src="./js/app.js?v=20261016a1"></script>
 </body>
 </html>

@@ -451,15 +451,10 @@
     const c = m.courseId ? EBB.getCourse(m.courseId) : (m.course_code ? EBB.getCourseByCode(m.course_code) : null);
     const courseLink = c ? `./course.html?id=${c.id}` : (opts.resources ? "#" : "#");
     const metaExtra = opts.resources
-      ? `<span style="color:var(--gold);font-weight:700">${c ? c.code : escapeAttr(m.course_code || "")}</span>
-         <span>${c ? c.name : ""}</span>
-         <span>${escapeAttr(m.topic || "")}</span>
-         <span>${formatDate(m.date)}</span>`
-      : `${typeBadge(m.type)}
-         <span>${escapeAttr(m.lecturer || "KB4GESA")}</span>
-         <span>${formatDate(m.date)}</span>
-         <span>${escapeAttr(formatBytesLabel(m.size))}</span>
-         <span>${m.downloads || 0} downloads</span>`;
+      ? `<span class="mat-code">${c ? escapeAttr(c.code) : escapeAttr(m.course_code || "")}</span>
+         <span>${escapeAttr(formatDate(m.date))}</span>`
+      : `<span>${escapeAttr(formatBytesLabel(m.size))}</span>
+         <span>${escapeAttr(formatDate(m.date))}</span>`;
     const titleInner = opts.resources
       ? `<a href="${courseLink}" style="color:inherit">${escapeAttr(m.title)}</a>`
       : escapeAttr(m.title);
@@ -471,16 +466,14 @@
              <button class="btn btn-ghost btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
              <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`
           : `<a class="btn btn-primary btn-sm" href="${courseLink}">Open</a>`)
-      : `<button class="btn btn-ghost btn-sm" type="button" data-mat-action="view" data-mat-id="${escapeAttr(m.id)}">${isVid ? "Watch" : "View"}</button>
-         <button class="btn btn-primary btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
+      : `<button class="btn btn-primary btn-sm" type="button" data-mat-action="view" data-mat-id="${escapeAttr(m.id)}">${isVid ? "Watch" : "Open"}</button>
+         <button class="btn btn-ghost btn-sm" type="button" data-mat-action="download" data-mat-id="${escapeAttr(m.id)}">Download</button>
          <button class="btn btn-ghost btn-sm" type="button" data-mat-action="share" data-mat-id="${escapeAttr(m.id)}">Share</button>`;
-    const typePart = opts.resources ? typeBadge(m.type) + " " : "";
     return `<div class="material-row" data-mat-id="${escapeAttr(m.id)}">
-      <div>
-        <h3>${titleInner}</h3>
-        <div class="meta">${typePart}${metaExtra}</div>
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">${actions}</div>
+      <div class="material-row__top">${typeBadge(m.type)}</div>
+      <h3>${titleInner}</h3>
+      <div class="meta">${metaExtra}</div>
+      <div class="material-row__actions">${actions}</div>
     </div>`;
   }
 
