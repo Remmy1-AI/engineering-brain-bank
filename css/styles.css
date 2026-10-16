@@ -220,10 +220,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 40%;
+  object-position: 58% 42%;
   transform: scale(1.04);
   animation: heroDrift 28s ease-in-out infinite alternate;
-  filter: grayscale(1) contrast(1.08) brightness(0.72);
+  filter: grayscale(1) contrast(1.12) brightness(0.88);
 }
 
 @keyframes heroDrift {
@@ -235,8 +235,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 42%, rgba(0,0,0,0.35) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.88) 100%);
+    linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.42) 38%, rgba(0,0,0,0.18) 72%, rgba(0,0,0,0.4) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.82) 100%);
 }
 
 .hero-grain {
@@ -769,22 +769,22 @@ textarea.form-control {
   color: var(--text-muted);
 }
 
-/* ---------- Material tiles — 1 → 2 → 3 with width ---------- */
+/* ---------- Material tiles — densify with viewport ---------- */
 .material-list {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 640px) {
   .material-list {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 }
 
 @media (min-width: 1100px) {
   .material-list {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
