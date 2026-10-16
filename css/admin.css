@@ -50,7 +50,18 @@
   max-width: 100%;
   box-sizing: border-box;
 }
-.admin-narrow { max-width: 560px; }
+/* Login / setup: beat the container rule above (specificity) and keep a real card width */
+.admin-main > .section > .container.admin-narrow {
+  width: min(100% - 1.5rem, 26rem);
+  max-width: 26rem; /* ~416px — not a full-bleed form */
+  margin-inline: auto;
+}
+.admin-narrow .admin-card {
+  padding: 1.5rem 1.25rem;
+}
+.admin-narrow .admin-form .btn {
+  width: 100%;
+}
 
 .admin-card {
   background: var(--bg-card);
