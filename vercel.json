@@ -4,7 +4,9 @@
   "trailingSlash": false,
   "functions": {
     "api/og.js": {
-      "includeFiles": "api/og-media/**"
+      "includeFiles": "api/og-media/**",
+      "memory": 1024,
+      "maxDuration": 10
     }
   },
   "rewrites": [
