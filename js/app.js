@@ -313,12 +313,33 @@
     });
   }
 
-  /** Canonical Vercel origin — WhatsApp OG previews need the /s serverless page. */
-  const SHARE_ORIGIN = "https://engineering-brain-bank.vercel.app";
+  /** Canonical domain — WhatsApp OG previews use /s/... on boye.study */
+  const SHARE_ORIGIN = "https://boye.study";
 
+  function shareSlugify(s) {
+    return String(s || "")
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 72) || "material";
+  }
+
+  function shareCourseSlug(code) {
+    const raw = String(code || "gen").trim().toLowerCase().replace(/\s+/g, "");
+    const m = raw.match(/^([a-z]+)(\d+)/i);
+    if (m) return `${m[1]}-${m[2]}`;
+    return shareSlugify(raw);
+  }
+
+  /** Clean share URL: https://boye.study/s/ae-196/workshop-practice~12e5ee */
   function materialShareLink(m) {
     if (m && m.live && m.id) {
-      return `${SHARE_ORIGIN}/s?m=${encodeURIComponent(m.id)}`;
+      const code = m.course_code || (m.courseId && EBB.getCourse(m.courseId)?.code) || "gen";
+      const title = m.title || m.fileName || "material";
+      const short = String(m.id).slice(0, 8); // leading UUID segment, e.g. 12e5eede
+      return `${SHARE_ORIGIN}/s/${shareCourseSlug(code)}/${shareSlugify(title)}~${short}`;
     }
     try {
       return new URL(
