@@ -190,7 +190,7 @@ function humanShareHtml(origin, bootstrap, og) {
   <meta property="og:url" content="${escapeHtml(og.url)}" />
   <meta property="og:image" content="${escapeHtml(og.image)}" />
   <meta property="og:image:secure_url" content="${escapeHtml(og.image)}" />
-  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="${escapeHtml(og.title)}" />
@@ -316,9 +316,10 @@ module.exports = async function handler(req, res) {
   };
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
+  // Long CDN cache — WhatsApp re-fetches rarely; same slug = same material
   res.setHeader(
     "Cache-Control",
-    "public, s-maxage=60, stale-while-revalidate=300"
+    "public, s-maxage=3600, stale-while-revalidate=86400"
   );
   res.statusCode = 200;
 
