@@ -1,14 +1,7 @@
-/* AceWithBoye OG card as JPEG (Node + sharp).
-   Small, cacheable file so WhatsApp shows Boye's face quickly. */
-import sharp from "sharp";
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-
-export const config = { runtime: "nodejs" };
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
+/* AceWithBoye OG card as JPEG (Node + sharp) — small for WhatsApp. */
+const sharp = require("sharp");
+const { readFileSync, existsSync } = require("fs");
+const { join } = require("path");
 
 const TYPE_LABELS = {
   slides: "Course Slides",
@@ -42,9 +35,22 @@ function wrapName(name, maxChars) {
   return lines.slice(0, 3);
 }
 
-export default async function handler(req, res) {
+function asset(...parts) {
+  const candidates = [
+    join(process.cwd(), ...parts),
+    join(__dirname, "..", ...parts),
+  ];
+  for (const p of candidates) {
+    if (existsSync(p)) return p;
+  }
+  throw new Error("Missing asset: " + parts.join("/"));
+}
+
+module.exports = async function handler(req, res) {
   try {
-    const url = new URL(req.url, "https://boye.study");
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "boye.study";
+    const proto = (req.headers["x-forwarded-proto"] || "https").split(",")[0];
+    const url = new URL(req.url, `${proto}://${host}`);
     const typeId = url.searchParams.get("type") || "shared";
     const typeLabel =
       url.searchParams.get("label") || TYPE_LABELS[typeId] || "Material";
@@ -53,13 +59,9 @@ export default async function handler(req, res) {
     if (name.length > 70) name = name.slice(0, 67) + "…";
     const nameLines = wrapName(name, 28);
 
-    const boyePath = join(root, "assets/og/boye-cutout-og.jpg");
-    const markPath = join(root, "assets/og/ace-wordmark-og.png");
-    const bpPath = join(root, "assets/og/blueprint-og.png");
-
-    const boyeBuf = readFileSync(boyePath);
-    const markBuf = readFileSync(markPath);
-    const bpBuf = readFileSync(bpPath);
+    const boyeBuf = readFileSync(asset("assets", "og", "boye-cutout-og.jpg"));
+    const markBuf = readFileSync(asset("assets", "og", "ace-wordmark-og.png"));
+    const bpBuf = readFileSync(asset("assets", "og", "blueprint-og.png"));
 
     const boyeB64 = boyeBuf.toString("base64");
     const markB64 = markBuf.toString("base64");
@@ -106,4 +108,4 @@ export default async function handler(req, res) {
       "OG render failed: " + (err && err.message ? err.message : String(err))
     );
   }
-}
+};
