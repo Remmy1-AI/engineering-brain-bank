@@ -1,8 +1,10 @@
-/* Route admin.boye.study → Owner Admin (filesystem index.html would win over vercel.json rewrites). */
+/* Route admin.boye.study → Owner Admin.
+   cleanUrls serves admin.html at /admin (not /admin.html), and filesystem
+   index.html would win over vercel.json host rewrites for "/". */
 import { next, rewrite } from "@vercel/edge";
 
 export const config = {
-  matcher: ["/", "/index", "/index.html", "/admin", "/admin.html"],
+  matcher: ["/", "/index", "/index.html"],
 };
 
 export default function middleware(request) {
@@ -10,5 +12,5 @@ export default function middleware(request) {
   if (host !== "admin.boye.study") {
     return next();
   }
-  return rewrite(new URL("/admin.html", request.url));
+  return rewrite(new URL("/admin", request.url));
 }

@@ -6,54 +6,29 @@
     {
       "source": "/admin",
       "has": [{ "type": "host", "value": "boye.study" }],
-      "destination": "https://admin.boye.study",
+      "destination": "https://admin.boye.study/",
       "permanent": true
     },
     {
       "source": "/admin.html",
       "has": [{ "type": "host", "value": "boye.study" }],
-      "destination": "https://admin.boye.study",
+      "destination": "https://admin.boye.study/",
       "permanent": true
     },
     {
       "source": "/admin",
       "has": [{ "type": "host", "value": "www.boye.study" }],
-      "destination": "https://admin.boye.study",
+      "destination": "https://admin.boye.study/",
       "permanent": true
     },
     {
       "source": "/admin.html",
       "has": [{ "type": "host", "value": "www.boye.study" }],
-      "destination": "https://admin.boye.study",
+      "destination": "https://admin.boye.study/",
       "permanent": true
     }
   ],
   "rewrites": [
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "admin.boye.study" }],
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/index",
-      "has": [{ "type": "host", "value": "admin.boye.study" }],
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/index.html",
-      "has": [{ "type": "host", "value": "admin.boye.study" }],
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/admin",
-      "has": [{ "type": "host", "value": "admin.boye.study" }],
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/admin.html",
-      "has": [{ "type": "host", "value": "admin.boye.study" }],
-      "destination": "/admin.html"
-    },
     {
       "source": "/s/:course/:slug*",
       "destination": "/api/share?course=:course&slug=:slug*"
