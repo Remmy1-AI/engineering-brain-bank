@@ -293,8 +293,10 @@
 .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
 .admin-row-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 0.35rem;
+  align-items: center;
 }
 .admin-row-actions .btn {
   white-space: nowrap;
@@ -302,15 +304,18 @@
 .admin-danger { color: #ff8a80 !important; }
 .admin-danger:hover { color: #ff5252 !important; }
 
-@media (max-width: 560px) {
+/* Tablet + phone: stack materials as cards (desktop keeps a real table) */
+@media (max-width: 900px) {
   .admin-card { padding: 1.1rem 0.85rem; }
   .brand-name { display: none; }
   .brand-divider { display: none; }
-  .admin-topbar-actions .btn-sm {
-    padding: 0.4rem 0.7rem;
-    font-size: 0.8rem;
+  .admin-topbar-actions {
+    gap: 0.3rem;
   }
-  /* On very small screens, materials table becomes stacked cards via JS-independent CSS */
+  .admin-topbar-actions .btn-sm {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+  }
   .admin-table thead { display: none; }
   .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
     display: block;
@@ -335,5 +340,16 @@
     letter-spacing: 0.04em;
     color: var(--text-dim);
     margin-bottom: 0.15rem;
+  }
+  .admin-row-actions {
+    flex-wrap: wrap;
+    margin-top: 0.35rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-topbar-actions .btn-sm {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.74rem;
   }
 }
