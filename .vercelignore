@@ -8,3 +8,4 @@ supabase/**
 .env.*
 **/*.pyc
 **/__pycache__
+# Keep api/, package.json, assets/og for OG link previews

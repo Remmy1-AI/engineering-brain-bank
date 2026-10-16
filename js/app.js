@@ -313,11 +313,20 @@
     });
   }
 
-  function absoluteShareUrl(pathQuery) {
+  /** Canonical Vercel origin — WhatsApp OG previews need the /s serverless page. */
+  const SHARE_ORIGIN = "https://engineering-brain-bank.vercel.app";
+
+  function materialShareLink(m) {
+    if (m && m.live && m.id) {
+      return `${SHARE_ORIGIN}/s?m=${encodeURIComponent(m.id)}`;
+    }
     try {
-      return new URL(pathQuery, window.location.href).href;
+      return new URL(
+        `./course.html?id=${encodeURIComponent((m && m.courseId) || "")}`,
+        window.location.href
+      ).href;
     } catch (_) {
-      return pathQuery;
+      return SHARE_ORIGIN;
     }
   }
 
@@ -326,68 +335,34 @@
       (m.courseId && EBB.getCourse(m.courseId)) ||
       (m.course_code && EBB.getCourseByCode(m.course_code)) ||
       null;
-    const sharePath = m.live && m.id
-      ? `./share.html?m=${encodeURIComponent(m.id)}`
-      : `./course.html?id=${encodeURIComponent(m.courseId || "")}`;
-    const url = absoluteShareUrl(sharePath);
-    const title = m.title || "Engineering Brain Bank material";
+    const url = materialShareLink(m);
+    const typeMeta = EBB.getTypeMeta(m.type);
+    const headline = course
+      ? `${course.code} — ${course.name || m.title || ""}`
+      : (m.title || "Engineering Brain Bank material");
+    const shareText = `${typeMeta ? typeMeta.name + ": " : ""}${headline}`;
 
-    showToast("Preparing AceWithBoye card…");
-
-    let card = null;
     try {
-      if (window.EBBOgCard) {
-        card = await EBBOgCard.buildMaterialCard(m, course);
+      // Always share the /s link so WhatsApp / iMessage can unfurl the Boye OG card
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
       }
-    } catch (err) {
-      console.warn("[EBB] og card:", err.message || err);
-    }
-
-    const shareText = card
-      ? `${card.typeLabel}: ${card.title}\n${url}`
-      : `${title}\n${url}`;
-
-    try {
-      if (card && navigator.share && navigator.canShare && navigator.canShare({ files: [card.file] })) {
-        await navigator.share({
-          files: [card.file],
-          title: card.title,
-          text: shareText,
-        });
-      } else if (navigator.share) {
-        await navigator.share({ title: card ? card.title : title, url, text: shareText });
+      if (navigator.share) {
+        await navigator.share({ title: headline, url, text: shareText });
+        showToast("Share link ready.");
       } else {
-        if (card) {
-          const a = document.createElement("a");
-          a.href = card.dataUrl;
-          a.download = card.file.name;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        }
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(url);
-          showToast(card ? "Card saved · link copied." : "Link copied.");
-        } else {
-          showToast(url);
-        }
+        showToast("Link copied — paste in WhatsApp.");
       }
       if (m.live && m.id && window.EBBApi) EBBApi.incrementShare(m.id);
     } catch (err) {
       if (err && err.name === "AbortError") return;
       try {
-        if (card) {
-          const a = document.createElement("a");
-          a.href = card.dataUrl;
-          a.download = card.file.name;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        }
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(url);
-          showToast(card ? "Card saved · link copied." : "Link copied.");
+          showToast("Link copied — paste in WhatsApp.");
           if (m.live && m.id && window.EBBApi) EBBApi.incrementShare(m.id);
+        } else {
+          showToast("Could not share.");
         }
       } catch (_) {
         showToast("Could not share.");

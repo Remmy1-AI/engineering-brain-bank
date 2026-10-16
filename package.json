@@ -1,0 +1,7 @@
+{
+  "name": "engineering-brain-bank",
+  "private": true,
+  "dependencies": {
+    "@vercel/og": "^0.6.8"
+  }
+}
