@@ -45,6 +45,12 @@
     search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>`,
   };
 
+  /** Root-absolute hrefs so chrome still works when URL is /s/course/slug */
+  function siteHref(path) {
+    const p = String(path || "").replace(/^\.\//, "");
+    return "/" + p;
+  }
+
   function injectChrome() {
     const headerEl = document.getElementById("site-header");
     const footerEl = document.getElementById("site-footer");
@@ -53,7 +59,7 @@
     if (headerEl) {
       headerEl.innerHTML = `
         <div class="container header-inner">
-          <a class="brand" href="./index.html" aria-label="KB4GESA Engineering Brain Bank home">
+          <a class="brand" href="${siteHref("index.html")}" aria-label="KB4GESA Engineering Brain Bank home">
             ${CREST_SVG}
             <span class="brand-text">
               <span class="brand-code">KB4GESA</span>
@@ -63,14 +69,14 @@
           </a>
           <div class="header-right">
             <nav class="nav" id="main-nav" aria-label="Primary">
-              <a href="./index.html" ${page === "home" ? 'class="active"' : ""}>Home</a>
-              <a href="./courses.html" ${page === "courses" || page === "course" ? 'class="active"' : ""}>Courses</a>
-              <a href="./resources.html" ${page === "resources" ? 'class="active"' : ""}>Resources</a>
-              <a href="./upload.html" ${page === "upload" ? 'class="active"' : ""}>Upload</a>
-              <a href="./about.html" ${page === "about" ? 'class="active"' : ""}>About</a>
+              <a href="${siteHref("index.html")}" ${page === "home" ? 'class="active"' : ""}>Home</a>
+              <a href="${siteHref("courses.html")}" ${page === "courses" || page === "course" ? 'class="active"' : ""}>Courses</a>
+              <a href="${siteHref("resources.html")}" ${page === "resources" ? 'class="active"' : ""}>Resources</a>
+              <a href="${siteHref("upload.html")}" ${page === "upload" ? 'class="active"' : ""}>Upload</a>
+              <a href="${siteHref("about.html")}" ${page === "about" ? 'class="active"' : ""}>About</a>
             </nav>
             <div class="header-actions">
-              <a class="icon-btn" href="./resources.html" aria-label="Search resources" title="Search">${ICONS.search}</a>
+              <a class="icon-btn" href="${siteHref("resources.html")}" aria-label="Search resources" title="Search">${ICONS.search}</a>
               <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
               </button>
@@ -92,28 +98,28 @@
             </div>
             <div class="footer-col">
               <h4>Explore</h4>
-              <a href="./index.html">Home</a>
-              <a href="./courses.html">Courses</a>
-              <a href="./resources.html">Resources</a>
-              <a href="./upload.html">Upload</a>
-              <a href="./about.html">About</a>
+              <a href="${siteHref("index.html")}">Home</a>
+              <a href="${siteHref("courses.html")}">Courses</a>
+              <a href="${siteHref("resources.html")}">Resources</a>
+              <a href="${siteHref("upload.html")}">Upload</a>
+              <a href="${siteHref("about.html")}">About</a>
             </div>
             <div class="footer-col">
               <h4>Departments</h4>
-              <a href="./courses.html?dept=civil">Civil</a>
-              <a href="./courses.html?dept=electrical">Electrical</a>
-              <a href="./courses.html?dept=mechanical">Mechanical</a>
-              <a href="./courses.html?dept=computer">Computer</a>
-              <a href="./courses.html?dept=chemical">Chemical</a>
-              <a href="./courses.html?dept=industrial">Industrial</a>
+              <a href="${siteHref("courses.html?dept=civil")}">Civil</a>
+              <a href="${siteHref("courses.html?dept=electrical")}">Electrical</a>
+              <a href="${siteHref("courses.html?dept=mechanical")}">Mechanical</a>
+              <a href="${siteHref("courses.html?dept=computer")}">Computer</a>
+              <a href="${siteHref("courses.html?dept=chemical")}">Chemical</a>
+              <a href="${siteHref("courses.html?dept=industrial")}">Industrial</a>
             </div>
             <div class="footer-col">
               <h4>Help</h4>
-              <a href="./about.html#faqs">FAQs</a>
-              <a href="./about.html#contact">Contact</a>
-              <a href="./about.html#terms">Terms of Service</a>
-              <a href="./about.html#privacy">Privacy Policy</a>
-              <a href="./admin.html" class="footer-admin-link" title="Owner">Admin</a>
+              <a href="${siteHref("about.html#faqs")}">FAQs</a>
+              <a href="${siteHref("about.html#contact")}">Contact</a>
+              <a href="${siteHref("about.html#terms")}">Terms of Service</a>
+              <a href="${siteHref("about.html#privacy")}">Privacy Policy</a>
+              <a href="${siteHref("admin.html")}" class="footer-admin-link" title="Owner">Admin</a>
             </div>
           </div>
           <div class="footer-bottom">
@@ -333,12 +339,60 @@
     return shareSlugify(raw);
   }
 
+  /** Strip dump / temp / course-prefix junk so links read like real titles. */
+  function cleanShareTitle(title, courseCode) {
+    let s = String(title || "").trim();
+    s = s.replace(/^~\$/, "");
+    s = s.replace(/^tmp[_-]?\d+[-_]?/i, "");
+    s = s.replace(/^\(\d+\)\s*/, "");
+    s = s.replace(/^[-_\s.]+/, "");
+    s = s.replace(/_+/g, " ");
+    s = s.replace(/\b\d{8,}\b/g, "");
+    s = s.replace(/\s*[-–—]?\s*\(?copy\)?\b/gi, "");
+    s = s.replace(/\(bookfi\)/gi, "");
+    if (courseCode) {
+      const spaced = String(courseCode).trim();
+      const compact = spaced.replace(/\s+/g, "");
+      const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      s = s.replace(new RegExp("^" + esc(spaced) + "[\\s:_-]+", "i"), "");
+      s = s.replace(new RegExp("^" + esc(compact) + "[\\s:_-]+", "i"), "");
+    }
+    s = s.replace(/\s+/g, " ").trim();
+    return s || String(title || "").trim() || "material";
+  }
+
+  function titleLooksDump(title) {
+    const t = String(title || "");
+    return (
+      /^~\$/.test(t) ||
+      /^tmp[_-]?\d+/i.test(t) ||
+      /^_/.test(t) ||
+      /\b\d{8,}\b/.test(t) ||
+      /_ebook_/i.test(t) ||
+      t.length > 70
+    );
+  }
+
+  function shareDisplayName(m, course) {
+    const code = (course && course.code) || m.course_code || "";
+    const raw = m.title || m.fileName || "";
+    const cleaned = cleanShareTitle(raw, code);
+    if (course && course.name && (titleLooksDump(raw) || cleaned.length < 6)) {
+      return course.name;
+    }
+    return cleaned || (course && course.name) || raw || "material";
+  }
+
   /** Clean share URL: https://boye.study/s/ae-196/workshop-practice~12e5ee */
   function materialShareLink(m) {
     if (m && m.live && m.id) {
       const code = m.course_code || (m.courseId && EBB.getCourse(m.courseId)?.code) || "gen";
-      const title = m.title || m.fileName || "material";
-      const short = String(m.id).slice(0, 8); // leading UUID segment, e.g. 12e5eede
+      const course =
+        (m.courseId && EBB.getCourse(m.courseId)) ||
+        (m.course_code && EBB.getCourseByCode(m.course_code)) ||
+        null;
+      const title = shareDisplayName(m, course);
+      const short = String(m.id).slice(0, 8);
       return `${SHARE_ORIGIN}/s/${shareCourseSlug(code)}/${shareSlugify(title)}~${short}`;
     }
     try {
@@ -358,9 +412,12 @@
       null;
     const url = materialShareLink(m);
     const typeMeta = EBB.getTypeMeta(m.type);
+    const nice = shareDisplayName(m, course);
     const headline = course
-      ? `${course.code} — ${course.name || m.title || ""}`
-      : (m.title || "Engineering Brain Bank material");
+      ? `${course.code} — ${
+          titleLooksDump(m.title) && course.name ? course.name : nice || course.name
+        }`
+      : nice || "Engineering Brain Bank material";
     const shareText = `${typeMeta ? typeMeta.name + ": " : ""}${headline}`;
 
     try {
@@ -896,27 +953,65 @@
   }
 
   /* ---------- Share landing (AceWithBoye card + open/download) ---------- */
+  function resolveShareMaterial() {
+    const boot = window.__EBB_SHARE__ || null;
+    const q = params();
+    const legacyId = q.get("m") || (boot && boot.id) || "";
+    if (legacyId) {
+      const exact = EBB.materials.find((x) => String(x.id) === String(legacyId));
+      if (exact) return exact;
+    }
+    const shortId =
+      (boot && boot.shortId) ||
+      (() => {
+        const path = window.location.pathname || "";
+        const m = path.match(/\/s\/[^/]+\/[^/]+~([a-f0-9]{6,12})\/?$/i);
+        return m ? m[1].toLowerCase() : "";
+      })();
+    if (shortId) {
+      return (
+        EBB.materials.find((x) => String(x.id).toLowerCase().startsWith(shortId)) ||
+        null
+      );
+    }
+    return null;
+  }
+
   async function initShare() {
     const root = qs("#share-root");
     if (!root) return;
-    const id = params().get("m");
-    if (!id) {
-      root.innerHTML = `<div class="empty-state"><p>No material specified.</p><a class="btn btn-primary" href="./resources.html">Browse resources</a></div>`;
-      return;
-    }
-    const m = EBB.materials.find((x) => String(x.id) === String(id));
+    const m = resolveShareMaterial();
     if (!m) {
-      root.innerHTML = `<div class="empty-state"><p>This material is not available.</p><a class="btn btn-primary" href="./resources.html">Browse resources</a></div>`;
+      root.innerHTML = `<div class="empty-state"><p>This material is not available.</p><a class="btn btn-primary" href="/resources.html">Browse resources</a></div>`;
       return;
     }
+    // Keep the address bar on /s/... — strip legacy ?m=<uuid> if present
+    try {
+      if (params().get("m") && window.history && window.history.replaceState) {
+        const pretty =
+          (window.__EBB_SHARE__ && window.__EBB_SHARE__.prettyPath) ||
+          materialShareLink(m).replace(SHARE_ORIGIN, "");
+        if (pretty && pretty.startsWith("/s/")) {
+          window.history.replaceState({}, "", pretty);
+        }
+      }
+    } catch (_) {
+      /* ignore */
+    }
+
     const course =
       (m.courseId && EBB.getCourse(m.courseId)) ||
       (m.course_code && EBB.getCourseByCode(m.course_code)) ||
       null;
     const typeMeta = EBB.getTypeMeta(m.type);
-    const headline = course ? `${course.code} – ${m.title}` : m.title;
+    const nice = shareDisplayName(m, course);
+    const headline = course
+      ? `${course.code} — ${
+          titleLooksDump(m.title) && course.name ? course.name : nice || course.name
+        }`
+      : nice;
 
-    document.title = `${m.title || "Material"} | Engineering Brain Bank`;
+    document.title = `${headline} | AceWithBoye`;
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) ogTitle.setAttribute("content", headline);
     const ogDesc = document.querySelector('meta[property="og:description"]');
@@ -940,22 +1035,22 @@
     const map = new Map([[String(m.id), m]]);
     root.innerHTML = `
       <div class="breadcrumb">
-        <a href="./index.html">Home</a><span>/</span>
-        <a href="./resources.html">Resources</a><span>/</span>
+        <a href="/index.html">Home</a><span>/</span>
+        <a href="/resources.html">Resources</a><span>/</span>
         Shared
       </div>
       ${cardHtml}
       <div class="course-header-block" style="margin-bottom:1.25rem">
         <div class="code">${escapeAttr(course ? course.code : m.course_code || "")}</div>
-        <h1 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(m.title)}</h1>
+        <h1 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(nice)}</h1>
         <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · AceWithBoye · Engineering Brain Bank</p>
       </div>
       <div class="material-list" id="share-mat-list">
         ${materialRowHtml(m, { resources: true })}
       </div>
       <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap">
-        ${course ? `<a class="btn btn-ghost" href="./course.html?id=${encodeURIComponent(course.id)}">View course</a>` : ""}
-        <a class="btn btn-ghost" href="./resources.html">All resources</a>
+        ${course ? `<a class="btn btn-ghost" href="/course.html?id=${encodeURIComponent(course.id)}">View course</a>` : ""}
+        <a class="btn btn-ghost" href="/resources.html">All resources</a>
       </div>`;
     wireMaterialActions(qs("#share-mat-list"), map);
   }

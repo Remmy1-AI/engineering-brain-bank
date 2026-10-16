@@ -226,15 +226,50 @@
     });
   }
 
+  function cleanCardTitle(title, courseCode) {
+    let s = String(title || "").trim();
+    s = s.replace(/^~\$/, "");
+    s = s.replace(/^tmp[_-]?\d+[-_]?/i, "");
+    s = s.replace(/^\(\d+\)\s*/, "");
+    s = s.replace(/^[-_\s.]+/, "");
+    s = s.replace(/_+/g, " ");
+    s = s.replace(/\b\d{8,}\b/g, "");
+    s = s.replace(/\s*[-–—]?\s*\(?copy\)?\b/gi, "");
+    s = s.replace(/\(bookfi\)/gi, "");
+    if (courseCode) {
+      const spaced = String(courseCode).trim();
+      const compact = spaced.replace(/\s+/g, "");
+      const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      s = s.replace(new RegExp("^" + esc(spaced) + "[\\s:_-]+", "i"), "");
+      s = s.replace(new RegExp("^" + esc(compact) + "[\\s:_-]+", "i"), "");
+    }
+    return s.replace(/\s+/g, " ").trim();
+  }
+
+  function titleLooksDump(title) {
+    const t = String(title || "");
+    return (
+      /^~\$/.test(t) ||
+      /^tmp[_-]?\d+/i.test(t) ||
+      /^_/.test(t) ||
+      /\b\d{8,}\b/.test(t) ||
+      /_ebook_/i.test(t) ||
+      t.length > 70
+    );
+  }
+
   async function buildMaterialCard(m, course) {
     const typeId = m.type || m.material_type || "shared";
     const typeLabel = TYPE_LABELS[typeId] || "Material";
     const code = (course && course.code) || m.course_code || "";
     const courseName = course && course.name ? course.name : "";
-    const fileTitle = (m.title || m.fileName || "").trim();
+    const fileTitle = cleanCardTitle(m.title || m.fileName || "", code);
 
     let title;
-    if (code && courseName) title = code + " — " + courseName;
+    // Prefer course name when the file title is dump/temp junk
+    if (code && courseName && (!fileTitle || titleLooksDump(m.title || ""))) {
+      title = code + " — " + courseName;
+    } else if (code && courseName) title = code + " — " + courseName;
     else if (code && fileTitle) title = code + " — " + fileTitle;
     else title = fileTitle || courseName || code || "Engineering Brain Bank";
 
