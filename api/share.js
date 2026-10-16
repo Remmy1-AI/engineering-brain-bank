@@ -76,16 +76,15 @@ async function fetchMaterialById(id) {
 
 async function fetchMaterialBySlug(course, slug, shortId) {
   // Prefer short id when present (unique, still human URL)
-  if (shortId && shortId.length >= 4) {
+  if (shortId && shortId.length >= 6) {
+    // UUID prefix match, e.g. 12e5eede*
     const rows = await sb(
-      `materials?id=like.${encodeURIComponent(shortId)}*` +
-        `&published=eq.true` +
+      `materials?id=like.${encodeURIComponent(shortId + "*")}` +
         `&select=id,title,course_code,material_type,file_path,file_name,published&limit=20`
     );
     if (Array.isArray(rows) && rows.length) {
       const hit =
-        rows.find((r) => slugify(r.title || r.file_name) === slug) ||
-        rows.find((r) => courseSlug(r.course_code) === course) ||
+        rows.find((r) => String(r.id).startsWith(shortId)) ||
         rows[0];
       return hit;
     }
@@ -176,7 +175,7 @@ module.exports = async function handler(req, res) {
 
   const prettyPath =
     row && row.id
-      ? `/s/${courseSlug(code)}/${slugify(title)}~${String(row.id).slice(0, 6)}`
+      ? `/s/${courseSlug(code)}/${slugify(title)}~${String(row.id).slice(0, 8)}`
       : "/resources.html";
   const humanUrl = id
     ? `${origin}/share.html?m=${encodeURIComponent(id)}`
