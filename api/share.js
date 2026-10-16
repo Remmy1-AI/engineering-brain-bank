@@ -190,6 +190,9 @@ module.exports = async function handler(req, res) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="${origin}/assets/favicon/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="${origin}/assets/favicon/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="${origin}/assets/favicon/apple-touch-icon.png" />
   <title>${escapeHtml(ogTitle)} | AceWithBoye</title>
   <meta name="description" content="${escapeHtml(ogDesc)}" />
   <meta property="og:type" content="website" />
