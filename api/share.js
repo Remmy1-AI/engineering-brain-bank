@@ -152,13 +152,6 @@ function parseSlugPath(pathParam) {
   return { slug: slugify(raw), shortId: "" };
 }
 
-function isCrawler(ua) {
-  const u = (ua || "").toLowerCase();
-  return /whatsapp|facebookexternalhit|facebot|twitterbot|slackbot|telegrambot|discordbot|linkedinbot|skypeuripreview|embedly|quora link preview|pinterest|vkshare|redditbot|applebot|googlebot|bingbot|yandex|duckduckbot|baiduspider|preview|bot|crawler|spider/i.test(
-    u
-  );
-}
-
 function titleLooksDump(title) {
   const t = String(title || "");
   return (
@@ -186,8 +179,11 @@ function humanShareHtml(origin, bootstrap, og) {
   <meta property="og:description" content="${escapeHtml(og.desc)}" />
   <meta property="og:url" content="${escapeHtml(og.url)}" />
   <meta property="og:image" content="${escapeHtml(og.image)}" />
+  <meta property="og:image:secure_url" content="${escapeHtml(og.image)}" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="${escapeHtml(og.title)}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${escapeHtml(og.title)}" />
   <meta name="twitter:description" content="${escapeHtml(og.desc)}" />
@@ -215,49 +211,6 @@ function humanShareHtml(origin, bootstrap, og) {
   <script src="${origin}/js/ebb-api.js?v=${ASSET_V}"></script>
   <script src="${origin}/js/og-card.js?v=${ASSET_V}"></script>
   <script src="${origin}/js/app.js?v=${ASSET_V}"></script>
-</body>
-</html>`;
-}
-
-function crawlerShareHtml(og) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(og.title)} | AceWithBoye</title>
-  <meta name="description" content="${escapeHtml(og.desc)}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AceWithBoye · Engineering Brain Bank" />
-  <meta property="og:title" content="${escapeHtml(og.title)}" />
-  <meta property="og:description" content="${escapeHtml(og.desc)}" />
-  <meta property="og:url" content="${escapeHtml(og.url)}" />
-  <meta property="og:image" content="${escapeHtml(og.image)}" />
-  <meta property="og:image:secure_url" content="${escapeHtml(og.image)}" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="${escapeHtml(og.title)}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${escapeHtml(og.title)}" />
-  <meta name="twitter:description" content="${escapeHtml(og.desc)}" />
-  <meta name="twitter:image" content="${escapeHtml(og.image)}" />
-  <link rel="canonical" href="${escapeHtml(og.url)}" />
-  <style>
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:#080a0e;color:#f8fafc;
-      display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
-    a{color:#78c8dc}
-    .box{max-width:420px;text-align:center}
-    img{width:100%;border-radius:12px;margin:0 0 1rem}
-  </style>
-</head>
-<body>
-  <div class="box">
-    <img src="${escapeHtml(og.image)}" alt="${escapeHtml(og.title)}" width="1200" height="630" />
-    <p><strong>${escapeHtml(og.title)}</strong></p>
-    <p>${escapeHtml(og.desc)}</p>
-    <p><a href="${escapeHtml(og.url)}">Open on boye.study</a></p>
-  </div>
 </body>
 </html>`;
 }
@@ -342,24 +295,15 @@ module.exports = async function handler(req, res) {
     url: canonicalShare,
   };
 
-  const ua = req.headers["user-agent"] || "";
-  const crawler = isCrawler(ua);
-
+  // One HTML for crawlers + humans: OG tags in <head>, SPA body for people.
+  // Avoids User-Agent cache splits (CDN must not serve crawler HTML to browsers).
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader(
     "Cache-Control",
-    crawler
-      ? "public, s-maxage=300, stale-while-revalidate=86400"
-      : "public, max-age=0, s-maxage=60, stale-while-revalidate=300"
+    "public, s-maxage=120, stale-while-revalidate=86400"
   );
   res.statusCode = 200;
 
-  if (crawler) {
-    res.end(crawlerShareHtml(og));
-    return;
-  }
-
-  // Humans stay on /s/... — no bounce to share.html?m=<uuid>
   const bootstrap = {
     id: row ? row.id : id || "",
     shortId: short,
