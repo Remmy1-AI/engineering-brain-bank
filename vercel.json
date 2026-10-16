@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/og.js": {
+      "includeFiles": "api/og-media/**"
+    }
+  },
   "rewrites": [
     { "source": "/s/:course/:slug*", "destination": "/api/share?course=:course&slug=:slug*" },
     { "source": "/s", "destination": "/api/share" }

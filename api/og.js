@@ -35,15 +35,16 @@ function wrapName(name, maxChars) {
   return lines.slice(0, 3);
 }
 
-function asset(...parts) {
+function asset(name) {
   const candidates = [
-    join(process.cwd(), ...parts),
-    join(__dirname, "..", ...parts),
+    join(__dirname, "og-media", name),
+    join(process.cwd(), "api", "og-media", name),
+    join(process.cwd(), "assets", "og", name),
   ];
   for (const p of candidates) {
     if (existsSync(p)) return p;
   }
-  throw new Error("Missing asset: " + parts.join("/"));
+  throw new Error("Missing asset: " + name);
 }
 
 module.exports = async function handler(req, res) {
@@ -59,9 +60,9 @@ module.exports = async function handler(req, res) {
     if (name.length > 70) name = name.slice(0, 67) + "…";
     const nameLines = wrapName(name, 28);
 
-    const boyeBuf = readFileSync(asset("assets", "og", "boye-cutout-og.jpg"));
-    const markBuf = readFileSync(asset("assets", "og", "ace-wordmark-og.png"));
-    const bpBuf = readFileSync(asset("assets", "og", "blueprint-og.png"));
+    const boyeBuf = readFileSync(asset("boye.jpg"));
+    const markBuf = readFileSync(asset("wordmark.png"));
+    const bpBuf = readFileSync(asset("blueprint.png"));
 
     const boyeB64 = boyeBuf.toString("base64");
     const markB64 = markBuf.toString("base64");
