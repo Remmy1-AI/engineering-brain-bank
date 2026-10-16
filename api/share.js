@@ -100,14 +100,34 @@ async function fetchMaterialById(id) {
   return Array.isArray(rows) && rows[0] ? rows[0] : null;
 }
 
+/** UUID columns can't LIKE — range-match the first segment (8 hex chars). */
+function uuidPrefixRange(shortId) {
+  const hex = String(shortId || "")
+    .toLowerCase()
+    .replace(/[^a-f0-9]/g, "");
+  if (hex.length < 6) return null;
+  const prefix = hex.slice(0, 8).padEnd(8, "0");
+  return {
+    gte: `${prefix}-0000-0000-0000-000000000000`,
+    lte: `${prefix}-ffff-ffff-ffff-ffffffffffff`,
+  };
+}
+
 async function fetchMaterialBySlug(course, slug, shortId) {
   if (shortId && shortId.length >= 6) {
-    const rows = await sb(
-      `materials?id=like.${encodeURIComponent(shortId + "*")}` +
-        `&select=id,title,course_code,material_type,file_path,file_name,published&limit=20`
-    );
-    if (Array.isArray(rows) && rows.length) {
-      return rows.find((r) => String(r.id).startsWith(shortId)) || rows[0];
+    const range = uuidPrefixRange(shortId);
+    if (range) {
+      const rows = await sb(
+        `materials?id=gte.${encodeURIComponent(range.gte)}` +
+          `&id=lte.${encodeURIComponent(range.lte)}` +
+          `&select=id,title,course_code,material_type,file_path,file_name,published&limit=20`
+      );
+      if (Array.isArray(rows) && rows.length) {
+        return (
+          rows.find((r) => String(r.id).toLowerCase().startsWith(shortId.toLowerCase())) ||
+          rows[0]
+        );
+      }
     }
   }
 
