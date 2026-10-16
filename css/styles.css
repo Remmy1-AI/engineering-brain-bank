@@ -57,7 +57,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .skip-link:focus { left: 0.5rem; top: 0.5rem; }
 
 .container {
-  width: min(100% - 2.5rem, var(--max));
+  width: min(100% - 3rem, var(--max));
   margin-inline: auto;
 }
 
@@ -71,20 +71,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
+  /* Keep brand + nav off the viewport edges at every width */
+  padding-inline: clamp(1.25rem, 4vw, 2.75rem);
 }
 
-.header-inner {
+.site-header > .container.header-inner,
+.site-header .header-inner {
   height: var(--header-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  box-sizing: border-box;
 }
 .header-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
   margin-left: auto;
   flex-shrink: 0;
 }
@@ -136,14 +142,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav {
   display: flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0.15rem;
 }
 
 .nav a {
   color: rgba(255,255,255,0.78);
   font-size: 0.88rem;
   font-weight: 500;
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.7rem;
   border-radius: var(--radius-sm);
   transition: color 0.15s ease;
 }
@@ -1208,9 +1214,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
 }
 
 @media (max-width: 860px) {
-  .container { width: min(100% - 1.75rem, var(--max)); }
-  .header-inner { width: 100%; }
-  .site-header .container { width: 100%; max-width: none; padding: 0 0.85rem; box-sizing: border-box; }
+  .container { width: min(100% - 2rem, var(--max)); }
+  .site-header {
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .site-header > .container.header-inner,
+  .site-header .header-inner {
+    width: 100%;
+    max-width: var(--max);
+  }
   .nav {
     display: none;
     position: absolute;
@@ -1218,7 +1230,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     left: 0; right: 0;
     background: rgba(0,0,0,0.98);
     flex-direction: column;
-    padding: 0.75rem 1rem 1.25rem;
+    padding: 0.85rem clamp(1rem, 4vw, 1.5rem) 1.25rem;
     border-bottom: 1px solid var(--border);
     gap: 0.15rem;
   }
@@ -1248,6 +1260,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
 }
 
 @media (max-width: 560px) {
+  .container { width: min(100% - 1.75rem, var(--max)); }
+  .site-header { padding-inline: 1rem; }
   .feature-grid,
   .dept-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
