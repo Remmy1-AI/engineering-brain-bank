@@ -2,6 +2,32 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/admin",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://admin.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/admin.html",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://admin.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/admin",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://admin.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/admin.html",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://admin.boye.study/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/s/:course/:slug*",

@@ -6,9 +6,9 @@ One-stop platform for engineering students to find and share course slides, lect
 
 ## Live site
 
-**https://remmy1-ai.github.io/engineering-brain-bank/**
+**https://boye.study**
 
-Owner admin: **https://remmy1-ai.github.io/engineering-brain-bank/admin.html**
+Owner admin: **https://admin.boye.study** (also redirects from `https://boye.study/admin`)
 
 Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 
@@ -22,7 +22,7 @@ Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 | Resources / Ask the Brain Bank | `resources.html` |
 | Upload (request) | `upload.html` |
 | About | `about.html` |
-| Owner Admin | `admin.html` |
+| Owner Admin | `https://admin.boye.study` (`admin.html`) |
 
 ## Stack
 
@@ -52,7 +52,7 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 2. Open **SQL Editor** → New query → paste the full contents of [`supabase/schema.sql`](supabase/schema.sql) → **Run**.  
    This creates `materials`, `page_views`, RPCs (`increment_download`, `increment_share`, `record_page_view`, `admin_stats`), RLS policies, and the public `materials` storage bucket.
 3. **Authentication → Users → Add user**  
-   Create the owner account with email + password (this is who signs in at `/admin.html`).
+   Create the owner account with email + password (this is who signs in at `https://admin.boye.study`).
 4. **Project Settings → API**  
    Copy **Project URL** and the **anon public** key (not `service_role`).
 5. Edit [`js/supabase-config.js`](js/supabase-config.js):
@@ -64,7 +64,7 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
    };
    ```
 
-6. Commit and push to `main` (or edit the file on GitHub). After Pages rebuilds, open `/admin.html`, sign in, and upload materials.
+6. Commit and push to `main` (or edit the file on GitHub). After deploy, open `https://admin.boye.study`, sign in, and upload materials.
 
 ### Allowed uploads (Admin)
 

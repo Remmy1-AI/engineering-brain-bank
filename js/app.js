@@ -118,7 +118,7 @@
               <a href="./about.html#contact">Contact</a>
               <a href="./about.html#terms">Terms of Service</a>
               <a href="./about.html#privacy">Privacy Policy</a>
-              <a href="./admin.html" class="footer-admin-link" title="Owner">Admin</a>
+              <a href="https://admin.boye.study" class="footer-admin-link" title="Owner">Admin</a>
             </div>
           </div>
           <div class="footer-bottom">
