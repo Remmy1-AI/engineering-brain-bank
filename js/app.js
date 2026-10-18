@@ -205,6 +205,12 @@
     return EBBApi.getDownloadUrl(m) || resolveMaterialUrl(m);
   }
 
+  /** Upgrade GitHub raw → media when the object is a Git LFS pointer. */
+  async function resolvePlayableUrl(url) {
+    if (!url || !window.EBBApi || !EBBApi.resolveGithubContentUrl) return url;
+    return EBBApi.resolveGithubContentUrl(url);
+  }
+
   function ensureMediaModal() {
     let modal = qs("#media-modal");
     if (modal) return modal;
@@ -250,13 +256,24 @@
 
   /** Fetch bytes and show via blob URL — GitHub raw sets X-Frame-Options: deny. */
   async function blobUrlForPreview(url, mimeHint) {
-    const res = await fetch(url, { mode: "cors" });
+    let finalUrl = await resolvePlayableUrl(url);
+    let res = await fetch(finalUrl, { mode: "cors" });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const buf = await res.arrayBuffer();
+    let buf = await res.arrayBuffer();
+    // Safety net: full fetch of an LFS pointer (no Range) still needs media host
+    if (
+      window.EBBApi?.looksLikeGitLfsPointer?.(buf) &&
+      String(finalUrl).includes("://raw.githubusercontent.com/")
+    ) {
+      finalUrl = EBBApi.rawToMediaGithubUrl(finalUrl);
+      res = await fetch(finalUrl, { mode: "cors" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      buf = await res.arrayBuffer();
+    }
     const type = mimeHint || res.headers.get("content-type") || "application/octet-stream";
     // GitHub often serves PDFs as octet-stream; force PDF so the browser renders it
     const forced =
-      /pdf/i.test(mimeHint || "") || /\.pdf(\?|#|$)/i.test(url)
+      /pdf/i.test(mimeHint || "") || /\.pdf(\?|#|$)/i.test(finalUrl)
         ? "application/pdf"
         : type;
     return URL.createObjectURL(new Blob([buf], { type: forced }));
@@ -286,7 +303,9 @@
     document.body.classList.add("modal-open");
 
     if (isVideo) {
-      body.innerHTML = `<video class="media-modal__video" controls playsinline preload="metadata" src="${escapeAttr(url)}"></video>
+      body.innerHTML = `<p class="media-modal__hint">Loading video…</p>`;
+      const playUrl = await resolvePlayableUrl(url);
+      body.innerHTML = `<video class="media-modal__video" controls playsinline preload="metadata" src="${escapeAttr(playUrl)}"></video>
         <p class="media-modal__hint">Playing on Engineering Brain Bank. Download anytime.</p>`;
       return;
     }
@@ -421,9 +440,21 @@
     const name = m.fileName || "download";
     showToast("Preparing download: " + name);
     try {
-      const res = await fetch(url, { mode: "cors" });
+      let finalUrl = await resolvePlayableUrl(url);
+      let res = await fetch(finalUrl, { mode: "cors" });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const blob = await res.blob();
+      let blob = await res.blob();
+      // LFS pointer safety net (full GET without Range)
+      if (
+        window.EBBApi?.looksLikeGitLfsPointer &&
+        blob.size < 500 &&
+        EBBApi.looksLikeGitLfsPointer(await blob.slice(0, 80).text())
+      ) {
+        finalUrl = EBBApi.rawToMediaGithubUrl(finalUrl);
+        res = await fetch(finalUrl, { mode: "cors" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        blob = await res.blob();
+      }
       const obj = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = obj;
@@ -436,9 +467,10 @@
     } catch (err) {
       // CORS fallback: hidden iframe keeps the SPA in place (no Drive tab)
       console.warn("[EBB] blob download fallback:", err.message || err);
+      const playUrl = await resolvePlayableUrl(url).catch(() => url);
       const iframe = document.createElement("iframe");
       iframe.hidden = true;
-      iframe.src = url;
+      iframe.src = playUrl;
       document.body.appendChild(iframe);
       setTimeout(() => iframe.remove(), 60000);
       showToast("Download started: " + name);
@@ -459,12 +491,13 @@
       }
       if (mode === "download") {
         if (m.id) EBBApi.incrementDownload(m.id);
-        const dl = resolveDownloadUrl(m) || url;
+        const dl = await resolvePlayableUrl(resolveDownloadUrl(m) || url);
         await downloadOnSite(m, dl);
         return;
       }
       // Watch / open entirely in our modal (video, PDF, images)
-      openMediaViewer(m, url);
+      const playUrl = await resolvePlayableUrl(url);
+      openMediaViewer(m, playUrl);
       return;
     }
     showToast(mode === "download"
