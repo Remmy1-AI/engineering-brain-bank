@@ -49,6 +49,49 @@
     };
   }
 
+  /** raw.githubusercontent.com → media.githubusercontent.com (actual Git LFS bytes). */
+  function rawToMediaGithubUrl(url) {
+    const u = String(url || "");
+    if (!u.includes("://raw.githubusercontent.com/")) return u;
+    return u.replace(
+      "://raw.githubusercontent.com/",
+      "://media.githubusercontent.com/media/"
+    );
+  }
+
+  function looksLikeGitLfsPointer(bytesOrText) {
+    const head =
+      typeof bytesOrText === "string"
+        ? bytesOrText.slice(0, 80)
+        : new TextDecoder("utf-8", { fatal: false }).decode(
+            bytesOrText.slice ? bytesOrText.slice(0, 80) : bytesOrText
+          );
+    return head.indexOf("version https://git-lfs.github.com/spec/v1") === 0;
+  }
+
+  /**
+   * GitHub raw serves LFS pointer text (~130B), not the real file.
+   * Probe the start of the object and upgrade to the media host when needed.
+   */
+  async function resolveGithubContentUrl(url) {
+    const u = String(url || "");
+    if (!u.includes("://raw.githubusercontent.com/")) return u;
+    try {
+      const res = await fetch(u, {
+        method: "GET",
+        headers: { Range: "bytes=0-200" },
+        mode: "cors",
+        cache: "no-store",
+      });
+      if (!res.ok && res.status !== 206) return u;
+      const buf = await res.arrayBuffer();
+      if (looksLikeGitLfsPointer(buf)) return rawToMediaGithubUrl(u);
+    } catch (err) {
+      console.warn("[EBB API] LFS probe:", err.message || err);
+    }
+    return u;
+  }
+
   function isConfigured() {
     const c = cfg();
     return !!(c.url && c.anonKey && String(c.url).includes("supabase"));
@@ -284,6 +327,9 @@
     getPublicFileUrl,
     getFileUrl,
     getDownloadUrl,
+    resolveGithubContentUrl,
+    rawToMediaGithubUrl,
+    looksLikeGitLfsPointer,
     isVideoMaterial,
     isImageMaterial,
     isAllowedFile,
