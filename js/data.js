@@ -1,10 +1,10 @@
-/* Engineering Brain Bank — catalog shell.
+/* KB'S BRAIN BANK — catalog shell.
    Courses + materials are hydrated at runtime from Supabase (live library). */
 
 const EBB = {
   brand: {
     short: "KB4GESA",
-    name: "Engineering Brain Bank",
+    name: "KB'S BRAIN BANK",
     tagline: "Learn • Share • Succeed",
     purpose:
       "One centralized place for engineering students to find and share slides, notes, past questions, and videos under KB4GESA.",

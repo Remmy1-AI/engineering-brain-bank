@@ -1,4 +1,4 @@
-# Engineering Brain Bank
+# KB'S BRAIN BANK
 
 **KB4GESA / Korle Boye** · Learn • Share • Succeed
 
@@ -76,7 +76,7 @@ PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploa
 - **GitHub** `materials/` = file warehouse via  
   `https://raw.githubusercontent.com/Remmy1-AI/engineering-brain-bank/main/{path}`
 - The repo must be **public** so students can watch/download without logging into GitHub.
-- UI stays on Engineering Brain Bank: in-page **Watch** (video/PDF/image modal) + **Download** (blob save). No Drive redirects.
+- UI stays on KB'S BRAIN BANK: in-page **Watch** (video/PDF/image modal) + **Download** (blob save). No Drive redirects.
 
 Re-seed catalog (owner machine; secrets in `~/.config/ebb/supabase.env`, not in repo):
 

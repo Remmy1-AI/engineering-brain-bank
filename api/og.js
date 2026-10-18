@@ -27,7 +27,7 @@ export default async function handler(req) {
     const typeLabel =
       searchParams.get("label") || TYPE_LABELS[typeId] || "Material";
     const code = (searchParams.get("code") || "EBB").trim();
-    let name = (searchParams.get("name") || "Engineering Brain Bank").trim();
+    let name = (searchParams.get("name") || "KB'S BRAIN BANK").trim();
     if (name.length > 70) name = name.slice(0, 67) + "…";
 
     return new ImageResponse(
@@ -210,7 +210,7 @@ export default async function handler(req) {
                   display: "flex",
                 },
               },
-              "Engineering Brain Bank · KB4GESA"
+              "KB'S BRAIN BANK · KB4GESA"
             )
           )
         )

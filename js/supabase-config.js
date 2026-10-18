@@ -1,4 +1,4 @@
-/* Engineering Brain Bank — Supabase public client config.
+/* KB'S BRAIN BANK — Supabase public client config.
    Anon/publishable key is safe in the front end; RLS protects data.
    NEVER put the service_role key here. */
 window.EBB_SUPABASE = {

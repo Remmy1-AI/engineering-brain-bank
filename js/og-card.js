@@ -1,4 +1,4 @@
-/* Engineering Brain Bank — AceWithBoye share card (from-scratch layout)
+/* KB'S BRAIN BANK — AceWithBoye share card (from-scratch layout)
    Left: Boye in a cool blueprint panel (inset, not edge-pinned)
    Right: mist accent + oversized course code + name + brand */
 (function () {
@@ -158,8 +158,8 @@
       opts.typeLabel ||
       TYPE_LABELS[opts.type] ||
       (opts.type ? String(opts.type) : "Material");
-    const { code, name } = splitCodeName(opts.title || "Engineering Brain Bank");
-    const footer = opts.footer || "Engineering Brain Bank · KB4GESA";
+    const { code, name } = splitCodeName(opts.title || "KB'S BRAIN BANK");
+    const footer = opts.footer || "KB'S BRAIN BANK · KB4GESA";
 
     // Giant mist watermark
     ctx.save();
@@ -236,7 +236,7 @@
     let title;
     if (code && courseName) title = code + " — " + courseName;
     else if (code && fileTitle) title = code + " — " + fileTitle;
-    else title = fileTitle || courseName || code || "Engineering Brain Bank";
+    else title = fileTitle || courseName || code || "KB'S BRAIN BANK";
 
     const canvas = await renderCard({ typeLabel, title, type: typeId });
     const blob = await canvasToBlob(canvas, "image/jpeg", 0.92);

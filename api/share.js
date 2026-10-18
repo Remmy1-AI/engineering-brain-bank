@@ -7,7 +7,7 @@ const SUPABASE_URL = "https://jcybycszuxlzkfjsmxjp.supabase.co";
 const SUPABASE_ANON =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjeWJ5Y3N6dXhsemtmanNteGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MzcxMTksImV4cCI6MjEwNjExMzExOX0.2eigOFb-Zc1kkNZJ8vfTif2fdoHIEWc9SPmZ2FmIcY0";
 
-const ASSET_V = "20261018a1";
+const ASSET_V = "20261018b1";
 
 const TYPE_LABELS = {
   slides: "Course Slides",
@@ -184,7 +184,7 @@ function humanShareHtml(origin, bootstrap, og) {
   <title>${escapeHtml(og.title)} | AceWithBoye</title>
   <meta name="description" content="${escapeHtml(og.desc)}" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AceWithBoye · Engineering Brain Bank" />
+  <meta property="og:site_name" content="AceWithBoye · KB'S BRAIN BANK" />
   <meta property="og:title" content="${escapeHtml(og.title)}" />
   <meta property="og:description" content="${escapeHtml(og.desc)}" />
   <meta property="og:url" content="${escapeHtml(og.url)}" />
@@ -272,7 +272,7 @@ module.exports = async function handler(req, res) {
   }
 
   if (!code) code = row ? "EBB" : "EBB";
-  if (!name) name = cleanShareTitle(title, code) || "Engineering Brain Bank";
+  if (!name) name = cleanShareTitle(title, code) || "KB'S BRAIN BANK";
   if (!label) label = TYPE_LABELS[typeId] || "Material";
 
   // Never market the website name as the OG title when we have a material
@@ -297,7 +297,7 @@ module.exports = async function handler(req, res) {
         : "/resources.html";
 
   const ogTitle = `${code} — ${name}`;
-  const ogDesc = `${label} · AceWithBoye · Engineering Brain Bank · KB4GESA`;
+  const ogDesc = `${label} · AceWithBoye · KB'S BRAIN BANK · KB4GESA`;
   const ogImage =
     `${origin}/api/og?` +
     new URLSearchParams({
