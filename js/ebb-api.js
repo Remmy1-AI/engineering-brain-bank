@@ -1,4 +1,4 @@
-/* Engineering Brain Bank — Supabase client helpers (vanilla, no bundler)
+/* KB'S BRAIN BANK — Supabase client helpers (vanilla, no bundler)
    Hybrid: catalog in Supabase; file bytes on GitHub materials/ (or Storage). */
 (function () {
   "use strict";

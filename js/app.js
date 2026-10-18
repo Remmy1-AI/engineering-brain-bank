@@ -1,4 +1,4 @@
-/* Engineering Brain Bank — Shared Application Logic (v2 visual twin) */
+/* KB'S BRAIN BANK — Shared Application Logic (v2 visual twin) */
 (function () {
   "use strict";
 
@@ -58,12 +58,12 @@
     if (headerEl) {
       headerEl.innerHTML = `
         <div class="container header-inner">
-          <a class="brand" href="${siteHref("index.html")}" aria-label="KB4GESA Engineering Brain Bank home">
+          <a class="brand" href="${siteHref("index.html")}" aria-label="KB'S BRAIN BANK home">
             ${CREST_SVG}
             <span class="brand-text">
               <span class="brand-code">KB4GESA</span>
               <span class="brand-divider" aria-hidden="true"></span>
-              <span class="brand-name">Engineering<br>Brain Bank</span>
+              <span class="brand-name">KB'S<br>BRAIN BANK</span>
             </span>
           </a>
           <div class="header-right">
@@ -91,7 +91,7 @@
             <div class="footer-brand">
               ${CREST_SVG}
               <div>
-                <strong>KB4GESA · Engineering Brain Bank</strong>
+                <strong>KB4GESA · KB'S BRAIN BANK</strong>
                 <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korle Boye.</p>
               </div>
             </div>
@@ -306,7 +306,7 @@
       body.innerHTML = `<p class="media-modal__hint">Loading video…</p>`;
       const playUrl = await resolvePlayableUrl(url);
       body.innerHTML = `<video class="media-modal__video" controls playsinline preload="metadata" src="${escapeAttr(playUrl)}"></video>
-        <p class="media-modal__hint">Playing on Engineering Brain Bank. Download anytime.</p>`;
+        <p class="media-modal__hint">Playing on KB'S BRAIN BANK. Download anytime.</p>`;
       return;
     }
     if (isImage) {
@@ -745,7 +745,7 @@
       return;
     }
     const dept = EBB.getDepartment(course.department);
-    document.title = `${course.code} · ${course.name} | Engineering Brain Bank`;
+    document.title = `${course.code} · ${course.name} | KB'S BRAIN BANK`;
 
     const materials = EBB.getMaterialsForCourse(course.id)
       .sort((a, b) => (a.type || "").localeCompare(b.type || "") || (a.title || "").localeCompare(b.title || ""));
@@ -1034,7 +1034,7 @@
       <div class="course-header-block" style="margin-bottom:1.25rem">
         <div class="code">${escapeAttr(course ? course.code : m.course_code || "")}</div>
         <h1 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(course && course.name ? course.name : nice)}</h1>
-        <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · AceWithBoye · Engineering Brain Bank</p>
+        <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · AceWithBoye · KB'S BRAIN BANK</p>
       </div>
       <div class="material-list" id="share-mat-list">
         ${materialRowHtml(m, { resources: true })}

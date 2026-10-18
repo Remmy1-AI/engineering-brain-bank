@@ -1,4 +1,4 @@
-/* Engineering Brain Bank — Owner Admin (vanilla IIFE) */
+/* KB'S BRAIN BANK — Owner Admin (vanilla IIFE) */
 (function () {
   "use strict";
 
