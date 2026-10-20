@@ -92,7 +92,7 @@
               ${CREST_SVG}
               <div>
                 <strong>KB4GESA · KB'S BRAIN BANK</strong>
-                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korle Boye.</p>
+                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korley Boye.</p>
               </div>
             </div>
             <div class="footer-col">
@@ -122,8 +122,8 @@
             </div>
           </div>
           <div class="footer-bottom">
-            <span>© ${new Date().getFullYear()} KB4GESA · Korle Boye</span>
-            <span class="closing">From Korle Boye, For Korle Boye.</span>
+            <span>© ${new Date().getFullYear()} KB4GESA · Korley Boye</span>
+            <span class="closing">From Korley Boye, For Korley Boye.</span>
           </div>
         </div>`;
     }
