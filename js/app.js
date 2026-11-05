@@ -116,6 +116,7 @@
               <h4>Help</h4>
               <a href="./about.html#faqs">FAQs</a>
               <a href="./about.html#contact">Contact</a>
+              <a href="https://whatsapp.com/channel/0029Vb99WmlLCoX6O2EZJ72d" target="_blank" rel="noopener noreferrer">Join the community</a>
               <a href="./about.html#terms">Terms of Service</a>
               <a href="./about.html#privacy">Privacy Policy</a>
               <a href="https://admin.boye.study" class="footer-admin-link" title="Owner">Admin</a>
