@@ -1,6 +1,6 @@
 # KB'S BRAIN BANK
 
-**KB4GESA / Korley Boye** · Learn • Share • Succeed
+**ENGINEER WITH KB** · Learn • Share • Succeed
 
 One-stop platform for engineering students to find and share course slides, lecture notes, past questions, and peer materials.
 

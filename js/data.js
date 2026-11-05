@@ -3,11 +3,11 @@
 
 const EBB = {
   brand: {
-    short: "KB4GESA",
+    short: "ENGINEER WITH KB",
     name: "KB'S BRAIN BANK",
     tagline: "Learn • Share • Succeed",
     purpose:
-      "One centralized place for engineering students to find and share slides, notes, past questions, and videos under KB4GESA.",
+      "One centralized place for engineering students to find and share slides, notes, past questions, and videos under ENGINEER WITH KB.",
     closing: "From Korley Boye, For Korley Boye.",
   },
 
@@ -101,7 +101,7 @@ EBB.hydrateFromLive = (uiMaterials) => {
         department: m.department || "general",
         level: m.level && m.level !== "unknown" ? String(m.level) : "100",
         semester: "1",
-        lecturer: "KB4GESA Library",
+        lecturer: "ENGINEER WITH KB Library",
         accessCount: 0,
         description: `Materials for ${code} — ${name}.`,
         materialCount: 0,

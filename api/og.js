@@ -1,11 +1,11 @@
-/* AceWithBoye OG card — Edge @vercel/og with inlined compressed assets.
+/* ENGINEER WITH KB OG card — Edge @vercel/og with inlined compressed assets.
    Satori ships fonts (course text always renders). Assets are data URLs
    so cold starts skip remote image fetches. Long CDN cache for WhatsApp. */
 import { ImageResponse } from "@vercel/og";
 import React from "react";
 
 
-import { BOYE, BLUEPRINT, WORDMARK } from "./og-assets.js";
+import { BOYE, BLUEPRINT } from "./og-assets.js";
 
 export const config = { runtime: "edge" };
 
@@ -194,12 +194,19 @@ export default async function handler(req) {
                 flexDirection: "column",
               },
             },
-            h("img", {
-              src: WORDMARK,
-              width: 220,
-              height: 36,
-              style: { height: 36 },
-            }),
+            h(
+              "div",
+              {
+                style: {
+                  fontSize: 22,
+                  fontWeight: 800,
+                  letterSpacing: "0.04em",
+                  color: "#FFB800",
+                  display: "flex",
+                },
+              },
+              "ENGINEER WITH KB"
+            ),
             h(
               "div",
               {
@@ -210,7 +217,7 @@ export default async function handler(req) {
                   display: "flex",
                 },
               },
-              "KB'S BRAIN BANK · KB4GESA"
+              "KB'S BRAIN BANK"
             )
           )
         )

@@ -297,7 +297,7 @@
       topic: row.description || row.title || "Material",
       title: row.title,
       lecturer: "",
-      uploadedBy: "KB4GESA",
+      uploadedBy: "ENGINEER WITH KB",
       date: (row.created_at || "").slice(0, 10),
       downloads: row.download_count || 0,
       shares: row.share_count || 0,

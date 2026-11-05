@@ -115,8 +115,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .brand-code {
   font-family: var(--display);
   font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
   color: #fff;
   white-space: nowrap;
 }
@@ -277,8 +277,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hero-brand {
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(2.6rem, 7vw, 5.6rem);
-  letter-spacing: 0.04em;
+  font-size: clamp(1.85rem, 5.2vw, 3.8rem);
+  letter-spacing: 0.02em;
   line-height: 0.95;
   color: #fff;
   margin: 0 0 0.35rem;
