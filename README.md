@@ -35,7 +35,7 @@ Backend (optional until configured): **Supabase** Auth + Postgres + Storage. The
 - Near-black background, white text, gold `#FFB800`
 - Crest logo · blueprint hero · gold swoosh title accent
 - Tagline: Learn • Share • Succeed
-- Closing: From Korley Boye, For Korley Boye.
+- Closing: From him, FOR GESA.
 
 ## Local preview
 

@@ -124,7 +124,7 @@
           </div>
           <div class="footer-bottom">
             <span>© ${new Date().getFullYear()} ENGINEER WITH KB</span>
-            <span class="closing">From Korley Boye, For Korley Boye.</span>
+            <span class="closing">From him, FOR GESA.</span>
           </div>
         </div>`;
     }
