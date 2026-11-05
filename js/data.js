@@ -8,7 +8,7 @@ const EBB = {
     tagline: "Learn • Share • Succeed",
     purpose:
       "One centralized place for engineering students to find and share slides, notes, past questions, and videos under KB4GESA.",
-    closing: "From Korle Boye, For Korle Boye.",
+    closing: "From Korley Boye, For Korley Boye.",
   },
 
   departments: [

@@ -92,7 +92,7 @@
               ${CREST_SVG}
               <div>
                 <strong>KB4GESA · KB'S BRAIN BANK</strong>
-                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korle Boye.</p>
+                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korley Boye.</p>
               </div>
             </div>
             <div class="footer-col">
@@ -116,14 +116,15 @@
               <h4>Help</h4>
               <a href="./about.html#faqs">FAQs</a>
               <a href="./about.html#contact">Contact</a>
+              <a href="https://whatsapp.com/channel/0029Vb99WmlLCoX6O2EZJ72d" target="_blank" rel="noopener noreferrer">Join the community</a>
               <a href="./about.html#terms">Terms of Service</a>
               <a href="./about.html#privacy">Privacy Policy</a>
               <a href="https://admin.boye.study" class="footer-admin-link" title="Owner">Admin</a>
             </div>
           </div>
           <div class="footer-bottom">
-            <span>© ${new Date().getFullYear()} KB4GESA · Korle Boye</span>
-            <span class="closing">From Korle Boye, For Korle Boye.</span>
+            <span>© ${new Date().getFullYear()} KB4GESA · Korley Boye</span>
+            <span class="closing">From Korley Boye, For Korley Boye.</span>
           </div>
         </div>`;
     }

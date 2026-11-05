@@ -1,6 +1,6 @@
 # KB'S BRAIN BANK
 
-**KB4GESA / Korle Boye** · Learn • Share • Succeed
+**KB4GESA / Korley Boye** · Learn • Share • Succeed
 
 One-stop platform for engineering students to find and share course slides, lecture notes, past questions, and peer materials.
 
@@ -35,7 +35,7 @@ Backend (optional until configured): **Supabase** Auth + Postgres + Storage. The
 - Near-black background, white text, gold `#FFB800`
 - Crest logo · blueprint hero · gold swoosh title accent
 - Tagline: Learn • Share • Succeed
-- Closing: From Korle Boye, For Korle Boye.
+- Closing: From Korley Boye, For Korley Boye.
 
 ## Local preview
 
