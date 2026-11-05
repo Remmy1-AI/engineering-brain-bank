@@ -1,4 +1,4 @@
-/* KB'S BRAIN BANK — AceWithBoye share card (from-scratch layout)
+/* KB'S BRAIN BANK — ENGINEER WITH KB share card (from-scratch layout)
    Left: Boye in a cool blueprint panel (inset, not edge-pinned)
    Right: mist accent + oversized course code + name + brand */
 (function () {
@@ -13,6 +13,7 @@
   const WHITE = "#f8fafc";
   const MUTE = "#828c96";
   const FOOT = "#555f69";
+  const GOLD = "#FFB800";
 
   const TYPE_LABELS = {
     slides: "Course Slides",
@@ -24,7 +25,6 @@
   };
 
   let _boye = null;
-  let _wordmark = null;
   let _blueprint = null;
   let _loading = null;
 
@@ -47,17 +47,15 @@
   }
 
   async function ensureAssets() {
-    if (_boye && _wordmark && _blueprint) return;
+    if (_boye && _blueprint) return;
     if (_loading) return _loading;
     _loading = Promise.all([
       loadImage(assetUrl("./assets/og/boye-cutout.png")),
-      loadImage(assetUrl("./assets/og/ace-wordmark.png")),
       loadImage(assetUrl("./assets/og/blueprint-left-clean.png")).catch(() =>
         loadImage(assetUrl("./assets/og/blueprint-from-svg.png"))
       ),
-    ]).then(([boye, wordmark, blueprint]) => {
+    ]).then(([boye, blueprint]) => {
       _boye = boye;
-      _wordmark = wordmark;
       _blueprint = blueprint;
     });
     return _loading;
@@ -159,7 +157,7 @@
       TYPE_LABELS[opts.type] ||
       (opts.type ? String(opts.type) : "Material");
     const { code, name } = splitCodeName(opts.title || "KB'S BRAIN BANK");
-    const footer = opts.footer || "KB'S BRAIN BANK · KB4GESA";
+    const footer = opts.footer || "KB'S BRAIN BANK";
 
     // Giant mist watermark
     ctx.save();
@@ -203,15 +201,15 @@
     });
 
     // Brand
-    const wh = 38;
-    const wr = wh / _wordmark.naturalHeight;
-    const ww = _wordmark.naturalWidth * wr;
-    ctx.drawImage(_wordmark, tx, H - 78, ww, wh);
+    ctx.fillStyle = GOLD;
+    ctx.font = "800 22px Inter, system-ui, sans-serif";
+    ctx.textBaseline = "top";
+    ctx.fillText("ENGINEER WITH KB", tx, H - 78);
 
     ctx.fillStyle = FOOT;
     ctx.font = "500 13px Inter, system-ui, sans-serif";
     ctx.textBaseline = "bottom";
-    ctx.fillText(footer, tx, H - 24);
+    ctx.fillText(footer || "KB'S BRAIN BANK", tx, H - 24);
 
     return canvas;
   }
@@ -245,7 +243,7 @@
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || "ebb";
-    const file = new File([blob], `acewithboye-${safe}.jpg`, {
+    const file = new File([blob], `engineer-with-kb-${safe}.jpg`, {
       type: "image/jpeg",
     });
     return {

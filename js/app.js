@@ -61,7 +61,7 @@
           <a class="brand" href="${siteHref("index.html")}" aria-label="KB'S BRAIN BANK home">
             ${CREST_SVG}
             <span class="brand-text">
-              <span class="brand-code">KB4GESA</span>
+              <span class="brand-code">ENGINEER WITH KB</span>
               <span class="brand-divider" aria-hidden="true"></span>
               <span class="brand-name">KB'S<br>BRAIN BANK</span>
             </span>
@@ -91,8 +91,8 @@
             <div class="footer-brand">
               ${CREST_SVG}
               <div>
-                <strong>KB4GESA · KB'S BRAIN BANK</strong>
-                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under KB4GESA / Korley Boye.</p>
+                <strong>ENGINEER WITH KB · KB'S BRAIN BANK</strong>
+                <p>One centralized place for engineering students to find, access, and share slides, notes, and past questions under ENGINEER WITH KB.</p>
               </div>
             </div>
             <div class="footer-col">
@@ -123,7 +123,7 @@
             </div>
           </div>
           <div class="footer-bottom">
-            <span>© ${new Date().getFullYear()} KB4GESA · Korley Boye</span>
+            <span>© ${new Date().getFullYear()} ENGINEER WITH KB</span>
             <span class="closing">From Korley Boye, For Korley Boye.</span>
           </div>
         </div>`;
@@ -942,13 +942,13 @@
         showToast("File type not allowed. Use PDF, PPT/PPTX, DOC/DOCX, TXT, or MD.");
         return;
       }
-      showToast("Thanks — request noted. The live library is published by KB4GESA via Admin.");
+      showToast("Thanks — request noted. The live library is published by ENGINEER WITH KB via Admin.");
       form.reset();
       showFile(null);
     });
   }
 
-  /* ---------- Share landing (AceWithBoye card + open/download) ---------- */
+  /* ---------- Share landing (ENGINEER WITH KB card + open/download) ---------- */
   function resolveShareMaterial() {
     const boot = window.__EBB_SHARE__ || null;
     const legacyId = params().get("m") || (boot && boot.id) || "";
@@ -1003,14 +1003,14 @@
       ? `${course.code} — ${course.name || nice}`
       : nice;
 
-    document.title = `${headline} | AceWithBoye`;
+    document.title = `${headline} | ENGINEER WITH KB`;
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) ogTitle.setAttribute("content", headline);
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) {
       ogDesc.setAttribute(
         "content",
-        `${typeMeta ? typeMeta.name : "Material"} · AceWithBoye · KB4GESA`
+        `${typeMeta ? typeMeta.name : "Material"} · ENGINEER WITH KB`
       );
     }
 
@@ -1035,7 +1035,7 @@
       <div class="course-header-block" style="margin-bottom:1.25rem">
         <div class="code">${escapeAttr(course ? course.code : m.course_code || "")}</div>
         <h1 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin:0.35rem 0 0.5rem">${escapeAttr(course && course.name ? course.name : nice)}</h1>
-        <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · AceWithBoye · KB'S BRAIN BANK</p>
+        <p style="color:var(--text-muted)">${escapeAttr(typeMeta ? typeMeta.name : m.type || "")} · ENGINEER WITH KB · KB'S BRAIN BANK</p>
       </div>
       <div class="material-list" id="share-mat-list">
         ${materialRowHtml(m, { resources: true })}

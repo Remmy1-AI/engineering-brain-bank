@@ -181,10 +181,10 @@ function humanShareHtml(origin, bootstrap, og) {
   <link rel="icon" href="${origin}/assets/favicon/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="${origin}/assets/favicon/favicon-32x32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="${origin}/assets/favicon/apple-touch-icon.png" />
-  <title>${escapeHtml(og.title)} | AceWithBoye</title>
+  <title>${escapeHtml(og.title)} | ENGINEER WITH KB</title>
   <meta name="description" content="${escapeHtml(og.desc)}" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AceWithBoye · KB'S BRAIN BANK" />
+  <meta property="og:site_name" content="ENGINEER WITH KB · KB'S BRAIN BANK" />
   <meta property="og:title" content="${escapeHtml(og.title)}" />
   <meta property="og:description" content="${escapeHtml(og.desc)}" />
   <meta property="og:url" content="${escapeHtml(og.url)}" />
@@ -297,7 +297,7 @@ module.exports = async function handler(req, res) {
         : "/resources.html";
 
   const ogTitle = `${code} — ${name}`;
-  const ogDesc = `${label} · AceWithBoye · KB'S BRAIN BANK · KB4GESA`;
+  const ogDesc = `${label} · ENGINEER WITH KB · KB'S BRAIN BANK · ENGINEER WITH KB`;
   const ogImage =
     `${origin}/api/og?` +
     new URLSearchParams({
