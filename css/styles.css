@@ -1088,11 +1088,6 @@ textarea.form-control {
   font-style: italic;
 }
 
-.footer-admin-link {
-  opacity: 0.45;
-  font-size: 0.8rem !important;
-}
-.footer-admin-link:hover { opacity: 0.9; }
 
 /* ---------- Contribute CTA band ---------- */
 .contribute-band {
