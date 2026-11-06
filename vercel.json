@@ -26,6 +26,54 @@
       "has": [{ "type": "host", "value": "www.boye.study" }],
       "destination": "https://admin.boye.study/",
       "permanent": true
+    },
+    {
+      "source": "/upload",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": false
+    },
+    {
+      "source": "/upload.html",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": false
+    },
+    {
+      "source": "/upload",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": false
+    },
+    {
+      "source": "/upload.html",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": false
+    },
+    {
+      "source": "/forms",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/forms.html",
+      "has": [{ "type": "host", "value": "boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/forms",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": true
+    },
+    {
+      "source": "/forms.html",
+      "has": [{ "type": "host", "value": "www.boye.study" }],
+      "destination": "https://forms.boye.study/",
+      "permanent": true
     }
   ],
   "rewrites": [
