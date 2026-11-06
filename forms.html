@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="./assets/favicon/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+  <meta name="application-name" content="ENGINEER WITH KB" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Contribute course slides, notes, and past questions to KB'S BRAIN BANK." />
+  <title>Contribute · ENGINEER WITH KB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261106a1" />
+  <link rel="stylesheet" href="./css/forms.css?v=20261106a1" />
+</head>
+<body class="forms-body" data-page="forms">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="forms-top">
+    <div class="container forms-top-inner">
+      <a class="forms-brand" href="https://boye.study/">
+        <span class="forms-brand-kicker">ENGINEER WITH KB</span>
+        <span class="forms-brand-name">KB'S BRAIN BANK</span>
+      </a>
+      <a class="btn btn-ghost btn-sm" href="https://boye.study/">Back to library</a>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+    <section class="forms-hero">
+      <div class="container">
+        <p class="forms-eyebrow">Student contribution</p>
+        <h1>Share material with the Brain Bank</h1>
+        <p class="forms-lead">
+          Drop slides, notes, or past questions. We compress large images for a faster send —
+          then ENGINEER WITH KB reviews before anything goes live.
+        </p>
+      </div>
+    </section>
+
+    <section class="section forms-section">
+      <div class="container forms-layout">
+        <form class="form-card forms-card" id="forms-upload" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="up-dept">Department *</label>
+              <select id="up-dept" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-level">Level *</label>
+              <select id="up-level" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-sem">Semester *</label>
+              <select id="up-sem" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-type">Material type *</label>
+              <select id="up-type" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label for="up-code">Course code *</label>
+              <input id="up-code" class="form-control" type="text" placeholder="e.g. METE 351" required />
+            </div>
+            <div class="form-group">
+              <label for="up-name">Course name *</label>
+              <input id="up-name" class="form-control" type="text" placeholder="e.g. Hydrometallurgy" required />
+            </div>
+            <div class="form-group full">
+              <label for="up-topic">Topic / file title *</label>
+              <input id="up-topic" class="form-control" type="text" placeholder="e.g. Leaching — Lecture 2" required />
+            </div>
+            <div class="form-group full">
+              <label for="up-lecturer">Lecturer *</label>
+              <input id="up-lecturer" class="form-control" type="text" placeholder="Lecturer name" required />
+            </div>
+            <div class="form-group full">
+              <label>File *</label>
+              <div class="file-drop" id="file-drop" role="button" tabindex="0">
+                <input id="up-file" type="file" />
+                <p>Drop a file here or tap to browse</p>
+                <p class="hint">PDF, Office, images. Large photos are auto-optimized before upload.</p>
+                <div class="file-name" id="file-name"></div>
+                <div class="file-meta" id="file-meta"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="up-progress" id="up-progress" hidden>
+            <div class="up-progress-track"><div class="up-progress-bar" id="up-progress-bar"></div></div>
+            <p class="up-progress-label" id="up-progress-label"></p>
+          </div>
+
+          <p class="forms-error" id="up-error" hidden></p>
+          <p class="forms-ok" id="up-ok" hidden></p>
+
+          <div class="forms-actions">
+            <button type="submit" class="btn btn-primary" id="up-submit">Submit for review</button>
+            <button type="reset" class="btn btn-ghost">Clear</button>
+          </div>
+        </form>
+
+        <aside class="info-card forms-aside">
+          <h3>How it works</h3>
+          <ul>
+            <li><strong>Fast send</strong> — images shrink on your phone before upload.</li>
+            <li><strong>Review first</strong> — nothing goes public until approved.</li>
+            <li><strong>Same library</strong> — once published, classmates find it on boye.study.</li>
+          </ul>
+          <p class="forms-aside-note">
+            Browse the live library on
+            <a href="https://boye.study/resources">Resources</a>.
+            Community help:
+            <a href="https://whatsapp.com/channel/0029Vb99WmlLCoX6O2EZJ72d" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>.
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="forms-foot">
+    <div class="container">
+      <span>ENGINEER WITH KB · forms.boye.study</span>
+      <span>From him, FOR GESA.</span>
+    </div>
+  </footer>
+
+  <script src="./js/data.js?v=20261106a1"></script>
+  <script src="./js/supabase-config.js?v=20261016a4"></script>
+  <script src="./js/ebb-api.js?v=20261106a1"></script>
+  <script src="./js/compress.js?v=20261106a1"></script>
+  <script src="./js/forms.js?v=20261106a1"></script>
+</body>
+</html>
