@@ -52,10 +52,23 @@
     const levelSel = qs("#up-level");
     const typeSel = qs("#up-type");
     const fileInput = qs("#up-file");
-    if (deptSel && window.EBB) {
-      deptSel.innerHTML = `<option value="">—</option>` +
-        EBB.departments.map((d) => `<option value="${d.id}">${d.name}</option>`).join("");
+    const progName = qs("#prog-name");
+    const progId = qs("#prog-id");
+
+    function fillDeptSelect(selected) {
+      if (!deptSel || !window.EBB) return;
+      const keep = selected != null ? selected : deptSel.value;
+      deptSel.innerHTML =
+        `<option value="">—</option>` +
+        EBB.departments
+          .map((d) => `<option value="${d.id}">${d.name}</option>`)
+          .join("");
+      if (keep && [...deptSel.options].some((o) => o.value === keep)) {
+        deptSel.value = keep;
+      }
     }
+
+    fillDeptSelect();
     if (levelSel && window.EBB) {
       levelSel.innerHTML = `<option value="">—</option>` +
         EBB.levels.map((l) => `<option value="${l.id}">${l.name}</option>`).join("");
@@ -66,6 +79,15 @@
       ).join("");
     }
     if (fileInput) fileInput.setAttribute("accept", EBBApi.acceptAttr());
+
+    // Auto-suggest programme slug from name
+    progName?.addEventListener("input", () => {
+      if (!progId || progId.dataset.touched === "1") return;
+      progId.value = window.EBB ? EBB.slugifyProgrammeId(progName.value) : "";
+    });
+    progId?.addEventListener("input", () => {
+      progId.dataset.touched = progId.value.trim() ? "1" : "";
+    });
 
     async function enterDash(session) {
       show(panelSetup, false);
@@ -115,6 +137,78 @@
     });
 
     qs("#btn-refresh")?.addEventListener("click", () => refreshAll());
+
+    qs("#programme-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      setError("prog-error", "");
+      const okEl = qs("#prog-ok");
+      if (okEl) { okEl.hidden = true; okEl.textContent = ""; }
+
+      const name = qs("#prog-name")?.value?.trim();
+      let id = qs("#prog-id")?.value?.trim().toLowerCase();
+      const short_name = qs("#prog-short")?.value?.trim() || null;
+      const code = qs("#prog-code")?.value?.trim() || null;
+      if (!name) {
+        setError("prog-error", "Programme name is required.");
+        return;
+      }
+      if (!id && window.EBB) id = EBB.slugifyProgrammeId(name);
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id || "")) {
+        setError("prog-error", "Id must be lowercase letters, numbers, and hyphens.");
+        return;
+      }
+
+      const btn = qs("#prog-submit");
+      if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+      try {
+        await EBBApi.createProgramme({
+          id,
+          name,
+          short_name:
+            short_name ||
+            name.replace(/\s+Engineering$/i, "").trim() ||
+            name,
+          code,
+          sort_order: 100,
+        });
+        if (okEl) {
+          okEl.textContent = `Added “${name}”. It is now in the Programme list.`;
+          okEl.hidden = false;
+        }
+        qs("#programme-form").reset();
+        if (progId) progId.dataset.touched = "";
+        await loadProgrammes();
+        fillDeptSelect(id);
+      } catch (err) {
+        const msg = err?.message || String(err);
+        const needsSql =
+          /relation .*programmes.* does not exist|Could not find the table|schema cache/i.test(msg);
+        setError(
+          "prog-error",
+          needsSql
+            ? "Programmes table missing. Run supabase/schema_programmes.sql once in the Supabase SQL Editor."
+            : msg || "Could not add programme."
+        );
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "Add programme"; }
+      }
+    });
+
+    qs("#programmes-tbody")?.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-action='delete-programme']");
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      const name = btn.getAttribute("data-name") || id;
+      if (!id) return;
+      if (!confirm(`Remove programme “${name}”? Existing materials keep their department id.`)) return;
+      try {
+        await EBBApi.deleteProgramme(id);
+        await loadProgrammes();
+        fillDeptSelect();
+      } catch (err) {
+        alert(err.message || "Delete failed");
+      }
+    });
 
     qs("#upload-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -229,7 +323,43 @@
     });
 
     async function refreshAll() {
-      await Promise.all([loadStats(), loadMaterials()]);
+      await Promise.all([loadProgrammes(), loadStats(), loadMaterials()]);
+    }
+
+    async function loadProgrammes() {
+      const tbody = qs("#programmes-tbody");
+      try {
+        const rows = await EBBApi.listProgrammes();
+        if (window.EBB) EBB.applyProgrammes(rows);
+        fillDeptSelect();
+        if (!tbody) return;
+        const list = window.EBB ? EBB.departments : [];
+        if (!list.length) {
+          tbody.innerHTML = `<tr><td colspan="4" class="admin-muted">No programmes yet.</td></tr>`;
+          return;
+        }
+        const builtinIds = new Set(
+          (EBB._builtinDepartments || []).map((d) => d.id)
+        );
+        tbody.innerHTML = list.map((d) => {
+          const canRemove = !builtinIds.has(d.id);
+          return `
+          <tr>
+            <td data-label="Name"><strong>${escapeHtml(d.name)}</strong></td>
+            <td data-label="Code">${escapeHtml(d.code || "—")}</td>
+            <td data-label="Id"><code>${escapeHtml(d.id)}</code></td>
+            <td class="admin-row-actions" data-label="Actions">
+              ${canRemove
+                ? `<button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete-programme" data-id="${escapeHtml(d.id)}" data-name="${escapeHtml(d.name)}">Remove</button>`
+                : `<span class="admin-muted">built-in</span>`}
+            </td>
+          </tr>`;
+        }).join("");
+      } catch (err) {
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="4" class="admin-error">${escapeHtml(err.message || "Failed to load programmes")}</td></tr>`;
+        }
+      }
     }
 
     async function loadStats() {

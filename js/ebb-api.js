@@ -239,6 +239,46 @@
     );
   }
 
+  async function listProgrammes() {
+    const sb = await getClient();
+    if (!sb) return [];
+    try {
+      const { data, error } = await sb
+        .from("programmes")
+        .select("id,name,short_name,code,sort_order")
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.warn("[EBB API] listProgrammes:", error.message || error);
+      return [];
+    }
+  }
+
+  async function createProgramme({ id, name, short_name, code, sort_order }) {
+    const sb = await getClient();
+    if (!sb) throw new Error("Not connected");
+    const row = {
+      id: String(id || "").trim(),
+      name: String(name || "").trim(),
+      short_name: short_name ? String(short_name).trim() : null,
+      code: code ? String(code).trim().toUpperCase() : null,
+      sort_order: sort_order != null ? Number(sort_order) : 100,
+    };
+    if (!row.id || !row.name) throw new Error("Programme id and name are required.");
+    const { data, error } = await sb.from("programmes").insert(row).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function deleteProgramme(id) {
+    const sb = await getClient();
+    if (!sb) throw new Error("Not connected");
+    const { error } = await sb.from("programmes").delete().eq("id", String(id || "").trim());
+    if (error) throw error;
+  }
+
   async function recordPageViewOncePerSession(path) {
     if (!isConfigured()) return;
     const key = "ebb-pv:" + (path || "/");
@@ -321,6 +361,9 @@
     getClient,
     listPublishedMaterials,
     listAllMaterials,
+    listProgrammes,
+    createProgramme,
+    deleteProgramme,
     recordPageViewOncePerSession,
     incrementDownload,
     incrementShare,

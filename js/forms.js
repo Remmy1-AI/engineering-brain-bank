@@ -69,8 +69,21 @@
     const okEl = qs("#up-ok");
     const submitBtn = qs("#up-submit");
 
-    if (window.EBB) {
+    async function loadDeptOptions() {
+      if (!window.EBB) return;
+      try {
+        if (window.EBBApi && EBBApi.isConfigured()) {
+          const programmes = await EBBApi.listProgrammes();
+          if (programmes && programmes.length) EBB.applyProgrammes(programmes);
+        }
+      } catch (err) {
+        console.warn("[forms] programmes:", err?.message || err);
+      }
       fillSelect(deptSel, EBB.departments, "Select department");
+    }
+
+    if (window.EBB) {
+      loadDeptOptions();
       fillSelect(levelSel, EBB.levels, "Select level");
       fillSelect(semSel, EBB.semesters, "Select semester");
       fillSelect(typeSel, EBB.materialTypes, "Select type");

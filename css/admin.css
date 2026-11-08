@@ -264,6 +264,18 @@
   }
 }
 
+/* Programmes + upload stack in the left column on wide screens */
+@media (min-width: 960px) {
+  .admin-grid > .admin-card:nth-child(1),
+  .admin-grid > .admin-card:nth-child(2) {
+    grid-column: 1;
+  }
+  .admin-grid > .admin-card-wide {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
 .admin-table-head {
   display: flex;
   align-items: center;

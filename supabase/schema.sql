@@ -20,7 +20,8 @@ create table if not exists public.materials (
   description text,
   course_code text,
   department text check (department in (
-    'civil','electrical','mechanical','computer','chemical','industrial'
+    'civil','electrical','mechanical','computer','chemical','industrial',
+    'materials','agricultural','general'
   )),
   level text,
   material_type text check (material_type in (
