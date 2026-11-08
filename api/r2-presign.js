@@ -3,6 +3,7 @@ import {
   buildObjectKey,
   corsPreflight,
   json,
+  mintUploadTicket,
   r2Env,
   signPutUrl,
   objectUrl,
@@ -56,16 +57,22 @@ export default async function handler(req) {
 
   const key = buildObjectKey(prefix, fileName);
   try {
-    const uploadUrl = await signPutUrl(key, contentType, 600);
+    const [uploadUrl, ticket] = await Promise.all([
+      signPutUrl(key, contentType, 600),
+      mintUploadTicket(key, 900),
+    ]);
     return json({
       ok: true,
       key,
+      ticket,
+      /** @deprecated Prefer same-origin /api/r2-put with ticket (no bucket CORS). */
       uploadUrl,
       publicUrl: objectUrl(key),
       source: "r2",
       contentType,
       prefix,
-      expiresIn: 600,
+      expiresIn: 900,
+      proxy: true,
     });
   } catch (err) {
     console.error("[r2-presign]", err);
