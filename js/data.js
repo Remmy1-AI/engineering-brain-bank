@@ -11,6 +11,7 @@ const EBB = {
     closing: "From him, FOR GESA.",
   },
 
+  /** Built-in programmes; live rows from Supabase programmes table merge on top. */
   departments: [
     { id: "civil", name: "Civil Engineering", short: "Civil", code: "CE", icon: "🏗", count: 0 },
     { id: "electrical", name: "Electrical Engineering", short: "Electrical", code: "EE", icon: "⚡", count: 0 },
@@ -18,6 +19,7 @@ const EBB = {
     { id: "computer", name: "Computer Engineering", short: "Computer", code: "COE", icon: "💻", count: 0 },
     { id: "chemical", name: "Chemical Engineering", short: "Chemical", code: "CHE", icon: "⚗", count: 0 },
     { id: "industrial", name: "Industrial Engineering", short: "Industrial", code: "IE", icon: "🏭", count: 0 },
+    { id: "materials", name: "Materials Engineering", short: "Materials", code: "METE", icon: "🔩", count: 0 },
     { id: "agricultural", name: "Agricultural Engineering", short: "Agricultural", code: "AE", icon: "🌾", count: 0 },
     { id: "general", name: "General / Shared", short: "General", code: "GEN", icon: "📚", count: 0 },
   ],
@@ -137,6 +139,72 @@ EBB.hydrateFromLive = (uiMaterials) => {
 
   EBB.liveReady = true;
   return { courses: EBB.courses.length, materials: EBB.materials.length };
+};
+
+/** Slug id for a new programme name (e.g. Materials Engineering → materials). */
+EBB.slugifyProgrammeId = (name) =>
+  String(name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, " and ")
+    .replace(/engineering$/i, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-") || "programme";
+
+/**
+ * Replace / merge live programmes into EBB.departments.
+ * Keeps material counts when re-applying after hydrate.
+ * @param {Array<{id:string,name:string,short_name?:string,short?:string,code?:string,sort_order?:number}>} rows
+ */
+EBB.applyProgrammes = (rows) => {
+  const prevCounts = new Map(
+    (EBB.departments || []).map((d) => [d.id, d.count || 0])
+  );
+  const builtins = (EBB._builtinDepartments || EBB.departments || []).slice();
+  if (!EBB._builtinDepartments) {
+    EBB._builtinDepartments = builtins.map((d) => ({ ...d, count: 0 }));
+  }
+
+  const byId = new Map();
+  EBB._builtinDepartments.forEach((d) => {
+    byId.set(d.id, { ...d, count: prevCounts.get(d.id) || 0 });
+  });
+
+  (Array.isArray(rows) ? rows : []).forEach((row, i) => {
+    const id = String(row.id || "").trim();
+    if (!id) return;
+    const name = String(row.name || id).trim();
+    const short =
+      String(row.short_name || row.short || "").trim() ||
+      name.replace(/\s+Engineering$/i, "") ||
+      name;
+    const code = String(row.code || "").trim().toUpperCase();
+    const existing = byId.get(id);
+    byId.set(id, {
+      id,
+      name,
+      short,
+      code: code || (existing && existing.code) || id.slice(0, 4).toUpperCase(),
+      icon: (existing && existing.icon) || "📘",
+      count: prevCounts.get(id) || 0,
+      sort_order:
+        row.sort_order != null
+          ? Number(row.sort_order)
+          : existing && existing.sort_order != null
+            ? existing.sort_order
+            : 100 + i,
+      live: true,
+    });
+  });
+
+  EBB.departments = [...byId.values()].sort((a, b) => {
+    const ao = a.sort_order != null ? a.sort_order : 999;
+    const bo = b.sort_order != null ? b.sort_order : 999;
+    if (ao !== bo) return ao - bo;
+    return String(a.name).localeCompare(String(b.name));
+  });
+  return EBB.departments;
 };
 
 /* ---------- Helper accessors ---------- */

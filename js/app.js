@@ -182,7 +182,13 @@
       return _liveCache;
     }
     try {
-      const rows = await EBBApi.listPublishedMaterials();
+      const [rows, programmes] = await Promise.all([
+        EBBApi.listPublishedMaterials(),
+        EBBApi.listProgrammes(),
+      ]);
+      if (window.EBB && programmes && programmes.length) {
+        EBB.applyProgrammes(programmes);
+      }
       _liveCache = (rows || []).map((r) => EBBApi.toUiMaterial(r));
     } catch (err) {
       console.warn("[EBB] live materials:", err.message || err);

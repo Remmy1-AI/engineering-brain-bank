@@ -17,8 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20261105d1" />
-  <link rel="stylesheet" href="./css/admin.css?v=20261016a7" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261108a1" />
+  <link rel="stylesheet" href="./css/admin.css?v=20261108a1" />
 </head>
 <body data-page="admin" class="admin-body">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -134,7 +134,7 @@
                   <input id="up-code" class="form-control" type="text" placeholder="e.g. CE 403" />
                 </div>
                 <div class="form-group">
-                  <label for="up-dept">Department</label>
+                  <label for="up-dept">Programme</label>
                   <select id="up-dept" class="form-control"></select>
                 </div>
               </div>
@@ -160,6 +160,49 @@
               <p class="admin-ok" id="upload-ok" hidden></p>
               <button type="submit" class="btn btn-primary" id="upload-submit">Upload</button>
             </form>
+          </div>
+
+          <div class="admin-card">
+            <h2>Programmes</h2>
+            <p class="admin-hint">Add missing programmes (e.g. Materials Engineering) so they appear in upload and on the site.</p>
+            <form id="programme-form" class="admin-form" novalidate>
+              <div class="form-group">
+                <label for="prog-name">Programme name *</label>
+                <input id="prog-name" class="form-control" type="text" placeholder="e.g. Materials Engineering" required maxlength="120" />
+              </div>
+              <div class="admin-form-row">
+                <div class="form-group">
+                  <label for="prog-short">Short name</label>
+                  <input id="prog-short" class="form-control" type="text" placeholder="e.g. Materials" maxlength="60" />
+                </div>
+                <div class="form-group">
+                  <label for="prog-code">Code</label>
+                  <input id="prog-code" class="form-control" type="text" placeholder="e.g. METE" maxlength="12" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="prog-id">Id (slug)</label>
+                <input id="prog-id" class="form-control" type="text" placeholder="auto from name, e.g. materials" maxlength="64" pattern="[a-z0-9\\-]+" />
+              </div>
+              <p class="admin-error" id="prog-error" hidden></p>
+              <p class="admin-ok" id="prog-ok" hidden></p>
+              <button type="submit" class="btn btn-primary" id="prog-submit">Add programme</button>
+            </form>
+            <div class="admin-table-wrap" style="margin-top:1rem">
+              <table class="admin-table" id="programmes-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Id</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="programmes-tbody">
+                  <tr><td colspan="4" class="admin-muted">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="admin-card admin-card-wide">
@@ -191,9 +234,9 @@
     </section>
   </main>
 
-  <script src="./js/data.js?v=20261016a7"></script>
+  <script src="./js/data.js?v=20261108a1"></script>
   <script src="./js/supabase-config.js?v=20261016a7"></script>
-  <script src="./js/ebb-api.js?v=20261018a1"></script>
-  <script src="./js/admin.js?v=20261016a7"></script>
+  <script src="./js/ebb-api.js?v=20261108a1"></script>
+  <script src="./js/admin.js?v=20261108a1"></script>
 </body>
 </html>
