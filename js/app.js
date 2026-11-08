@@ -71,7 +71,7 @@
               <a href="${siteHref("index.html")}" ${page === "home" ? 'class="active"' : ""}>Home</a>
               <a href="${siteHref("courses.html")}" ${page === "courses" || page === "course" ? 'class="active"' : ""}>Courses</a>
               <a href="${siteHref("resources.html")}" ${page === "resources" ? 'class="active"' : ""}>Resources</a>
-              <a href="${siteHref("upload.html")}" ${page === "upload" ? 'class="active"' : ""}>Upload</a>
+              <a href="https://forms.boye.study/">Upload</a>
               <a href="${siteHref("about.html")}" ${page === "about" ? 'class="active"' : ""}>About</a>
             </nav>
             <div class="header-actions">
@@ -100,7 +100,7 @@
               <a href="./index.html">Home</a>
               <a href="./courses.html">Courses</a>
               <a href="./resources.html">Resources</a>
-              <a href="./upload.html">Upload</a>
+              <a href="https://forms.boye.study/">Upload</a>
               <a href="./about.html">About</a>
             </div>
             <div class="footer-col">

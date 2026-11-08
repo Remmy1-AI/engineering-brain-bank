@@ -10,6 +10,8 @@ One-stop platform for engineering students to find and share course slides, lect
 
 Owner admin: **https://admin.boye.study** (also redirects from `https://boye.study/admin`)
 
+Student uploads: **https://forms.boye.study** (also redirects from `https://boye.study/upload`)
+
 Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 
 ## Pages
@@ -20,7 +22,7 @@ Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 | Courses | `courses.html` |
 | Course detail | `course.html?id=` |
 | Resources / Ask the Brain Bank | `resources.html` |
-| Upload (request) | `upload.html` |
+| Student upload | `https://forms.boye.study` (`forms.html`) |
 | About | `about.html` |
 | Owner Admin | `https://admin.boye.study` (`admin.html`) |
 
@@ -67,6 +69,8 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 6. Commit and push to `main` (or edit the file on GitHub). After deploy, open `https://admin.boye.study`, sign in, and upload materials.
 7. **Programmes (departments)** — in SQL Editor, run [`supabase/schema_programmes.sql`](supabase/schema_programmes.sql).  
    This creates the `programmes` table (seeded with Civil…Materials…etc.). After that, Admin → **Programmes** can add new ones (e.g. a missing faculty programme).
+8. **Student inbox (forms.boye.study)** — in SQL Editor, run [`supabase/schema_forms_inbox.sql`](supabase/schema_forms_inbox.sql).  
+   This lets anonymous visitors upload under `materials/inbox/*` as **unpublished** rows. Review and publish them from Admin.
 
 ### Allowed uploads (Admin)
 

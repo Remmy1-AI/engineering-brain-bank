@@ -395,11 +395,18 @@
           tbody.innerHTML = `<tr><td colspan="7" class="admin-muted">No materials yet. Upload one above.</td></tr>`;
           return;
         }
-        tbody.innerHTML = rows.map((m) => `
-          <tr>
+        tbody.innerHTML = rows.map((m) => {
+          const inbox = String(m.file_path || "").startsWith("inbox/");
+          const statusLabel = m.published
+            ? "Published"
+            : inbox
+              ? "Inbox"
+              : "Hidden";
+          return `
+          <tr${inbox && !m.published ? ' class="admin-inbox-row"' : ""}>
             <td data-label="Title">
               <strong>${escapeHtml(m.title)}</strong>
-              <div class="admin-muted">${escapeHtml(m.file_name || "")}</div>
+              <div class="admin-muted">${escapeHtml(m.file_name || "")}${inbox ? " · forms inbox" : ""}</div>
             </td>
             <td data-label="Course">${escapeHtml(m.course_code || "—")}</td>
             <td data-label="Type">${escapeHtml(m.material_type || "—")}</td>
@@ -408,14 +415,15 @@
             <td data-label="Status">
               <button type="button" class="btn btn-ghost btn-sm"
                 data-action="toggle" data-id="${m.id}" data-published="${m.published ? "true" : "false"}">
-                ${m.published ? "Published" : "Hidden"}
+                ${statusLabel}
               </button>
             </td>
             <td class="admin-row-actions" data-label="Actions">
               <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}" data-source="${escapeHtml(m.source || "")}" data-external="${escapeHtml(m.external_url || "")}">Open</button>
               <button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Delete</button>
             </td>
-          </tr>`).join("");
+          </tr>`;
+        }).join("");
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="7" class="admin-error">${escapeHtml(err.message || "Failed to load")}</td></tr>`;
       }
