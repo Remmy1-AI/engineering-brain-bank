@@ -118,7 +118,7 @@
         <div class="admin-grid">
           <div class="admin-card">
             <h2>Upload material</h2>
-            <p class="admin-hint">Allowed: PDF, PPT/PPTX, DOC/DOCX, TXT, MD — no video.</p>
+            <p class="admin-hint">New files go to Cloudflare R2 (existing GitHub library stays put). Allowed: PDF, PPT/PPTX, DOC/DOCX, TXT, MD.</p>
             <form id="upload-form" class="admin-form" novalidate>
               <div class="form-group">
                 <label for="up-title">Title *</label>
@@ -235,8 +235,9 @@
   </main>
 
   <script src="./js/data.js?v=20261108a1"></script>
-  <script src="./js/supabase-config.js?v=20261016a7"></script>
-  <script src="./js/ebb-api.js?v=20261108a1"></script>
-  <script src="./js/admin.js?v=20261108a1"></script>
+  <script src="./js/supabase-config.js?v=20261108r2"></script>
+  <script src="./js/ebb-api.js?v=20261108r2"></script>
+  <script src="./js/r2-upload.js?v=20261108r2"></script>
+  <script src="./js/admin.js?v=20261108r2"></script>
 </body>
 </html>

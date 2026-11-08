@@ -238,17 +238,45 @@
       try {
         const { data: userData } = await sb.auth.getUser();
         const uid = userData?.user?.id || null;
-        const safeName = file.name.replace(/[^\w.\-()+ ]+/g, "_");
-        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+        const { data: sess } = await sb.auth.getSession();
+        const accessToken = sess?.session?.access_token || null;
 
-        const { error: upErr } = await sb.storage
-          .from("materials")
-          .upload(path, file, {
-            cacheControl: "3600",
-            upsert: false,
-            contentType: file.type || undefined,
-          });
-        if (upErr) throw upErr;
+        let path;
+        let source = "storage";
+        let publicUrl = null;
+
+        if (window.EBBR2 && accessToken) {
+          try {
+            const up = await EBBR2.uploadFile(file, {
+              prefix: "uploads",
+              accessToken,
+            });
+            path = up.key;
+            source = "r2";
+            publicUrl = up.publicUrl;
+          } catch (r2err) {
+            if (r2err && r2err.code === "r2_not_configured") {
+              // Fall back to Supabase Storage until R2 env is set
+              console.warn("[admin] R2 not configured, using Supabase Storage");
+            } else {
+              throw r2err;
+            }
+          }
+        }
+
+        if (!path) {
+          const safeName = file.name.replace(/[^\w.\-()+ ]+/g, "_");
+          path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+          const { error: upErr } = await sb.storage
+            .from("materials")
+            .upload(path, file, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: file.type || undefined,
+            });
+          if (upErr) throw upErr;
+          source = "storage";
+        }
 
         const { error: insErr } = await sb.from("materials").insert({
           title,
@@ -262,11 +290,20 @@
           mime_type: file.type || null,
           file_size: file.size,
           published,
+          source,
+          download_url: publicUrl,
+          external_url: publicUrl,
           uploaded_by: uid,
         });
         if (insErr) {
           // best-effort cleanup
-          try { await sb.storage.from("materials").remove([path]); } catch (_) {}
+          try {
+            if (source === "r2" && window.EBBR2 && accessToken) {
+              await EBBR2.deleteObject(path, accessToken);
+            } else {
+              await sb.storage.from("materials").remove([path]);
+            }
+          } catch (_) {}
           throw insErr;
         }
 
@@ -300,10 +337,19 @@
         } else if (action === "delete") {
           if (!confirm("Delete this material and its file?")) return;
           const path = btn.getAttribute("data-path");
+          const source = btn.getAttribute("data-source") || "";
+          const { data: sess } = await sb.auth.getSession();
+          const accessToken = sess?.session?.access_token || null;
           const { error } = await sb.from("materials").delete().eq("id", id);
           if (error) throw error;
           if (path) {
-            try { await sb.storage.from("materials").remove([path]); } catch (_) {}
+            try {
+              if (source === "r2" && window.EBBR2 && accessToken) {
+                await EBBR2.deleteObject(path, accessToken);
+              } else if (!String(path).startsWith("materials/")) {
+                await sb.storage.from("materials").remove([path]);
+              }
+            } catch (_) {}
           }
           await refreshAll();
         } else if (action === "open") {
@@ -313,6 +359,7 @@
           const url = EBBApi.getFileUrl({
             file_path: path,
             external_url: ext,
+            download_url: ext,
             source: source || (String(path || "").startsWith("materials/") ? "github" : "storage"),
           }) || EBBApi.getPublicFileUrl(path);
           if (url) window.open(url, "_blank", "noopener");
@@ -419,8 +466,8 @@
               </button>
             </td>
             <td class="admin-row-actions" data-label="Actions">
-              <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}" data-source="${escapeHtml(m.source || "")}" data-external="${escapeHtml(m.external_url || "")}">Open</button>
-              <button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}">Delete</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="open" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}" data-source="${escapeHtml(m.source || "")}" data-external="${escapeHtml(m.external_url || m.download_url || "")}">Open</button>
+              <button type="button" class="btn btn-ghost btn-sm admin-danger" data-action="delete" data-id="${m.id}" data-path="${escapeHtml(m.file_path)}" data-source="${escapeHtml(m.source || "")}">Delete</button>
             </td>
           </tr>`;
         }).join("");

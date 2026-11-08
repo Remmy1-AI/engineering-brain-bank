@@ -161,10 +161,29 @@
     const row = rowOrPath;
     if (row.file_url) return row.file_url;
     if (row.external_url) return row.external_url;
+    if (row.download_url) return row.download_url;
     const source = row.source || (String(row.file_path || "").startsWith("materials/") ? "github" : "storage");
     const path = row.file_path || "";
     if (source === "github" || path.startsWith("materials/")) {
       return filesCfg().githubRawBase.replace(/\/?$/, "/") + encodeGithubPath(path);
+    }
+    if (source === "r2") {
+      const base = String(filesCfg().r2PublicBase || "").replace(/\/$/, "");
+      const key = String(path || "").replace(/^\/+/, "");
+      if (base && key) {
+        if (/\/api\/r2-file$/i.test(base) || base.includes("r2-file")) {
+          return `${base}?key=${encodeURIComponent(key)}`;
+        }
+        return (
+          base +
+          "/" +
+          key
+            .split("/")
+            .map((seg) => encodeURIComponent(seg))
+            .join("/")
+        );
+      }
+      return "";
     }
     return getPublicFileUrl(path);
   }
