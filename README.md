@@ -65,6 +65,8 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
    ```
 
 6. Commit and push to `main` (or edit the file on GitHub). After deploy, open `https://admin.boye.study`, sign in, and upload materials.
+7. **Programmes (departments)** — in SQL Editor, run [`supabase/schema_programmes.sql`](supabase/schema_programmes.sql).  
+   This creates the `programmes` table (seeded with Civil…Materials…etc.). After that, Admin → **Programmes** can add new ones (e.g. a missing faculty programme).
 
 ### Allowed uploads (Admin)
 
