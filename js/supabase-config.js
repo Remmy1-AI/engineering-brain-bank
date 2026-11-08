@@ -12,5 +12,6 @@ window.EBB_SUPABASE = {
    Set r2PublicBase to the bucket public URL (same as Vercel R2_PUBLIC_BASE_URL). */
 window.EBB_FILES = {
   githubRawBase: "https://raw.githubusercontent.com/Remmy1-AI/engineering-brain-bank/main/",
-  r2PublicBase: "",
+  /* Proxied reads via /api/r2-file?key=… (bucket can stay private) */
+  r2PublicBase: "https://boye.study/api/r2-file",
 };

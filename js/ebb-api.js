@@ -169,12 +169,15 @@
     }
     if (source === "r2") {
       const base = String(filesCfg().r2PublicBase || "").replace(/\/$/, "");
-      if (base && path) {
+      const key = String(path || "").replace(/^\/+/, "");
+      if (base && key) {
+        if (/\/api\/r2-file$/i.test(base) || base.includes("r2-file")) {
+          return `${base}?key=${encodeURIComponent(key)}`;
+        }
         return (
           base +
           "/" +
-          String(path)
-            .replace(/^\/+/, "")
+          key
             .split("/")
             .map((seg) => encodeURIComponent(seg))
             .join("/")
