@@ -41,8 +41,7 @@
     setText(qs("#up-progress-label"), "");
   }
 
-  async function uploadWithProgress(sb, path, file, contentType) {
-    // supabase-js storage upload does not expose byte progress; simulate stages
+  async function uploadLegacyStorage(sb, path, file, contentType) {
     setProgress(0.75, "Uploading to Brain Bank…");
     const { error } = await sb.storage.from("materials").upload(path, file, {
       cacheControl: "3600",
@@ -205,12 +204,35 @@
         const sb = await EBBApi.getClient();
         if (!sb) throw new Error("Could not connect to upload service.");
 
-        const safeName = String(file.name || "file").replace(/[^\w.\-()+ ]+/g, "_");
-        const path = `${INBOX_PREFIX}${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}-${safeName}`;
+        let path;
+        let source = "storage";
+        let publicUrl = null;
 
-        await uploadWithProgress(sb, path, file, file.type || undefined);
+        if (window.EBBR2) {
+          try {
+            const up = await EBBR2.uploadFile(file, {
+              prefix: "inbox",
+              onProgress: setProgress,
+            });
+            path = up.key;
+            source = "r2";
+            publicUrl = up.publicUrl;
+          } catch (r2err) {
+            if (r2err && r2err.code === "r2_not_configured") {
+              console.warn("[forms] R2 not configured, using Supabase Storage inbox");
+            } else {
+              throw r2err;
+            }
+          }
+        }
+
+        if (!path) {
+          const safeName = String(file.name || "file").replace(/[^\w.\-()+ ]+/g, "_");
+          path = `${INBOX_PREFIX}${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 8)}-${safeName}`;
+          await uploadLegacyStorage(sb, path, file, file.type || undefined);
+        }
 
         const title = `${qs("#up-code").value.trim()} — ${qs("#up-topic").value.trim()}`;
         const description = [
@@ -236,12 +258,18 @@
           mime_type: file.type || null,
           file_size: file.size,
           published: false,
-          source: "storage",
+          source,
+          download_url: publicUrl,
+          external_url: publicUrl,
           uploaded_by: null,
         });
         if (insErr) {
           try {
-            await sb.storage.from("materials").remove([path]);
+            if (source === "r2") {
+              // Inbox deletes need auth; best-effort skip for anon orphan
+            } else {
+              await sb.storage.from("materials").remove([path]);
+            }
           } catch (_) {}
           throw insErr;
         }
@@ -257,13 +285,16 @@
       } catch (err) {
         console.error(err);
         const msg = err?.message || String(err);
+        const needsR2 = /r2_not_configured|R2 is not configured/i.test(msg);
         const needsSql =
           /row-level security|policy|permission|not allowed|inbox/i.test(msg);
         setText(
           errEl,
-          needsSql
-            ? "Upload blocked by storage permissions. Ask the owner to run supabase/schema_forms_inbox.sql once in Supabase SQL Editor."
-            : msg || "Upload failed. Try again on Wi‑Fi."
+          needsR2
+            ? "File storage (R2) is not connected yet. Ask the owner to finish Cloudflare R2 setup."
+            : needsSql
+              ? "Upload blocked by catalog permissions. Ask the owner to run supabase/schema_forms_inbox.sql and schema_r2_source.sql in Supabase."
+              : msg || "Upload failed. Try again on Wi‑Fi."
         );
         show(errEl, true);
         resetProgress();

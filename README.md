@@ -28,9 +28,11 @@ Repository: https://github.com/Remmy1-AI/engineering-brain-bank
 
 ## Stack
 
-Static HTML / CSS / vanilla JS on GitHub Pages. Relative asset paths (`./css/...`) for base `/engineering-brain-bank/`.
+Static HTML / CSS / vanilla JS on **Vercel** (`boye.study`).
 
-Backend (optional until configured): **Supabase** Auth + Postgres + Storage. The front end uses only the **anon key** + user session. Never commit the `service_role` key.
+- **Supabase** — Auth (Admin), Postgres catalog, programmes  
+- **GitHub** `materials/` — existing library files (unchanged)  
+- **Cloudflare R2** — new Admin + forms uploads (`source=r2`)
 
 ## Brand
 
@@ -70,19 +72,41 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 7. **Programmes (departments)** — in SQL Editor, run [`supabase/schema_programmes.sql`](supabase/schema_programmes.sql).  
    This creates the `programmes` table (seeded with Civil…Materials…etc.). After that, Admin → **Programmes** can add new ones (e.g. a missing faculty programme).
 8. **Student inbox (forms.boye.study)** — in SQL Editor, run [`supabase/schema_forms_inbox.sql`](supabase/schema_forms_inbox.sql).  
-   This lets anonymous visitors upload under `materials/inbox/*` as **unpublished** rows. Review and publish them from Admin.
+   This lets anonymous visitors insert **unpublished** catalog rows for review. File bytes go to R2 when configured.
+9. **R2 source allow-list** — run [`supabase/schema_r2_source.sql`](supabase/schema_r2_source.sql) so `materials.source` may be `r2`.
+
+### Cloudflare R2 setup (new uploads)
+
+Existing GitHub library files stay on GitHub. **New** Admin / forms uploads go to R2.
+
+1. Cloudflare dashboard → **R2** → Create bucket (e.g. `ebb-materials`).
+2. Enable **Public access** (R2.dev subdomain or custom domain like `files.boye.study`).
+3. **Manage R2 API Tokens** → Create token with Object Read & Write on that bucket.  
+   Copy **Access Key ID**, **Secret Access Key**, and note your **Account ID**.
+4. Bucket **Settings → CORS** — allow `PUT`/`GET`/`HEAD` from `https://boye.study`, `https://admin.boye.study`, `https://forms.boye.study`.
+5. In **Vercel → Project → Settings → Environment Variables** (Production), add:
+
+   | Name | Value |
+   |---|---|
+   | `R2_ACCOUNT_ID` | Cloudflare account id |
+   | `R2_ACCESS_KEY_ID` | R2 token access key |
+   | `R2_SECRET_ACCESS_KEY` | R2 token secret |
+   | `R2_BUCKET_NAME` | bucket name |
+   | `R2_PUBLIC_BASE_URL` | public base, e.g. `https://pub-….r2.dev` |
+
+6. Set the same public base in [`js/supabase-config.js`](js/supabase-config.js) as `EBB_FILES.r2PublicBase` (optional if every row stores `download_url`).
+7. Redeploy. Admin + forms uploads will use `/api/r2-presign` → R2. Until env is set, uploads fall back to Supabase Storage.
 
 ### Allowed uploads (Admin)
 
-PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploads. The bulk course library is **not** stored in Supabase Storage.
+PDF, PPT/PPTX, DOC/DOCX, TXT, MD, plus common images/video (MP4) for admin uploads. The bulk course library stays on GitHub; new files go to R2.
 
 ### Hybrid file hosting (catalog in Supabase)
 
 - **Supabase** = materials **catalog** (metadata, publish flag, download/share counts).
-- **GitHub** `materials/` = file warehouse via  
-  `https://raw.githubusercontent.com/Remmy1-AI/engineering-brain-bank/main/{path}`
-- The repo must be **public** so students can watch/download without logging into GitHub.
-- UI stays on KB'S BRAIN BANK: in-page **Watch** (video/PDF/image modal) + **Download** (blob save). No Drive redirects.
+- **GitHub** `materials/` = existing file warehouse (unchanged).
+- **Cloudflare R2** = new uploads (`source=r2`, keys under `uploads/` or `inbox/`).
+- UI stays on KB'S BRAIN BANK: in-page **Watch** + **Download**.
 
 Re-seed catalog (owner machine; secrets in `~/.config/ebb/supabase.env`, not in repo):
 
