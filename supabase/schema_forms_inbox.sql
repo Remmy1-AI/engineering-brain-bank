@@ -34,7 +34,7 @@ create policy "anon_insert_inbox_materials"
   to anon
   with check (
     published = false
-    and coalesce(source, 'storage') = 'storage'
+    and coalesce(source, 'storage') in ('storage', 'r2')
     and file_path like 'inbox/%'
   );
 

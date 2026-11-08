@@ -80,11 +80,9 @@ Do this once so Admin uploads, live materials, visit/download/share stats work.
 Existing GitHub library files stay on GitHub. **New** Admin / forms uploads go to R2.
 
 1. Cloudflare dashboard → **R2** → Create bucket (e.g. `ebb-materials`).
-2. Enable **Public access** (R2.dev subdomain or custom domain like `files.boye.study`).
-3. **Manage R2 API Tokens** → Create token with Object Read & Write on that bucket.  
+2. **Manage R2 API Tokens** → Create token with Object Read & Write on that bucket.  
    Copy **Access Key ID**, **Secret Access Key**, and note your **Account ID**.
-4. Bucket **Settings → CORS** — allow `PUT`/`GET`/`HEAD` from `https://boye.study`, `https://admin.boye.study`, `https://forms.boye.study`.
-5. In **Vercel → Project → Settings → Environment Variables** (Production), add:
+3. In **Vercel → Project → Settings → Environment Variables** (Production), add:
 
    | Name | Value |
    |---|---|
@@ -92,10 +90,10 @@ Existing GitHub library files stay on GitHub. **New** Admin / forms uploads go t
    | `R2_ACCESS_KEY_ID` | R2 token access key |
    | `R2_SECRET_ACCESS_KEY` | R2 token secret |
    | `R2_BUCKET_NAME` | bucket name |
-   | `R2_PUBLIC_BASE_URL` | public base, e.g. `https://pub-….r2.dev` |
+   | `R2_PUBLIC_BASE_URL` | `https://boye.study/api/r2-file` (private bucket via signed GET) |
 
-6. Set the same public base in [`js/supabase-config.js`](js/supabase-config.js) as `EBB_FILES.r2PublicBase` (optional if every row stores `download_url`).
-7. Redeploy. Admin + forms uploads will use `/api/r2-presign` → R2. Until env is set, uploads fall back to Supabase Storage.
+4. Set the same public base in [`js/supabase-config.js`](js/supabase-config.js) as `EBB_FILES.r2PublicBase`.
+5. Redeploy. Uploads go **same-origin** via `/api/r2-presign` → `/api/r2-put` (server writes to R2), so **bucket CORS is not required**. Until env is set, uploads fall back to Supabase Storage.
 
 ### Allowed uploads (Admin)
 
