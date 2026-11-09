@@ -80,6 +80,33 @@
     }
     if (fileInput) fileInput.setAttribute("accept", EBBApi.acceptAttr());
 
+    function setAdminTab(tabId) {
+      const id = tabId || "upload";
+      document.querySelectorAll("#admin-tabs .admin-tab").forEach((btn) => {
+        const on = btn.getAttribute("data-tab") === id;
+        btn.classList.toggle("is-active", on);
+        btn.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+        panel.hidden = panel.getAttribute("data-tab-panel") !== id;
+      });
+      try {
+        sessionStorage.setItem("ebb-admin-tab", id);
+      } catch (_) {}
+    }
+
+    qs("#admin-tabs")?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".admin-tab[data-tab]");
+      if (!btn) return;
+      setAdminTab(btn.getAttribute("data-tab"));
+    });
+
+    let savedTab = "upload";
+    try {
+      savedTab = sessionStorage.getItem("ebb-admin-tab") || "upload";
+    } catch (_) {}
+    setAdminTab(savedTab);
+
     // Auto-suggest programme slug from name
     progName?.addEventListener("input", () => {
       if (!progId || progId.dataset.touched === "1") return;

@@ -249,30 +249,52 @@
   color: var(--text-dim);
 }
 
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+  padding: 0.3rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.admin-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted, #a0a0a0);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.admin-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+.admin-tab.is-active {
+  color: #111;
+  background: linear-gradient(90deg, var(--gold-dark, #c49200), var(--gold-light, #ffd54f));
+}
+
 .admin-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr); /* never force 280px side column on small screens */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
   width: 100%;
   max-width: 100%;
 }
-@media (min-width: 960px) {
-  .admin-grid {
-    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
-    gap: 1.25rem;
-  }
+.admin-grid > .admin-card[hidden] {
+  display: none !important;
 }
-
-/* Programmes + upload stack in the left column on wide screens */
 @media (min-width: 960px) {
-  .admin-grid > .admin-card:nth-child(1),
-  .admin-grid > .admin-card:nth-child(2) {
-    grid-column: 1;
-  }
-  .admin-grid > .admin-card-wide {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+  .admin-grid > .admin-card[data-tab-panel="upload"] {
+    max-width: 520px;
   }
 }
 
