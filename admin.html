@@ -17,8 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20261109u1" />
-  <link rel="stylesheet" href="./css/admin.css?v=20261109u1" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261109t1" />
+  <link rel="stylesheet" href="./css/admin.css?v=20261109t1" />
 </head>
 <body data-page="admin" class="admin-body">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -115,8 +115,14 @@
           <div class="admin-stat"><span class="admin-stat-val" id="stat-materials">—</span><span class="admin-stat-label">Materials</span></div>
         </div>
 
+        <nav class="admin-tabs" id="admin-tabs" aria-label="Admin sections">
+          <button type="button" class="admin-tab is-active" data-tab="upload" aria-selected="true">Upload</button>
+          <button type="button" class="admin-tab" data-tab="programmes" aria-selected="false">Programmes</button>
+          <button type="button" class="admin-tab" data-tab="materials" aria-selected="false">Materials</button>
+        </nav>
+
         <div class="admin-grid">
-          <div class="admin-card">
+          <div class="admin-card" data-tab-panel="upload">
             <h2>Upload material</h2>
             <p class="admin-hint">New files go to Cloudflare R2 (existing GitHub library stays put). Allowed: PDF, PPT/PPTX, DOC/DOCX, TXT, MD.</p>
             <form id="upload-form" class="admin-form" novalidate>
@@ -166,7 +172,7 @@
             </form>
           </div>
 
-          <div class="admin-card">
+          <div class="admin-card" data-tab-panel="programmes" hidden>
             <h2>Programmes</h2>
             <p class="admin-hint">Add missing programmes (e.g. Materials Engineering) so they appear in upload and on the site.</p>
             <form id="programme-form" class="admin-form" novalidate>
@@ -209,7 +215,7 @@
             </div>
           </div>
 
-          <div class="admin-card admin-card-wide">
+          <div class="admin-card admin-card-wide" data-tab-panel="materials" hidden>
             <div class="admin-table-head">
               <h2>All materials</h2>
               <button type="button" class="btn btn-ghost btn-sm" id="btn-refresh">Refresh</button>
@@ -238,10 +244,10 @@
     </section>
   </main>
 
-  <script src="./js/data.js?v=20261109u1"></script>
-  <script src="./js/supabase-config.js?v=20261109u1"></script>
-  <script src="./js/ebb-api.js?v=20261109u1"></script>
-  <script src="./js/r2-upload.js?v=20261109u1"></script>
-  <script src="./js/admin.js?v=20261109u1"></script>
+  <script src="./js/data.js?v=20261109t1"></script>
+  <script src="./js/supabase-config.js?v=20261109t1"></script>
+  <script src="./js/ebb-api.js?v=20261109t1"></script>
+  <script src="./js/r2-upload.js?v=20261109t1"></script>
+  <script src="./js/admin.js?v=20261109t1"></script>
 </body>
 </html>
