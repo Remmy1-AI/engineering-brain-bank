@@ -33,6 +33,10 @@
     setText(lab, label || "");
   }
 
+  function onUploadProgress(ratio, label) {
+    setProgress(ratio, label);
+  }
+
   function resetProgress() {
     const wrap = qs("#up-progress");
     const bar = qs("#up-progress-bar");
@@ -212,7 +216,7 @@
           try {
             const up = await EBBR2.uploadFile(file, {
               prefix: "inbox",
-              onProgress: setProgress,
+              onProgress: onUploadProgress,
             });
             path = up.key;
             source = "r2";

@@ -17,8 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/styles.css?v=20261108a1" />
-  <link rel="stylesheet" href="./css/admin.css?v=20261108a1" />
+  <link rel="stylesheet" href="./css/styles.css?v=20261109u1" />
+  <link rel="stylesheet" href="./css/admin.css?v=20261109u1" />
 </head>
 <body data-page="admin" class="admin-body">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -156,6 +156,10 @@
                 <input type="checkbox" id="up-published" checked />
                 Publish immediately
               </label>
+              <div class="admin-progress" id="upload-progress" hidden>
+                <div class="admin-progress-track"><div class="admin-progress-bar" id="upload-progress-bar"></div></div>
+                <p class="admin-progress-label" id="upload-progress-label"></p>
+              </div>
               <p class="admin-error" id="upload-error" hidden></p>
               <p class="admin-ok" id="upload-ok" hidden></p>
               <button type="submit" class="btn btn-primary" id="upload-submit">Upload</button>
@@ -234,10 +238,10 @@
     </section>
   </main>
 
-  <script src="./js/data.js?v=20261108a1"></script>
-  <script src="./js/supabase-config.js?v=20261108r2p"></script>
-  <script src="./js/ebb-api.js?v=20261108r2p"></script>
-  <script src="./js/r2-upload.js?v=20261108r2pp"></script>
-  <script src="./js/admin.js?v=20261108r2p"></script>
+  <script src="./js/data.js?v=20261109u1"></script>
+  <script src="./js/supabase-config.js?v=20261109u1"></script>
+  <script src="./js/ebb-api.js?v=20261109u1"></script>
+  <script src="./js/r2-upload.js?v=20261109u1"></script>
+  <script src="./js/admin.js?v=20261109u1"></script>
 </body>
 </html>

@@ -233,7 +233,23 @@
       }
 
       const btn = qs("#upload-submit");
+      const prog = qs("#upload-progress");
+      const progBar = qs("#upload-progress-bar");
+      const progLab = qs("#upload-progress-label");
+      const setUploadProgress = (ratio, label) => {
+        if (prog) prog.hidden = false;
+        if (progBar) progBar.style.width = `${Math.round(Math.max(0, Math.min(1, ratio)) * 100)}%`;
+        if (progLab) progLab.textContent = label || "";
+        if (btn) btn.textContent = label && /%/.test(label) ? "Uploading…" : btn.textContent;
+      };
+      const resetUploadProgress = () => {
+        if (prog) prog.hidden = true;
+        if (progBar) progBar.style.width = "0%";
+        if (progLab) progLab.textContent = "";
+      };
       if (btn) { btn.disabled = true; btn.textContent = "Uploading…"; }
+      resetUploadProgress();
+      setUploadProgress(0.02, "Starting…");
 
       try {
         const { data: userData } = await sb.auth.getUser();
@@ -250,13 +266,13 @@
             const up = await EBBR2.uploadFile(file, {
               prefix: "uploads",
               accessToken,
+              onProgress: (ratio, label) => setUploadProgress(ratio, label),
             });
             path = up.key;
             source = "r2";
             publicUrl = up.publicUrl;
           } catch (r2err) {
             if (r2err && r2err.code === "r2_not_configured") {
-              // Fall back to Supabase Storage until R2 env is set
               console.warn("[admin] R2 not configured, using Supabase Storage");
             } else {
               throw r2err;
@@ -265,6 +281,7 @@
         }
 
         if (!path) {
+          setUploadProgress(0.5, "Uploading to storage…");
           const safeName = file.name.replace(/[^\w.\-()+ ]+/g, "_");
           path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
           const { error: upErr } = await sb.storage
@@ -278,6 +295,7 @@
           source = "storage";
         }
 
+        setUploadProgress(0.97, "Saving catalog…");
         const { error: insErr } = await sb.from("materials").insert({
           title,
           description,
@@ -296,7 +314,6 @@
           uploaded_by: uid,
         });
         if (insErr) {
-          // best-effort cleanup
           try {
             if (source === "r2" && window.EBBR2 && accessToken) {
               await EBBR2.deleteObject(path, accessToken);
@@ -307,6 +324,7 @@
           throw insErr;
         }
 
+        setUploadProgress(1, "Done · " + (window.EBBR2 ? EBBR2.formatBytes(file.size) : ""));
         if (okEl) {
           okEl.textContent = "Uploaded successfully.";
           okEl.hidden = false;
@@ -314,7 +332,9 @@
         qs("#upload-form").reset();
         if (qs("#up-published")) qs("#up-published").checked = true;
         await refreshAll();
+        setTimeout(resetUploadProgress, 1200);
       } catch (err) {
+        resetUploadProgress();
         setError("upload-error", err.message || "Upload failed");
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = "Upload"; }
