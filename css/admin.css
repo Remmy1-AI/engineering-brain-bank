@@ -370,6 +370,27 @@
   }
 }
 
+.admin-progress {
+  margin: 0.85rem 0 0.35rem;
+}
+.admin-progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.admin-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold-dark, #c49200), var(--gold-light, #ffd54f));
+  transition: width 0.2s ease;
+}
+.admin-progress-label {
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, #a0a0a0);
+}
+
 @media (max-width: 380px) {
   .admin-topbar-actions .btn-sm {
     padding: 0.35rem 0.55rem;
