@@ -34,9 +34,15 @@ export default async function handler(req) {
   const key = allowedKey(url.searchParams.get("key") || "");
   if (!key) return json({ error: "Invalid or missing key" }, 400);
 
+  const wantDownload = url.searchParams.get("download") === "1";
+  const filename = wantDownload
+    ? url.searchParams.get("name") || key.split("/").pop() || "download"
+    : "";
+
   try {
-    const signed = await signGetUrl(key, 3600);
-    // 302 so browsers / video players hit R2 directly (Range friendly)
+    const signed = await signGetUrl(key, 3600, wantDownload ? { filename } : {});
+    // 302 so browsers / video players hit R2 directly (Range friendly).
+    // download=1 signs Content-Disposition: attachment so it lands in Downloads.
     return Response.redirect(signed, 302);
   } catch (err) {
     console.error("[r2-file]", err);

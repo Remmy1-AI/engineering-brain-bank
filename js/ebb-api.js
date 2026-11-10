@@ -46,6 +46,7 @@
     const f = window.EBB_FILES || {};
     return {
       githubRawBase: f.githubRawBase || DEFAULT_GITHUB_RAW,
+      r2PublicBase: f.r2PublicBase || "",
     };
   }
 
