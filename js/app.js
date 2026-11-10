@@ -321,6 +321,12 @@
     }
     if (isPdf) {
       body.innerHTML = `<p class="media-modal__hint">Loading preview…</p>`;
+      // R2 signed redirects have no browser CORS; the PDF itself can still render in an iframe.
+      if (/\/api\/r2-file/i.test(String(url || "")) || (m && m.source === "r2")) {
+        body.innerHTML = `<iframe class="media-modal__frame" src="${escapeAttr(url)}" title="PDF preview"></iframe>
+          <p class="media-modal__hint">Preview on site. Use Download to save a copy.</p>`;
+        return;
+      }
       try {
         const blobUrl = await blobUrlForPreview(url, m.mime_type || "application/pdf");
         modal._blobUrl = blobUrl;
@@ -442,15 +448,69 @@
     }
   }
 
+  function safeDownloadName(m) {
+    let name = String((m && (m.fileName || m.file_name)) || "download").replace(/[\\/]/g, "_");
+    if (!/\.[a-z0-9]{1,8}$/i.test(name)) {
+      const path = String((m && m.file_path) || "");
+      const ext = (path.match(/\.([a-z0-9]{1,8})$/i) || [])[1];
+      if (ext) name += "." + ext;
+    }
+    return name.slice(0, 180) || "download";
+  }
+
+  function labeledSizeBytes(m) {
+    const s = String((m && m.size) || "");
+    const n = parseFloat(s);
+    if (!n) return 0;
+    if (/gb/i.test(s)) return n * 1024 * 1024 * 1024;
+    if (/mb/i.test(s)) return n * 1024 * 1024;
+    if (/kb/i.test(s)) return n * 1024;
+    return n;
+  }
+
+  function triggerBrowserDownload(href, filename) {
+    const a = document.createElement("a");
+    a.href = href;
+    if (filename) a.setAttribute("download", filename);
+    a.rel = "noopener";
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function r2DownloadHref(url, filename) {
+    const u = new URL(url, window.location.origin);
+    u.searchParams.set("download", "1");
+    u.searchParams.set("name", filename);
+    return u.href;
+  }
+
   async function downloadOnSite(m, url) {
-    const name = m.fileName || "download";
+    const name = safeDownloadName(m);
+    const isR2 = (m && m.source === "r2") || /\/api\/r2-file/i.test(String(url || ""));
+    // R2 bucket has no browser CORS. A JS fetch of the signed URL fails, and the
+    // old hidden-iframe fallback toasted "Download started" without saving a file.
+    if (isR2) {
+      triggerBrowserDownload(r2DownloadHref(url, name), name);
+      showToast("Download started: " + name);
+      return;
+    }
+
+    const tooBig = labeledSizeBytes(m) > 25 * 1024 * 1024;
+    if (tooBig) {
+      const finalUrl = await resolvePlayableUrl(url);
+      triggerBrowserDownload(finalUrl, name);
+      showToast("Download started: " + name);
+      return;
+    }
+
     showToast("Preparing download: " + name);
     try {
       let finalUrl = await resolvePlayableUrl(url);
       let res = await fetch(finalUrl, { mode: "cors" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       let blob = await res.blob();
-      // LFS pointer safety net (full GET without Range)
       if (
         window.EBBApi?.looksLikeGitLfsPointer &&
         blob.size < 500 &&
@@ -468,17 +528,12 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(obj), 4000);
+      setTimeout(() => URL.revokeObjectURL(obj), 15000);
       showToast("Download started: " + name);
     } catch (err) {
-      // CORS fallback: hidden iframe keeps the SPA in place (no Drive tab)
       console.warn("[EBB] blob download fallback:", err.message || err);
       const playUrl = await resolvePlayableUrl(url).catch(() => url);
-      const iframe = document.createElement("iframe");
-      iframe.hidden = true;
-      iframe.src = playUrl;
-      document.body.appendChild(iframe);
-      setTimeout(() => iframe.remove(), 60000);
+      triggerBrowserDownload(playUrl, name);
       showToast("Download started: " + name);
     }
   }
