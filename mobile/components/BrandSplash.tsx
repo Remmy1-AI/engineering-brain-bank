@@ -9,7 +9,11 @@ export function BrandSplash() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.root, { paddingBottom: Math.max(insets.bottom, 28) }]}>
+    <View
+      style={[
+        styles.root,
+        { paddingBottom: Math.max(insets.bottom, 28), paddingTop: insets.top },
+      ]}>
       <View style={styles.center}>
         <Crest size={56} />
         <Text style={styles.parent}>{Brand.parentBrand}</Text>
@@ -26,6 +30,8 @@ export function BrandSplash() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    width: '100%',
+    minHeight: '100%' as unknown as number,
     backgroundColor: Brand.bg,
     justifyContent: 'space-between',
   },
