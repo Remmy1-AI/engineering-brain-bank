@@ -3,9 +3,8 @@ import {
   DMSans_500Medium,
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
-import { Syne_700Bold, Syne_800ExtraBold } from '@expo-google-fonts/syne';
 import { useFonts } from 'expo-font';
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -26,22 +25,20 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 const NavTheme = {
-  ...DarkTheme,
+  ...DefaultTheme,
   colors: {
-    ...DarkTheme.colors,
-    primary: Brand.gold,
+    ...DefaultTheme.colors,
+    primary: Brand.accent,
     background: Brand.bg,
     card: Brand.bgElevated,
     text: Brand.text,
     border: Brand.borderSubtle,
-    notification: Brand.gold,
+    notification: Brand.accent,
   },
 };
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Syne_700Bold,
-    Syne_800ExtraBold,
     DMSans_400Regular,
     DMSans_500Medium,
     DMSans_700Bold,
@@ -72,14 +69,15 @@ export default function RootLayout() {
     <AuthProvider>
       <LibraryProvider>
         <ThemeProvider value={NavTheme}>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <View style={styles.root}>
             <Stack
               screenOptions={{
-                headerStyle: { backgroundColor: Brand.bgElevated },
-                headerTintColor: Brand.gold,
+                headerStyle: { backgroundColor: Brand.bg },
+                headerTintColor: Brand.accent,
+                headerShadowVisible: false,
                 headerTitleStyle: {
-                  fontFamily: 'Syne_700Bold',
+                  fontFamily: 'DMSans_700Bold',
                   color: Brand.text,
                 },
                 contentStyle: { backgroundColor: Brand.bg },

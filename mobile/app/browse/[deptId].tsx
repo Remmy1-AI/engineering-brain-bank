@@ -2,7 +2,7 @@ import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ListRow, Muted } from '@/components/ui';
+import { LetterMark, ListRow, Muted } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import {
   getCoursesByDepartment,
@@ -25,10 +25,13 @@ export default function DepartmentScreen() {
     <>
       <Stack.Screen options={{ title: dept?.short ?? 'Department' }} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        <Text style={styles.heading}>
-          {dept ? `${dept.icon} ${dept.name}` : 'Department'}
-        </Text>
-        <Muted>{dept?.code} · pick a course</Muted>
+        <View style={styles.headerRow}>
+          {dept ? <LetterMark letters={dept.code} /> : null}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.heading}>{dept?.name ?? 'Department'}</Text>
+            <Muted>{dept?.code} · pick a course</Muted>
+          </View>
+        </View>
 
         <View style={styles.filters}>
           <Pressable
@@ -74,11 +77,17 @@ export default function DepartmentScreen() {
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 4,
+  },
   heading: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 22,
     color: Brand.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   filters: {
     flexDirection: 'row',
@@ -89,15 +98,15 @@ const styles = StyleSheet.create({
   },
   filter: {
     borderWidth: 1,
-    borderColor: Brand.borderSubtle,
+    borderColor: Brand.border,
     paddingVertical: 7,
     paddingHorizontal: 12,
-    borderRadius: 4,
+    borderRadius: 8,
     backgroundColor: Brand.bgCard,
   },
   filterActive: {
-    borderColor: Brand.gold,
-    backgroundColor: 'rgba(255, 184, 0, 0.12)',
+    borderColor: Brand.accent,
+    backgroundColor: Brand.accentSoft,
   },
   filterText: {
     fontFamily: 'DMSans_500Medium',
@@ -105,12 +114,12 @@ const styles = StyleSheet.create({
     color: Brand.textMuted,
   },
   filterTextActive: {
-    color: Brand.gold,
+    color: Brand.accent,
   },
   empty: {
     fontFamily: 'DMSans_400Regular',
     color: Brand.textDim,
     marginTop: 24,
   },
-  chevron: { color: Brand.gold, fontSize: 22 },
+  chevron: { color: Brand.textDim, fontSize: 22 },
 });

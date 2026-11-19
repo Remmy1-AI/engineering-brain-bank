@@ -1,25 +1,36 @@
-/** Brain Bank brand tokens — aligned with boye.study css/styles.css */
+/** Brain Bank v2 — light paper library (Notes / Goodnotes), one deep-blue accent.
+ *  Not the boye.study black / gold web chrome.
+ */
 
-const gold = '#FFB800';
-const goldLight = '#FFCC33';
-const goldDark = '#E09A00';
+const accent = '#1A56A8';
+const accentSoft = '#E8F0FA';
+const accentPressed = '#154785';
+
+/** Exam Drill–style locked category colors (dots / labels only). */
+export const TypeColors = {
+  slides: '#2F6FED',
+  notes: '#0F9F6E',
+  'past-questions': '#C47A0A',
+  tutorials: '#6D4ACB',
+  videos: '#C43C3C',
+  shared: '#5B6B7C',
+} as const;
 
 export const Brand = {
-  bg: '#050505',
-  bgElevated: '#0A0A0A',
-  bgCard: '#121212',
-  bgCardHover: '#1A1A1A',
-  bgInput: '#0E0E0E',
-  border: 'rgba(255, 255, 255, 0.14)',
-  borderSubtle: 'rgba(255, 255, 255, 0.07)',
-  text: '#F5F5F5',
-  textMuted: '#B0B0B4',
-  textDim: '#7A7A80',
-  gold,
-  goldLight,
-  goldDark,
-  goldInk: '#000000',
-  crestRed: '#C62828',
+  bg: '#F4F1EA',
+  bgElevated: '#FFFCF7',
+  bgCard: '#FFFFFF',
+  bgInput: '#FFFFFF',
+  bgWash: '#EDE9E1',
+  border: 'rgba(26, 26, 26, 0.10)',
+  borderSubtle: 'rgba(26, 26, 26, 0.06)',
+  text: '#1A1A1A',
+  textMuted: '#5A5A5A',
+  textDim: '#8A8A8A',
+  accent,
+  accentSoft,
+  accentPressed,
+  accentInk: '#FFFFFF',
   siteUrl: 'https://boye.study',
   parentBrand: 'ENGINEER WITH KB',
   appName: 'Brain Bank',
@@ -29,22 +40,19 @@ export const Brand = {
   closing: 'From him, FOR GESA.',
 };
 
-const tintColorLight = gold;
-const tintColorDark = gold;
-
 export default {
   light: {
     text: Brand.text,
     background: Brand.bg,
-    tint: tintColorLight,
+    tint: accent,
     tabIconDefault: Brand.textDim,
-    tabIconSelected: tintColorLight,
+    tabIconSelected: accent,
   },
   dark: {
     text: Brand.text,
     background: Brand.bg,
-    tint: tintColorDark,
+    tint: accent,
     tabIconDefault: Brand.textDim,
-    tabIconSelected: tintColorDark,
+    tabIconSelected: accent,
   },
 };

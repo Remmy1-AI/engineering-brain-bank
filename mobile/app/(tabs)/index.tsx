@@ -2,15 +2,16 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Crest } from '@/components/Crest';
 import {
+  AccentLabel,
   Field,
-  GoldLabel,
+  LetterMark,
   ListRow,
   PrimaryButton,
   SectionHeader,
   Subtitle,
   Title,
+  TypeDot,
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
@@ -35,17 +36,11 @@ export default function HomeScreen() {
       style={styles.scroll}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled">
-      <View style={styles.brandRow}>
-        <Crest size={36} />
-        <View style={{ flex: 1 }}>
-          <GoldLabel>{Brand.parentBrand}</GoldLabel>
-          <Text style={styles.brandName}>{Brand.fullName}</Text>
-        </View>
-      </View>
-
+      <Text style={styles.appWordmark}>{Brand.appName}</Text>
       <Title>Home</Title>
       <Subtitle>
-        Browse engineering materials free. Sign in with phone to download and keep progress.
+        Your engineering materials, quietly organized. Browse free — sign in to download and
+        continue.
       </Subtitle>
 
       <Field
@@ -69,6 +64,7 @@ export default function HomeScreen() {
               key={c.id}
               title={`${c.code} · ${c.name}`}
               subtitle={departments.find((d) => d.id === c.department)?.name}
+              leading={<LetterMark letters={c.code.replace(/\s/g, '').slice(0, 3)} />}
               onPress={() => router.push(`/browse/course/${c.id}`)}
             />
           ))}
@@ -77,6 +73,7 @@ export default function HomeScreen() {
               key={m.id}
               title={m.title}
               subtitle={`${m.course_code} · ${m.topic}`}
+              leading={<TypeDot type={m.type} />}
               onPress={() => router.push(`/material/${m.id}`)}
             />
           ))}
@@ -85,7 +82,7 @@ export default function HomeScreen() {
         <>
           {isSignedIn && continueMaterial && continueCourse ? (
             <View style={styles.continueCard}>
-              <GoldLabel>Continue learning</GoldLabel>
+              <AccentLabel>Continue learning</AccentLabel>
               <Text style={styles.continueTitle}>{continueMaterial.title}</Text>
               <Text style={styles.continueMeta}>
                 {continueCourse.code} · {continueCourse.name}
@@ -100,9 +97,9 @@ export default function HomeScreen() {
             </View>
           ) : (
             <View style={styles.guestBanner}>
-              <Text style={styles.guestTitle}>Learning as guest</Text>
+              <Text style={styles.guestTitle}>Browsing as guest</Text>
               <Text style={styles.guestBody}>
-                Open materials freely. Sign in on Profile to unlock downloads and Continue.
+                Open any material. Sign in on Profile to unlock downloads and Continue.
               </Text>
               <Text
                 style={styles.guestLink}
@@ -113,16 +110,16 @@ export default function HomeScreen() {
           )}
 
           <SectionHeader title="Departments" />
-          <View style={styles.deptGrid}>
-            {departments.slice(0, 6).map((d) => (
-              <Text
-                key={d.id}
-                style={styles.deptChip}
-                onPress={() => router.push(`/browse/${d.id}`)}>
-                {d.icon} {d.short}
-              </Text>
-            ))}
-          </View>
+          {departments.slice(0, 6).map((d) => (
+            <ListRow
+              key={d.id}
+              title={d.name}
+              subtitle={`${d.code} · ${d.count} materials`}
+              leading={<LetterMark letters={d.code} />}
+              onPress={() => router.push(`/browse/${d.id}`)}
+              right={<Text style={styles.chevron}>›</Text>}
+            />
+          ))}
           <Text style={styles.seeAll} onPress={() => router.push('/(tabs)/browse')}>
             See all departments →
           </Text>
@@ -134,6 +131,7 @@ export default function HomeScreen() {
               title={m.title}
               subtitle={`${m.course_code} · ${m.topic}`}
               meta={`${m.downloads} opens`}
+              leading={<TypeDot type={m.type} />}
               onPress={() => router.push(`/material/${m.id}`)}
             />
           ))}
@@ -146,17 +144,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 40 },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 22,
-  },
-  brandName: {
-    fontFamily: 'Syne_700Bold',
-    fontSize: 16,
-    color: Brand.text,
-    marginTop: 2,
+  appWordmark: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 13,
+    color: Brand.accent,
+    letterSpacing: 0.4,
+    marginBottom: 10,
   },
   continueCard: {
     marginTop: 20,
@@ -164,10 +157,10 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.bgCard,
     borderWidth: 1,
     borderColor: Brand.border,
-    borderRadius: 4,
+    borderRadius: 12,
   },
   continueTitle: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 18,
     color: Brand.text,
     marginTop: 8,
@@ -187,13 +180,11 @@ const styles = StyleSheet.create({
   guestBanner: {
     marginTop: 20,
     padding: 16,
-    borderWidth: 1,
-    borderColor: Brand.borderSubtle,
-    borderRadius: 4,
-    backgroundColor: Brand.bgElevated,
+    borderRadius: 12,
+    backgroundColor: Brand.accentSoft,
   },
   guestTitle: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 16,
     color: Brand.text,
   },
@@ -206,30 +197,13 @@ const styles = StyleSheet.create({
   },
   guestLink: {
     fontFamily: 'DMSans_500Medium',
-    color: Brand.gold,
+    color: Brand.accent,
     marginTop: 12,
     fontSize: 14,
   },
-  deptGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  deptChip: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 13,
-    color: Brand.text,
-    backgroundColor: Brand.bgCard,
-    borderWidth: 1,
-    borderColor: Brand.borderSubtle,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
   seeAll: {
     fontFamily: 'DMSans_500Medium',
-    color: Brand.gold,
+    color: Brand.accent,
     marginTop: 12,
     fontSize: 14,
   },
@@ -237,5 +211,10 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_400Regular',
     color: Brand.textDim,
     marginTop: 8,
+  },
+  chevron: {
+    color: Brand.textDim,
+    fontSize: 22,
+    fontFamily: 'DMSans_400Regular',
   },
 });

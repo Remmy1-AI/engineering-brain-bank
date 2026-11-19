@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { GoldLabel, ListRow, Subtitle, Title } from '@/components/ui';
+import { LetterMark, ListRow, Subtitle, Title } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { departments, levels } from '@/data/mockCatalog';
 
 export default function BrowseScreen() {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-      <GoldLabel>{Brand.parentBrand}</GoldLabel>
+      <Text style={styles.appWordmark}>{Brand.appName}</Text>
       <Title>Browse</Title>
       <Subtitle>Department → course → materials. Guests can open anything.</Subtitle>
 
@@ -16,8 +16,9 @@ export default function BrowseScreen() {
       {departments.map((d) => (
         <ListRow
           key={d.id}
-          title={`${d.icon}  ${d.name}`}
-          subtitle={`${d.code} · ${d.count} materials (mock)`}
+          title={d.name}
+          subtitle={`${d.code} · ${d.count} materials`}
+          leading={<LetterMark letters={d.code} />}
           onPress={() => router.push(`/browse/${d.id}`)}
           right={<Text style={styles.chevron}>›</Text>}
         />
@@ -32,7 +33,7 @@ export default function BrowseScreen() {
         ))}
       </View>
       <Text style={styles.hint}>
-        Pick a department to filter courses by level inside the course list.
+        Open a department to filter courses by level.
       </Text>
     </ScrollView>
   );
@@ -41,15 +42,22 @@ export default function BrowseScreen() {
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 40 },
+  appWordmark: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 13,
+    color: Brand.accent,
+    letterSpacing: 0.4,
+    marginBottom: 10,
+  },
   section: {
-    fontFamily: 'Syne_700Bold',
-    fontSize: 16,
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 15,
     color: Brand.text,
-    marginTop: 24,
+    marginTop: 26,
     marginBottom: 4,
   },
   chevron: {
-    color: Brand.gold,
+    color: Brand.textDim,
     fontSize: 22,
     fontFamily: 'DMSans_400Regular',
   },
@@ -61,11 +69,11 @@ const styles = StyleSheet.create({
   },
   levelChip: {
     borderWidth: 1,
-    borderColor: Brand.borderSubtle,
+    borderColor: Brand.border,
     backgroundColor: Brand.bgCard,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 4,
+    borderRadius: 8,
   },
   levelText: {
     fontFamily: 'DMSans_500Medium',

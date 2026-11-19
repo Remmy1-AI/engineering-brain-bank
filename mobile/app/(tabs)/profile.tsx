@@ -8,10 +8,11 @@ import {
   View,
 } from 'react-native';
 
+import { Crest } from '@/components/Crest';
 import {
+  AccentLabel,
   Field,
   GhostButton,
-  GoldLabel,
   Muted,
   PrimaryButton,
   SecondaryButton,
@@ -71,7 +72,7 @@ export default function ProfileScreen() {
       style={styles.scroll}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled">
-      <GoldLabel>{Brand.parentBrand}</GoldLabel>
+      <Text style={styles.appWordmark}>{Brand.appName}</Text>
       <Title>Profile</Title>
       <Subtitle>
         Phone OTP for downloads and progress. Admin email auth stays on the web.
@@ -79,7 +80,7 @@ export default function ProfileScreen() {
 
       {isSignedIn ? (
         <View style={styles.card}>
-          <GoldLabel>Signed in</GoldLabel>
+          <AccentLabel>Signed in</AccentLabel>
           <Text style={styles.phone}>{user?.phone}</Text>
           <Muted>
             {supabaseConfigured
@@ -92,7 +93,7 @@ export default function ProfileScreen() {
         </View>
       ) : (
         <View style={styles.card}>
-          <GoldLabel>Phone sign-in</GoldLabel>
+          <AccentLabel>Phone sign-in</AccentLabel>
           <Text style={styles.cardTitle}>Verify with OTP</Text>
           <View style={{ marginTop: 4 }}>
             <Muted>
@@ -152,15 +153,18 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      <View style={styles.links}>
-        <Text style={styles.linksTitle}>About</Text>
+      <View style={styles.about}>
+        <Text style={styles.aboutTitle}>About</Text>
+        <View style={styles.aboutBrand}>
+          <Crest size={36} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.aboutParent}>{Brand.parentBrand}</Text>
+            <Text style={styles.aboutName}>{Brand.fullName}</Text>
+            <Text style={styles.aboutTag}>{Brand.tagline}</Text>
+          </View>
+        </View>
         <Text style={styles.link} onPress={() => Linking.openURL(Brand.siteUrl)}>
-          {Brand.fullName} · boye.study
-        </Text>
-        <Text
-          style={styles.link}
-          onPress={() => Linking.openURL(Brand.siteUrl)}>
-          {Brand.parentBrand} · Learn • Share • Succeed
+          boye.study
         </Text>
         <Text style={styles.credit}>{Brand.splashCredit}</Text>
         <Text style={styles.closing}>{Brand.closing}</Text>
@@ -172,22 +176,29 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 48 },
+  appWordmark: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 13,
+    color: Brand.accent,
+    letterSpacing: 0.4,
+    marginBottom: 10,
+  },
   card: {
     marginTop: 22,
     padding: 16,
     backgroundColor: Brand.bgCard,
     borderWidth: 1,
     borderColor: Brand.border,
-    borderRadius: 4,
+    borderRadius: 12,
   },
   cardTitle: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 18,
     color: Brand.text,
     marginTop: 8,
   },
   phone: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 20,
     color: Brand.text,
     marginTop: 8,
@@ -206,26 +217,51 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Brand.borderSubtle,
   },
-  links: {
+  about: {
     marginTop: 36,
     gap: 8,
   },
-  linksTitle: {
-    fontFamily: 'Syne_700Bold',
+  aboutTitle: {
+    fontFamily: 'DMSans_700Bold',
     fontSize: 14,
     color: Brand.text,
-    marginBottom: 4,
+    marginBottom: 8,
+  },
+  aboutBrand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
+  },
+  aboutParent: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 11,
+    letterSpacing: 0.8,
+    color: Brand.accent,
+    textTransform: 'uppercase',
+  },
+  aboutName: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 15,
+    color: Brand.text,
+    marginTop: 2,
+  },
+  aboutTag: {
+    fontFamily: 'DMSans_400Regular',
+    fontSize: 13,
+    color: Brand.textMuted,
+    marginTop: 2,
   },
   link: {
     fontFamily: 'DMSans_500Medium',
     fontSize: 14,
-    color: Brand.gold,
+    color: Brand.accent,
   },
   credit: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 13,
     color: Brand.textDim,
-    marginTop: 12,
+    marginTop: 8,
   },
   closing: {
     fontFamily: 'DMSans_400Regular',

@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand } from '@/constants/Colors';
+import { Brand, TypeColors } from '@/constants/Colors';
+import type { MaterialTypeId } from '@/data/mockCatalog';
 
 export function Screen({
   children,
@@ -48,8 +49,42 @@ export function Muted({ children }: { children: ReactNode }) {
   return <Text style={styles.muted}>{children}</Text>;
 }
 
-export function GoldLabel({ children }: { children: ReactNode }) {
-  return <Text style={styles.goldLabel}>{children}</Text>;
+export function AccentLabel({ children }: { children: ReactNode }) {
+  return <Text style={styles.accentLabel}>{children}</Text>;
+}
+
+/** @deprecated use AccentLabel — kept so older imports don’t break mid-edit */
+export const GoldLabel = AccentLabel;
+
+export function TypeDot({ type }: { type: MaterialTypeId | string }) {
+  const color =
+    (TypeColors as Record<string, string>)[type] ?? Brand.textDim;
+  return <View style={[styles.typeDot, { backgroundColor: color }]} />;
+}
+
+export function TypePill({
+  type,
+  label,
+}: {
+  type: MaterialTypeId | string;
+  label: string;
+}) {
+  const color =
+    (TypeColors as Record<string, string>)[type] ?? Brand.textDim;
+  return (
+    <View style={styles.typePill}>
+      <View style={[styles.typeDot, { backgroundColor: color }]} />
+      <Text style={styles.typePillText}>{label}</Text>
+    </View>
+  );
+}
+
+export function LetterMark({ letters }: { letters: string }) {
+  return (
+    <View style={styles.letterMark}>
+      <Text style={styles.letterMarkText}>{letters.slice(0, 3).toUpperCase()}</Text>
+    </View>
+  );
 }
 
 export function PrimaryButton({
@@ -69,11 +104,11 @@ export function PrimaryButton({
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.primaryBtn,
+        pressed && !disabled && { backgroundColor: Brand.accentPressed },
         (disabled || loading) && styles.btnDisabled,
-        pressed && !disabled && { opacity: 0.88 },
       ]}>
       {loading ? (
-        <ActivityIndicator color={Brand.goldInk} />
+        <ActivityIndicator color={Brand.accentInk} />
       ) : (
         <Text style={styles.primaryBtnText}>{label}</Text>
       )}
@@ -97,7 +132,7 @@ export function SecondaryButton({
       style={({ pressed }) => [
         styles.secondaryBtn,
         disabled && styles.btnDisabled,
-        pressed && !disabled && { opacity: 0.88 },
+        pressed && !disabled && { backgroundColor: Brand.bgWash },
       ]}>
       <Text style={styles.secondaryBtnText}>{label}</Text>
     </Pressable>
@@ -134,18 +169,27 @@ export function ListRow({
   meta,
   onPress,
   right,
+  leading,
 }: {
   title: string;
   subtitle?: string;
   meta?: string;
   onPress?: () => void;
   right?: ReactNode;
+  leading?: ReactNode;
 }) {
   const content = (
     <View style={styles.row}>
+      {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.rowBody}>
-        <Text style={styles.rowTitle}>{title}</Text>
-        {subtitle ? <Text style={styles.rowSubtitle}>{subtitle}</Text> : null}
+        <Text style={styles.rowTitle} numberOfLines={2}>
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text style={styles.rowSubtitle} numberOfLines={1}>
+            {subtitle}
+          </Text>
+        ) : null}
         {meta ? <Text style={styles.rowMeta}>{meta}</Text> : null}
       </View>
       {right}
@@ -153,7 +197,7 @@ export function ListRow({
   );
   if (!onPress) return content;
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [pressed && { opacity: 0.85 }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [pressed && { opacity: 0.72 }]}>
       {content}
     </Pressable>
   );
@@ -195,10 +239,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontFamily: 'Syne_700Bold',
-    fontSize: 28,
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 30,
     color: Brand.text,
-    letterSpacing: 0.2,
+    letterSpacing: -0.4,
   },
   subtitle: {
     fontFamily: 'DMSans_400Regular',
@@ -212,32 +256,60 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Brand.textDim,
   },
-  goldLabel: {
-    fontFamily: 'Syne_700Bold',
+  accentLabel: {
+    fontFamily: 'DMSans_700Bold',
     fontSize: 11,
-    letterSpacing: 1.2,
-    color: Brand.gold,
+    letterSpacing: 0.8,
+    color: Brand.accent,
     textTransform: 'uppercase',
   },
+  typeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  typePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  typePillText: {
+    fontFamily: 'DMSans_500Medium',
+    fontSize: 12,
+    color: Brand.textMuted,
+  },
+  letterMark: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: Brand.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  letterMarkText: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 12,
+    color: Brand.accent,
+    letterSpacing: 0.3,
+  },
   primaryBtn: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Brand.accent,
     paddingVertical: 14,
     paddingHorizontal: 18,
-    borderRadius: 4,
+    borderRadius: 10,
     alignItems: 'center',
   },
   primaryBtnText: {
-    fontFamily: 'Syne_700Bold',
-    color: Brand.goldInk,
+    fontFamily: 'DMSans_700Bold',
+    color: Brand.accentInk,
     fontSize: 15,
-    letterSpacing: 0.3,
   },
   secondaryBtn: {
     borderWidth: 1,
     borderColor: Brand.border,
     paddingVertical: 13,
     paddingHorizontal: 18,
-    borderRadius: 4,
+    borderRadius: 10,
     alignItems: 'center',
     backgroundColor: Brand.bgCard,
   },
@@ -248,7 +320,7 @@ const styles = StyleSheet.create({
   },
   ghostBtnText: {
     fontFamily: 'DMSans_500Medium',
-    color: Brand.gold,
+    color: Brand.accent,
     fontSize: 14,
   },
   btnDisabled: {
@@ -258,7 +330,7 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.bgInput,
     borderWidth: 1,
     borderColor: Brand.border,
-    borderRadius: 4,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 13,
     color: Brand.text,
@@ -273,13 +345,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Brand.borderSubtle,
   },
+  leading: {
+    flexShrink: 0,
+  },
   rowBody: {
     flex: 1,
     gap: 3,
   },
   rowTitle: {
     fontFamily: 'DMSans_500Medium',
-    fontSize: 15,
+    fontSize: 16,
     color: Brand.text,
   },
   rowSubtitle: {
@@ -296,20 +371,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 22,
-    marginBottom: 8,
+    marginTop: 26,
+    marginBottom: 6,
   },
   sectionTitle: {
-    fontFamily: 'Syne_700Bold',
-    fontSize: 16,
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 15,
     color: Brand.text,
   },
   empty: {
-    paddingVertical: 48,
+    paddingVertical: 56,
     alignItems: 'center',
   },
   emptyTitle: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 18,
     color: Brand.text,
     textAlign: 'center',

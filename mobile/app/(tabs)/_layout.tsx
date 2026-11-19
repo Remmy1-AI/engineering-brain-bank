@@ -20,7 +20,7 @@ function TabIcon({
         android: android as any,
         web: android as any,
       }}
-      tintColor={color ?? Brand.gold}
+      tintColor={color ?? Brand.accent}
       size={24}
     />
   );
@@ -31,7 +31,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Brand.gold,
+        tabBarActiveTintColor: Brand.accent,
         tabBarInactiveTintColor: Brand.textDim,
         tabBarStyle: {
           backgroundColor: Brand.bgElevated,

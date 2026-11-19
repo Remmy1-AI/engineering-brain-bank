@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.bg,
   },
   title: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 18,
     color: Brand.text,
   },
@@ -37,6 +37,6 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: 'DMSans_500Medium',
     fontSize: 14,
-    color: Brand.gold,
+    color: Brand.accent,
   },
 });

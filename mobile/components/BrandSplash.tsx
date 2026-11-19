@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Crest } from '@/components/Crest';
 import { Brand } from '@/constants/Colors';
 
-/** Claude-style splash: name centered; “by Korle Boye” at bottom with space above. */
+/** Notes-style splash: name centered; credit at bottom with open space above. */
 export function BrandSplash() {
   const insets = useSafeAreaInsets();
 
@@ -12,10 +12,10 @@ export function BrandSplash() {
     <View
       style={[
         styles.root,
-        { paddingBottom: Math.max(insets.bottom, 28), paddingTop: insets.top },
+        { paddingBottom: Math.max(insets.bottom, 32), paddingTop: insets.top },
       ]}>
       <View style={styles.center}>
-        <Crest size={56} />
+        <Crest size={52} />
         <Text style={styles.parent}>{Brand.parentBrand}</Text>
         <Text style={styles.name}>{Brand.appName}</Text>
         <Text style={styles.tagline}>{Brand.tagline}</Text>
@@ -44,17 +44,17 @@ const styles = StyleSheet.create({
   },
   parent: {
     marginTop: 14,
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 11,
-    letterSpacing: 1.6,
-    color: Brand.gold,
+    letterSpacing: 1.4,
+    color: Brand.accent,
     textTransform: 'uppercase',
   },
   name: {
-    fontFamily: 'Syne_800ExtraBold',
-    fontSize: 42,
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 40,
     color: Brand.text,
-    letterSpacing: 0.5,
+    letterSpacing: -0.6,
   },
   tagline: {
     fontFamily: 'DMSans_400Regular',

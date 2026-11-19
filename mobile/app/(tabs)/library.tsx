@@ -3,11 +3,11 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 
 import {
   EmptyState,
-  GoldLabel,
   ListRow,
   PrimaryButton,
   Subtitle,
   Title,
+  TypeDot,
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
@@ -20,7 +20,7 @@ export default function LibraryScreen() {
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-      <GoldLabel>{Brand.parentBrand}</GoldLabel>
+      <Text style={styles.appWordmark}>{Brand.appName}</Text>
       <Title>Library</Title>
       <Subtitle>Your offline shelf — downloads saved on this device.</Subtitle>
 
@@ -55,6 +55,7 @@ export default function LibraryScreen() {
                 title={m.title}
                 subtitle={`${m.course_code} · ${m.topic}`}
                 meta={`Saved ${new Date(d.savedAt).toLocaleDateString()}`}
+                leading={<TypeDot type={m.type} />}
                 onPress={() => router.push(`/material/${m.id}`)}
                 right={
                   <Text
@@ -75,6 +76,13 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 40 },
+  appWordmark: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 13,
+    color: Brand.accent,
+    letterSpacing: 0.4,
+    marginBottom: 10,
+  },
   count: {
     fontFamily: 'DMSans_400Regular',
     color: Brand.textDim,

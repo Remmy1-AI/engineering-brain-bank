@@ -48,9 +48,9 @@ Enable Phone provider in the Supabase project. Do **not** put `service_role` in 
 
 `data/mockCatalog.ts` mirrors web shapes from `js/data.js` (departments, levels, materialTypes, courses, materials). Wire live Supabase catalog later without changing the static site.
 
-## Brand
+## Brand (v2 UI)
 
-Near-black `#050505`, gold `#FFB800`, Syne + DM Sans, crest mark. Splash: **Brain Bank** centered, **by Korle Boye** at bottom center with space above.
+Light paper library (Notes / Goodnotes feel): warm off-white `#F4F1EA`, ink text, **one** deep-blue accent `#1A56A8`. Material types use small color dots only. Crest / ENGINEER WITH KB only on splash + Profile About. Splash: **Brain Bank** centered, **by Korle Boye** at bottom center.
 
 ## Out of scope (v1)
 

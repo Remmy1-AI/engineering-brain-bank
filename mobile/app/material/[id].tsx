@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 
 import {
-  GoldLabel,
   Muted,
   PrimaryButton,
   SecondaryButton,
+  TypePill,
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
@@ -51,7 +51,7 @@ export default function MaterialScreen() {
     try {
       await WebBrowser.openBrowserAsync(openUrl, {
         toolbarColor: Brand.bg,
-        controlsColor: Brand.gold,
+        controlsColor: Brand.accent,
       });
     } finally {
       setOpening(false);
@@ -91,22 +91,24 @@ export default function MaterialScreen() {
     <>
       <Stack.Screen options={{ title: typeMeta?.name ?? 'Material' }} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        <GoldLabel>{typeMeta ? `${typeMeta.icon} ${typeMeta.name}` : 'Material'}</GoldLabel>
+        {typeMeta ? (
+          <TypePill type={material.type} label={typeMeta.name} />
+        ) : null}
         <Text style={styles.title}>{material.title}</Text>
         <Muted>
           {material.course_code}
           {course ? ` · ${course.name}` : ''}
         </Muted>
         <Text style={styles.meta}>
-          Level {material.level} · {material.downloads} opens (mock)
+          Level {material.level} · {material.downloads} opens
         </Text>
         <Text style={styles.path}>{material.file_path}</Text>
 
         <View style={styles.reader}>
-          <Text style={styles.readerTitle}>In-app open</Text>
+          <Text style={styles.readerTitle}>Open in place</Text>
           <Text style={styles.readerBody}>
-            Opens the material on boye.study (Watch / Open surface). Full offline reader ships
-            when the live catalog is wired.
+            Opens the material on boye.study. A quieter in-app reader ships when the live
+            catalog is wired.
           </Text>
         </View>
 
@@ -128,10 +130,10 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 },
   title: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 24,
     color: Brand.text,
-    marginTop: 8,
+    marginTop: 10,
     marginBottom: 6,
   },
   meta: {
@@ -149,14 +151,14 @@ const styles = StyleSheet.create({
   reader: {
     marginTop: 24,
     padding: 16,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Brand.bgCard,
     borderWidth: 1,
-    borderColor: Brand.borderSubtle,
-    borderRadius: 4,
+    borderColor: Brand.border,
+    borderRadius: 12,
     minHeight: 140,
   },
   readerTitle: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 15,
     color: Brand.text,
   },

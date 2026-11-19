@@ -2,7 +2,7 @@ import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ListRow, Muted } from '@/components/ui';
+import { ListRow, Muted, TypePill } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import {
   getCourse,
@@ -46,9 +46,9 @@ export default function CourseScreen() {
         ) : (
           byType.map((group) => (
             <View key={group.type.id}>
-              <Text style={styles.typeHeader}>
-                {group.type.icon} {group.type.name}
-              </Text>
+              <View style={styles.typeHeader}>
+                <TypePill type={group.type.id} label={group.type.name} />
+              </View>
               {group.items.map((m) => (
                 <ListRow
                   key={m.id}
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 },
   heading: {
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'DMSans_700Bold',
     fontSize: 22,
     color: Brand.text,
     marginBottom: 4,
@@ -84,16 +84,13 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   typeHeader: {
-    fontFamily: 'Syne_700Bold',
-    fontSize: 15,
-    color: Brand.text,
     marginTop: 24,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   empty: {
     fontFamily: 'DMSans_400Regular',
     color: Brand.textDim,
     marginTop: 24,
   },
-  chevron: { color: Brand.gold, fontSize: 22 },
+  chevron: { color: Brand.textDim, fontSize: 22 },
 });
