@@ -58,9 +58,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="library"
         options={{
-          title: 'Library',
+          title: 'Downloads',
+          tabBarAccessibilityLabel: 'Downloads',
           tabBarIcon: ({ color }) => (
-            <TabIcon ios="books.vertical.fill" android="menu_book" color={String(color)} />
+            <TabIcon
+              ios="arrow.down.to.line"
+              android="download"
+              color={String(color)}
+            />
           ),
         }}
       />
