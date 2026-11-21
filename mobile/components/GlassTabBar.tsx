@@ -82,7 +82,8 @@ export function GlassTabBar({
             {state.routes.map((route, index) => {
               const { options } = descriptors[route.key];
               const focused = state.index === index;
-              const color = focused ? Brand.accent : Brand.textDim;
+              // Solid gold pill → black icon for contrast; inactive stays muted
+              const color = focused ? Brand.accentInk : Brand.textDim;
               const icon = options.tabBarIcon?.({
                 focused,
                 color,
@@ -154,7 +155,13 @@ const styles = StyleSheet.create({
     width: INDICATOR,
     height: INDICATOR,
     borderRadius: INDICATOR / 2,
-    backgroundColor: Brand.accentSoft,
+    backgroundColor: Brand.accent,
+    borderWidth: 1,
+    borderColor: Brand.accentPressed,
+    shadowColor: Brand.accentPressed,
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
   tab: {
     flex: 1,
