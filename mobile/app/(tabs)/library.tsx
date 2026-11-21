@@ -60,27 +60,31 @@ export default function LibraryScreen() {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="never">
         {!isSignedIn ? (
-          <EmptyState
-            title="Sign in to keep downloads"
-            body="Guests can browse and open materials. Phone OTP unlocks offline saves on this device."
-            action={
-              <PrimaryButton
-                label="Sign in on Profile"
-                onPress={() => router.push('/(tabs)/profile')}
-              />
-            }
-          />
+          <View style={styles.emptyPad}>
+            <EmptyState
+              title="Sign in to keep downloads"
+              body="Guests can browse and open materials. Phone OTP unlocks offline saves on this device."
+              action={
+                <PrimaryButton
+                  label="Sign in on Profile"
+                  onPress={() => router.push('/(tabs)/profile')}
+                />
+              }
+            />
+          </View>
         ) : downloads.length === 0 ? (
-          <EmptyState
-            title="No downloads yet"
-            body="Open a material and tap Download to save it offline here."
-            action={
-              <PrimaryButton
-                label="Browse libraries"
-                onPress={() => router.push('/(tabs)/browse')}
-              />
-            }
-          />
+          <View style={styles.emptyPad}>
+            <EmptyState
+              title="No downloads yet"
+              body="Open a material and tap Download to save it offline here."
+              action={
+                <PrimaryButton
+                  label="Browse libraries"
+                  onPress={() => router.push('/(tabs)/browse')}
+                />
+              }
+            />
+          </View>
         ) : (
           <View style={styles.list}>
             {downloads.map((d, i) => {
@@ -227,22 +231,22 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   content: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 0,
+  },
+  emptyPad: {
+    paddingHorizontal: 20,
   },
   list: {
-    backgroundColor: Brand.bgCard,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Brand.border,
-    overflow: 'hidden',
+    backgroundColor: 'transparent',
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     minHeight: 64,
+    backgroundColor: 'transparent',
   },
   fileTile: {
     width: 40,
@@ -281,6 +285,6 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: Brand.border,
-    marginLeft: 64,
+    marginLeft: 68,
   },
 });
