@@ -83,8 +83,9 @@ export default function HomeScreen() {
   }, []);
 
   const heroPadTop = Math.max(insets.top, 8) + 4;
-  // Search starts overlapping the sticky hero seam; scrolls under it
-  const contentPadTop = HERO_H - SEARCH_OVERLAP;
+  // Sticky block = hero + overlapping search; only carousel/trending scroll under
+  const stickyBottom = HERO_H + SEARCH_OVERLAP;
+  const contentPadTop = stickyBottom + 12;
 
   return (
     <View style={styles.root}>
@@ -96,20 +97,7 @@ export default function HomeScreen() {
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        // Content scrolls behind the sticky hero
         contentInsetAdjustmentBehavior="never">
-        <View style={styles.searchInScroll}>
-          <Field
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search courses or materials…"
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-            style={styles.searchField}
-          />
-        </View>
-
         {query.trim() ? (
           <View>
             <SectionHeader title="Search results" />
@@ -192,44 +180,57 @@ export default function HomeScreen() {
         )}
       </ScrollView>
 
-      {/* Sticky forever — content scrolls under this slab */}
-      <View
-        pointerEvents="box-none"
-        style={[styles.hero, { height: HERO_H, paddingTop: heroPadTop }]}>
-        <View style={styles.heroRow} pointerEvents="box-none">
-          <View style={styles.heroLeft}>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.heroName} numberOfLines={1}>
-              {name}
-            </Text>
+      {/* Sticky hero + search — carousel/trending scroll under this block */}
+      <View pointerEvents="box-none" style={styles.stickyBlock}>
+        <View style={[styles.hero, { height: HERO_H, paddingTop: heroPadTop }]}>
+          <View style={styles.heroRow} pointerEvents="box-none">
+            <View style={styles.heroLeft}>
+              <Text style={styles.greeting}>{greeting}</Text>
+              <Text style={styles.heroName} numberOfLines={1}>
+                {name}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  if (isSignedIn && continueMaterial) {
+                    router.push(`/material/${continueMaterial.id}`);
+                  } else {
+                    router.push('/(tabs)/browse');
+                  }
+                }}
+                style={({ pressed }) => [
+                  styles.heroBtn,
+                  pressed && { opacity: 0.88 },
+                ]}>
+                <Text style={styles.heroBtnText}>
+                  {isSignedIn && continueCourse
+                    ? `Continue · ${continueCourse.code}`
+                    : 'Browse courses'}
+                </Text>
+              </Pressable>
+            </View>
+
             <Pressable
-              onPress={() => {
-                if (isSignedIn && continueMaterial) {
-                  router.push(`/material/${continueMaterial.id}`);
-                } else {
-                  router.push('/(tabs)/browse');
-                }
-              }}
-              style={({ pressed }) => [
-                styles.heroBtn,
-                pressed && { opacity: 0.88 },
-              ]}>
-              <Text style={styles.heroBtnText}>
-                {isSignedIn && continueCourse
-                  ? `Continue · ${continueCourse.code}`
-                  : 'Browse courses'}
+              onPress={() => router.push('/(tabs)/profile')}
+              accessibilityLabel="Profile"
+              style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}>
+              <Text style={styles.avatarText}>
+                {initialsFrom(isSignedIn, user?.phone)}
               </Text>
             </Pressable>
           </View>
+        </View>
 
-          <Pressable
-            onPress={() => router.push('/(tabs)/profile')}
-            accessibilityLabel="Profile"
-            style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.avatarText}>
-              {initialsFrom(isSignedIn, user?.phone)}
-            </Text>
-          </Pressable>
+        {/* Half on blue slab, half on paper — sticky with hero */}
+        <View style={[styles.searchWrap, { top: HERO_H - SEARCH_OVERLAP }]}>
+          <Field
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search courses or materials…"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+            style={styles.searchField}
+          />
         </View>
       </View>
     </View>
@@ -241,22 +242,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Brand.bg,
   },
-  hero: {
+  stickyBlock: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
+    zIndex: 20,
+    elevation: 12,
+  },
+  hero: {
     backgroundColor: Brand.accent,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
     paddingBottom: SEARCH_OVERLAP + 10,
-    zIndex: 20,
-    elevation: 12,
     shadowColor: '#0A2A55',
     shadowOpacity: 0.18,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
+  },
+  searchWrap: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    zIndex: 21,
   },
   heroRow: {
     flex: 1,
@@ -309,9 +318,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans_700Bold',
     fontSize: 13,
     color: Brand.accentInk,
-  },
-  searchInScroll: {
-    marginBottom: 16,
   },
   searchField: {
     height: SEARCH_H,
