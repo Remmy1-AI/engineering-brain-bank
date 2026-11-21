@@ -49,6 +49,7 @@ export default function TabLayout() {
         name="browse"
         options={{
           title: 'Browse',
+          tabBarAccessibilityLabel: 'Libraries',
           tabBarIcon: ({ color }) => (
             <TabIcon ios="square.grid.2x2.fill" android="grid_view" color={String(color)} />
           ),
