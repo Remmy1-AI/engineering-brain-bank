@@ -256,8 +256,8 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
-    // Room for the half-overlapping search sitting on the seam
-    paddingBottom: SEARCH_OVERLAP + 14,
+    // Keep greeting/CTA just above the sticky search (half of which sits on the slab)
+    paddingBottom: SEARCH_OVERLAP + 4,
     shadowColor: '#0A2A55',
     shadowOpacity: 0.18,
     shadowRadius: 10,
