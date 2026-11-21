@@ -175,7 +175,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
-  content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 48 },
+  content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 110 },
   appWordmark: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 13,

@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 
+import { GlassTabBar } from '@/components/GlassTabBar';
 import { Brand } from '@/constants/Colors';
 
 function TabIcon({
@@ -21,7 +21,7 @@ function TabIcon({
         web: android as any,
       }}
       tintColor={color ?? Brand.accent}
-      size={24}
+      size={22}
     />
   );
 }
@@ -29,20 +29,12 @@ function TabIcon({
 export default function TabLayout() {
   return (
     <Tabs
+      tabBar={(props) => <GlassTabBar {...props} />}
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: Brand.accent,
         tabBarInactiveTintColor: Brand.textDim,
-        tabBarStyle: {
-          backgroundColor: Brand.bgElevated,
-          borderTopColor: Brand.borderSubtle,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingTop: 6,
-        },
-        tabBarLabelStyle: {
-          fontFamily: 'DMSans_500Medium',
-          fontSize: 11,
-        },
       }}>
       <Tabs.Screen
         name="index"

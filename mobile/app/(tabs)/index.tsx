@@ -29,8 +29,8 @@ import {
 } from '@/data/mockCatalog';
 
 const SCREEN_H = Dimensions.get('window').height;
-/** ~20% of screen — clamp to a readable 140–180pt band on phones */
-const HERO_H = Math.min(180, Math.max(140, Math.round(SCREEN_H * 0.2)));
+/** Sticky top color slab — 22% of screen height */
+const HERO_H = Math.round(SCREEN_H * 0.22);
 const SEARCH_H = 48;
 const SEARCH_OVERLAP = SEARCH_H / 2;
 
@@ -42,7 +42,6 @@ function greetingForHour(hour: number) {
 
 function displayName(isSignedIn: boolean, phone?: string | null) {
   if (!isSignedIn || !phone) return 'there';
-  // Stub: show a short friendly label from phone
   const digits = phone.replace(/\D/g, '');
   if (digits.length >= 4) return `…${digits.slice(-4)}`;
   return phone;
@@ -68,8 +67,11 @@ export default function HomeScreen() {
   /** Deduped trending materials from mock campus activity (newest signal first). */
   const trendingMaterials = useMemo(() => {
     const seen = new Set<string>();
-    const rows: { id: string; material: NonNullable<ReturnType<typeof getMaterial>>; when: string }[] =
-      [];
+    const rows: {
+      id: string;
+      material: NonNullable<ReturnType<typeof getMaterial>>;
+      when: string;
+    }[] = [];
     for (const a of mockActivity) {
       if (seen.has(a.materialId)) continue;
       const m = getMaterial(a.materialId);
@@ -81,72 +83,33 @@ export default function HomeScreen() {
   }, []);
 
   const heroPadTop = Math.max(insets.top, 8) + 4;
-  // Content below search: hero height minus overlap, then room for the hanging search
-  const bodyPadTop = HERO_H - SEARCH_OVERLAP + SEARCH_H / 2 + 12;
+  // Search starts overlapping the sticky hero seam; scrolls under it
+  const contentPadTop = HERO_H - SEARCH_OVERLAP;
 
   return (
     <View style={styles.root}>
-      {/* Flush-top color slab — only bottom corners rounded */}
-      <View style={[styles.hero, { height: HERO_H, paddingTop: heroPadTop }]}>
-        <View style={styles.heroRow}>
-          <View style={styles.heroLeft}>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.heroName} numberOfLines={1}>
-              {name}
-            </Text>
-            <Pressable
-              onPress={() => {
-                if (isSignedIn && continueMaterial) {
-                  router.push(`/material/${continueMaterial.id}`);
-                } else {
-                  router.push('/(tabs)/browse');
-                }
-              }}
-              style={({ pressed }) => [
-                styles.heroBtn,
-                pressed && { opacity: 0.88 },
-              ]}>
-              <Text style={styles.heroBtnText}>
-                {isSignedIn && continueCourse
-                  ? `Continue · ${continueCourse.code}`
-                  : 'Browse courses'}
-              </Text>
-            </Pressable>
-          </View>
-
-          <Pressable
-            onPress={() => router.push('/(tabs)/profile')}
-            accessibilityLabel="Profile"
-            style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.avatarText}>
-              {initialsFrom(isSignedIn, user?.phone)}
-            </Text>
-          </Pressable>
-        </View>
-      </View>
-
-      {/* Search straddles hero / paper seam */}
-      <View
-        style={[
-          styles.searchWrap,
-          { top: HERO_H - SEARCH_OVERLAP },
-        ]}>
-        <Field
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search courses or materials…"
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-          style={styles.searchField}
-        />
-      </View>
-
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingTop: bodyPadTop }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: contentPadTop, paddingBottom: 100 + insets.bottom },
+        ]}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        // Content scrolls behind the sticky hero
+        contentInsetAdjustmentBehavior="never">
+        <View style={styles.searchInScroll}>
+          <Field
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search courses or materials…"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+            style={styles.searchField}
+          />
+        </View>
+
         {query.trim() ? (
           <View>
             <SectionHeader title="Search results" />
@@ -174,7 +137,6 @@ export default function HomeScreen() {
           </View>
         ) : (
           <>
-            {/* 1) Horizontal card carousel — swipe sideways */}
             <SectionHeader
               title="Courses"
               action={
@@ -212,7 +174,6 @@ export default function HomeScreen() {
               })}
             </ScrollView>
 
-            {/* 2) Vertical feed — trending materials people are opening */}
             <SectionHeader title="Trending" />
             <Text style={styles.feedHint}>
               Learning materials people are reading and opening
@@ -230,6 +191,47 @@ export default function HomeScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Sticky forever — content scrolls under this slab */}
+      <View
+        pointerEvents="box-none"
+        style={[styles.hero, { height: HERO_H, paddingTop: heroPadTop }]}>
+        <View style={styles.heroRow} pointerEvents="box-none">
+          <View style={styles.heroLeft}>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={styles.heroName} numberOfLines={1}>
+              {name}
+            </Text>
+            <Pressable
+              onPress={() => {
+                if (isSignedIn && continueMaterial) {
+                  router.push(`/material/${continueMaterial.id}`);
+                } else {
+                  router.push('/(tabs)/browse');
+                }
+              }}
+              style={({ pressed }) => [
+                styles.heroBtn,
+                pressed && { opacity: 0.88 },
+              ]}>
+              <Text style={styles.heroBtnText}>
+                {isSignedIn && continueCourse
+                  ? `Continue · ${continueCourse.code}`
+                  : 'Browse courses'}
+              </Text>
+            </Pressable>
+          </View>
+
+          <Pressable
+            onPress={() => router.push('/(tabs)/profile')}
+            accessibilityLabel="Profile"
+            style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}>
+            <Text style={styles.avatarText}>
+              {initialsFrom(isSignedIn, user?.phone)}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 }
@@ -249,7 +251,12 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
     paddingBottom: SEARCH_OVERLAP + 10,
-    zIndex: 1,
+    zIndex: 20,
+    elevation: 12,
+    shadowColor: '#0A2A55',
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
   },
   heroRow: {
     flex: 1,
@@ -303,11 +310,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Brand.accentInk,
   },
-  searchWrap: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    zIndex: 2,
+  searchInScroll: {
+    marginBottom: 16,
   },
   searchField: {
     height: SEARCH_H,
@@ -321,10 +325,10 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     backgroundColor: Brand.bg,
+    zIndex: 1,
   },
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 40,
   },
   courseScroll: {
     marginHorizontal: -20,

@@ -75,7 +75,7 @@ export default function LibraryScreen() {
 
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: Brand.bg },
-  content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 40 },
+  content: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 110 },
   appWordmark: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 13,
