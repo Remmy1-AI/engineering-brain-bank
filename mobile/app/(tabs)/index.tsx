@@ -82,7 +82,8 @@ export default function HomeScreen() {
     return rows;
   }, []);
 
-  const heroPadTop = Math.max(insets.top, 8) + 4;
+  // Clear status bar / notch; content itself is bottom-aligned toward the search
+  const heroPadTop = Math.max(insets.top, 12);
   // Sticky block = hero + overlapping search; only carousel/trending scroll under
   const stickyBottom = HERO_H + SEARCH_OVERLAP;
   const contentPadTop = stickyBottom + 12;
@@ -255,7 +256,8 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
-    paddingBottom: SEARCH_OVERLAP + 10,
+    // Room for the half-overlapping search sitting on the seam
+    paddingBottom: SEARCH_OVERLAP + 14,
     shadowColor: '#0A2A55',
     shadowOpacity: 0.18,
     shadowRadius: 10,
@@ -270,13 +272,14 @@ const styles = StyleSheet.create({
   heroRow: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    // Sit greeting / CTA / avatar near the search, not under the status bar
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     gap: 16,
   },
   heroLeft: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   greeting: {
     fontFamily: 'DMSans_500Medium',
@@ -289,7 +292,7 @@ const styles = StyleSheet.create({
     color: Brand.accentInk,
     letterSpacing: -0.4,
     marginTop: 1,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   heroBtn: {
     alignSelf: 'flex-start',
@@ -312,7 +315,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+    marginBottom: 2,
   },
   avatarText: {
     fontFamily: 'DMSans_700Bold',
