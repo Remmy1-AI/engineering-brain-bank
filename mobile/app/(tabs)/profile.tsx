@@ -100,6 +100,7 @@ export default function ProfileScreen() {
     verifyOtp,
     signOut,
     stubSignIn,
+    openAuthGate,
   } = useAuth();
 
   const [phone, setPhone] = useState('+233');
@@ -166,7 +167,9 @@ export default function ProfileScreen() {
     {
       key: 'programme',
       title: 'Programme',
-      meta: 'Mechanical Engineering · Level 200',
+      meta: user?.programme
+        ? user.programme
+        : 'Mechanical Engineering · Level 200',
       icon: { ios: 'graduationcap.fill', android: 'school' },
       onPress: () =>
         Alert.alert('Programme', 'Programme picker lands in a later build.'),
@@ -325,24 +328,24 @@ export default function ProfileScreen() {
                 Sign in to sync downloads and Continue across this device.
               </Text>
 
-              {!signingIn ? (
-                <Pressable
-                  onPress={() => setSigningIn(true)}
-                  style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sign in with phone">
-                  <SymbolView
-                    name={{
-                      ios: 'phone.fill' as any,
-                      android: 'phone' as any,
-                      web: 'phone' as any,
-                    }}
-                    tintColor={Brand.accent}
-                    size={18}
-                  />
-                  <Text style={styles.ctaText}>Sign in with phone</Text>
-                </Pressable>
-              ) : (
+            {!signingIn ? (
+              <Pressable
+                onPress={() => openAuthGate({ phase: 'signin' })}
+                style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+                accessibilityRole="button"
+                accessibilityLabel="Sign in with phone">
+                <SymbolView
+                  name={{
+                    ios: 'phone.fill' as any,
+                    android: 'phone' as any,
+                    web: 'phone' as any,
+                  }}
+                  tintColor={Brand.accent}
+                  size={18}
+                />
+                <Text style={styles.ctaText}>Sign in with phone</Text>
+              </Pressable>
+            ) : (
                 <View style={styles.otpPanel}>
                   <Text style={styles.label}>Phone</Text>
                   <Field

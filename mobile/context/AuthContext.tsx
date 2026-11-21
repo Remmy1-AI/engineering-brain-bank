@@ -16,6 +16,8 @@ export type AuthUser = {
   phone: string;
   /** Stub sessions set this; live Supabase sessions use the UUID */
   id: string;
+  name?: string;
+  programme?: string;
 };
 
 type AuthContextValue = {
@@ -23,6 +25,15 @@ type AuthContextValue = {
   isSignedIn: boolean;
   isReady: boolean;
   supabaseConfigured: boolean;
+  /** Cold-start / Profile: show splash→auth overlay */
+  authGateOpen: boolean;
+  /** True after first hydrate decided signed-in vs guest gate */
+  bootResolved: boolean;
+  openAuthGate: (opts?: { phase?: 'signin' | 'signup' }) => void;
+  closeAuthGate: () => void;
+  authGatePhase: 'signin' | 'signup' | null;
+  /** Skip land splash animation (Profile re-open / signup deep link). */
+  authGateSkipLand: boolean;
   /** Send OTP — Supabase when configured, else mock accept any E.164-ish phone */
   requestOtp: (phone: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   /** Verify OTP — Supabase when configured, else accept code "123456" */
@@ -30,6 +41,12 @@ type AuthContextValue = {
     phone: string,
     token: string
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  /** Merge profile fields after signup OTP (stub / local). */
+  completeSignIn: (profile: {
+    phone: string;
+    name?: string;
+    programme?: string;
+  }) => Promise<void>;
   signOut: () => Promise<void>;
   /** Dev helper: flip signed-in without OTP (for Home Continue demos) */
   stubSignIn: (phone?: string) => Promise<void>;
@@ -49,6 +66,10 @@ function normalizePhone(raw: string) {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [authGateOpen, setAuthGateOpen] = useState(false);
+  const [authGatePhase, setAuthGatePhase] = useState<'signin' | 'signup' | null>(null);
+  const [authGateSkipLand, setAuthGateSkipLand] = useState(false);
+  const [bootResolved, setBootResolved] = useState(false);
   const supabaseConfigured = isSupabaseConfigured();
 
   useEffect(() => {
@@ -82,6 +103,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  // Cold start: open gate for guests; signed-in users get a brief splash only (layout).
+  useEffect(() => {
+    if (!isReady || bootResolved) return;
+    if (!user) {
+      setAuthGateSkipLand(false);
+      setAuthGateOpen(true);
+      setAuthGatePhase('signin');
+    }
+    setBootResolved(true);
+  }, [isReady, user, bootResolved]);
 
   const persistStub = useCallback(async (next: AuthUser | null) => {
     setUser(next);
@@ -143,22 +175,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [persistStub]
   );
 
+  const completeSignIn = useCallback(
+    async (profile: { phone: string; name?: string; programme?: string }) => {
+      const phone = normalizePhone(profile.phone);
+      const next: AuthUser = {
+        id: user?.id || `stub-${phone}`,
+        phone,
+        name: profile.name,
+        programme: profile.programme,
+      };
+      await persistStub(next);
+    },
+    [persistStub, user?.id]
+  );
+
   const signOut = useCallback(async () => {
     const sb = getSupabase();
     if (sb) {
       await sb.auth.signOut();
       setUser(null);
+      setAuthGateSkipLand(false);
+      setAuthGateOpen(true);
+      setAuthGatePhase('signin');
       return;
     }
     await persistStub(null);
+    setAuthGateSkipLand(false);
+    setAuthGateOpen(true);
+    setAuthGatePhase('signin');
   }, [persistStub]);
 
   const stubSignIn = useCallback(
-    async (phone = '+233200000000') => {
+    async (phone = '+233241234567') => {
       await persistStub({ id: `stub-${phone}`, phone: normalizePhone(phone) });
+      setAuthGateOpen(false);
     },
     [persistStub]
   );
+
+  const openAuthGate = useCallback((opts?: { phase?: 'signin' | 'signup' }) => {
+    setAuthGateSkipLand(true);
+    setAuthGatePhase(opts?.phase ?? 'signin');
+    setAuthGateOpen(true);
+  }, []);
+
+  const closeAuthGate = useCallback(() => {
+    setAuthGateOpen(false);
+    setAuthGatePhase(null);
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -166,12 +230,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isSignedIn: Boolean(user),
       isReady,
       supabaseConfigured,
+      authGateOpen,
+      bootResolved,
+      openAuthGate,
+      closeAuthGate,
+      authGatePhase,
+      authGateSkipLand,
       requestOtp,
       verifyOtp,
+      completeSignIn,
       signOut,
       stubSignIn,
     }),
-    [user, isReady, supabaseConfigured, requestOtp, verifyOtp, signOut, stubSignIn]
+    [
+      user,
+      isReady,
+      supabaseConfigured,
+      authGateOpen,
+      bootResolved,
+      openAuthGate,
+      closeAuthGate,
+      authGatePhase,
+      authGateSkipLand,
+      requestOtp,
+      verifyOtp,
+      completeSignIn,
+      signOut,
+      stubSignIn,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
