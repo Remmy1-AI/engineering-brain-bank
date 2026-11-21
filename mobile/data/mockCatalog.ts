@@ -495,3 +495,24 @@ export const mockDownloadsForUser: DownloadRecord[] = [
   { materialId: 'm7', savedAt: '2026-11-17T14:30:00Z' },
   { materialId: 'm8', savedAt: '2026-11-16T09:15:00Z' },
 ];
+
+export type ActivityItem = {
+  id: string;
+  who: string;
+  action: 'opened' | 'read';
+  materialId: string;
+  when: string;
+};
+
+/** Mock “what people have been reading” feed for Home. */
+export const mockActivity: ActivityItem[] = [
+  { id: 'a1', who: 'Ama K.', action: 'opened', materialId: 'm8', when: '12 min ago' },
+  { id: 'a2', who: 'Kwesi M.', action: 'read', materialId: 'm2', when: '34 min ago' },
+  { id: 'a3', who: 'Yaw B.', action: 'opened', materialId: 'm14', when: '1 hr ago' },
+  { id: 'a4', who: 'Efua S.', action: 'read', materialId: 'm7', when: '2 hr ago' },
+  { id: 'a5', who: 'Kojo A.', action: 'opened', materialId: 'm3', when: '3 hr ago' },
+  { id: 'a6', who: 'Abena T.', action: 'read', materialId: 'm12', when: '5 hr ago' },
+  { id: 'a7', who: 'Nana P.', action: 'opened', materialId: 'm5', when: 'Yesterday' },
+  { id: 'a8', who: 'Adwoa R.', action: 'read', materialId: 'm15', when: 'Yesterday' },
+];
+
