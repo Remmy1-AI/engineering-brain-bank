@@ -29,7 +29,8 @@ import {
 } from '@/data/mockCatalog';
 
 const SCREEN_H = Dimensions.get('window').height;
-const HERO_H = Math.round(SCREEN_H * 0.3);
+/** ~20% of screen — clamp to a readable 140–180pt band on phones */
+const HERO_H = Math.min(180, Math.max(140, Math.round(SCREEN_H * 0.2)));
 const SEARCH_H = 48;
 const SEARCH_OVERLAP = SEARCH_H / 2;
 
@@ -79,7 +80,7 @@ export default function HomeScreen() {
     return rows;
   }, []);
 
-  const heroPadTop = Math.max(insets.top, 12) + 8;
+  const heroPadTop = Math.max(insets.top, 8) + 4;
   // Content below search: hero height minus overlap, then room for the hanging search
   const bodyPadTop = HERO_H - SEARCH_OVERLAP + SEARCH_H / 2 + 12;
 
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
-    paddingBottom: SEARCH_OVERLAP + 16,
+    paddingBottom: SEARCH_OVERLAP + 10,
     zIndex: 1,
   },
   heroRow: {
@@ -260,26 +261,25 @@ const styles = StyleSheet.create({
   heroLeft: {
     flex: 1,
     justifyContent: 'center',
-    paddingTop: 4,
   },
   greeting: {
     fontFamily: 'DMSans_500Medium',
-    fontSize: 15,
+    fontSize: 14,
     color: 'rgba(255,255,255,0.82)',
   },
   heroName: {
     fontFamily: 'DMSans_700Bold',
-    fontSize: 32,
+    fontSize: 26,
     color: Brand.accentInk,
-    letterSpacing: -0.5,
-    marginTop: 2,
-    marginBottom: 14,
+    letterSpacing: -0.4,
+    marginTop: 1,
+    marginBottom: 8,
   },
   heroBtn: {
     alignSelf: 'flex-start',
     backgroundColor: Brand.accentInk,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 999,
   },
   heroBtnText: {
@@ -288,9 +288,9 @@ const styles = StyleSheet.create({
     color: Brand.accent,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.35)',
