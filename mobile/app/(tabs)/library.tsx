@@ -40,7 +40,7 @@ function mockSize(type: MaterialTypeId | string) {
 }
 
 /**
- * Downloads tab — offline shelf with sticky black hero (boye.study).
+ * Downloads — compact list rows (icon · title/meta · open + trash), sticky black hero.
  */
 export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
@@ -55,7 +55,7 @@ export default function LibraryScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: HERO_H + 16, paddingBottom: 110 + insets.bottom },
+          { paddingTop: HERO_H + 8, paddingBottom: 110 + insets.bottom },
         ]}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="never">
@@ -83,50 +83,75 @@ export default function LibraryScreen() {
           />
         ) : (
           <View style={styles.list}>
-            {downloads.map((d) => {
+            {downloads.map((d, i) => {
               const m = getMaterial(d.materialId);
               if (!m) return null;
               return (
-                <View key={d.materialId} style={styles.row}>
-                  <View style={styles.fileTile}>
-                    <SymbolView
-                      name={{
-                        ios: 'doc.fill' as any,
-                        android: 'description' as any,
-                        web: 'description' as any,
-                      }}
-                      tintColor={Brand.accent}
-                      size={22}
-                    />
-                  </View>
-                  <View style={styles.rowBody}>
-                    <Text style={styles.rowTitle} numberOfLines={2}>
-                      {m.title}
-                    </Text>
-                    <Text style={styles.rowMeta} numberOfLines={1}>
-                      {typeLabel(m.type)} · {m.course_code} · {mockSize(m.type)}
-                    </Text>
-                    <View style={styles.actions}>
+                <View key={d.materialId}>
+                  <View style={styles.row}>
+                    <View style={styles.fileTile}>
+                      <SymbolView
+                        name={{
+                          ios: 'doc.fill' as any,
+                          android: 'description' as any,
+                          web: 'description' as any,
+                        }}
+                        tintColor={Brand.accent}
+                        size={20}
+                      />
+                    </View>
+                    <Pressable
+                      onPress={() => router.push(`/material/${m.id}`)}
+                      style={styles.rowBody}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Open ${m.title}`}>
+                      <Text style={styles.rowTitle} numberOfLines={1}>
+                        {m.title}
+                      </Text>
+                      <Text style={styles.rowMeta} numberOfLines={1}>
+                        {typeLabel(m.type)} · {m.course_code} · {mockSize(m.type)}
+                      </Text>
+                    </Pressable>
+                    <View style={styles.trailing}>
                       <Pressable
                         onPress={() => router.push(`/material/${m.id}`)}
+                        hitSlop={10}
+                        accessibilityLabel="Open"
                         style={({ pressed }) => [
-                          styles.actionBtn,
-                          styles.openBtn,
-                          pressed && { opacity: 0.88 },
+                          styles.iconBtn,
+                          pressed && { opacity: 0.7 },
                         ]}>
-                        <Text style={styles.openBtnText}>Open</Text>
+                        <SymbolView
+                          name={{
+                            ios: 'arrow.up.right.square' as any,
+                            android: 'open_in_new' as any,
+                            web: 'open_in_new' as any,
+                          }}
+                          tintColor={Brand.accent}
+                          size={20}
+                        />
                       </Pressable>
                       <Pressable
                         onPress={() => removeDownload(d.materialId)}
+                        hitSlop={10}
+                        accessibilityLabel="Delete"
                         style={({ pressed }) => [
-                          styles.actionBtn,
-                          styles.deleteBtn,
-                          pressed && { opacity: 0.88 },
+                          styles.iconBtn,
+                          pressed && { opacity: 0.7 },
                         ]}>
-                        <Text style={styles.deleteBtnText}>Delete</Text>
+                        <SymbolView
+                          name={{
+                            ios: 'trash' as any,
+                            android: 'delete' as any,
+                            web: 'delete' as any,
+                          }}
+                          tintColor={Brand.textDim}
+                          size={20}
+                        />
                       </Pressable>
                     </View>
                   </View>
+                  {i < downloads.length - 1 ? <View style={styles.divider} /> : null}
                 </View>
               );
             })}
@@ -202,69 +227,60 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   content: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   list: {
-    gap: 10,
+    backgroundColor: Brand.bgCard,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    overflow: 'hidden',
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
-    backgroundColor: Brand.bgCard,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Brand.border,
-    padding: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    minHeight: 64,
   },
   fileTile: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     backgroundColor: Brand.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   rowBody: {
     flex: 1,
-    gap: 4,
+    minWidth: 0,
+    gap: 2,
   },
   rowTitle: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 15,
     color: Brand.text,
-    lineHeight: 20,
   },
   rowMeta: {
     fontFamily: 'DMSans_400Regular',
     fontSize: 12,
     color: Brand.textDim,
   },
-  actions: {
+  trailing: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
+    alignItems: 'center',
+    gap: 4,
   },
-  actionBtn: {
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 999,
+  iconBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  openBtn: {
-    backgroundColor: Brand.accent,
-  },
-  openBtnText: {
-    fontFamily: 'DMSans_700Bold',
-    fontSize: 12,
-    color: Brand.accentInk,
-  },
-  deleteBtn: {
-    backgroundColor: Brand.bgWash,
-    borderWidth: 1,
-    borderColor: Brand.border,
-  },
-  deleteBtnText: {
-    fontFamily: 'DMSans_500Medium',
-    fontSize: 12,
-    color: Brand.textMuted,
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Brand.border,
+    marginLeft: 64,
   },
 });
