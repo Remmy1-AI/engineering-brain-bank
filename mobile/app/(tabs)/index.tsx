@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import {
   Dimensions,
@@ -90,6 +91,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
+      <StatusBar style="light" />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[
@@ -252,16 +254,16 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   hero: {
-    backgroundColor: Brand.accent,
+    backgroundColor: Brand.heroBg,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
     // Keep greeting/CTA just above the sticky search (half of which sits on the slab)
     paddingBottom: SEARCH_OVERLAP + 4,
-    shadowColor: '#0A2A55',
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#000000',
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
   searchWrap: {
     position: 'absolute',
@@ -284,19 +286,19 @@ const styles = StyleSheet.create({
   greeting: {
     fontFamily: 'DMSans_500Medium',
     fontSize: 13,
-    color: 'rgba(255,255,255,0.82)',
+    color: Brand.textMutedOnDark,
   },
   heroName: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 24,
-    color: Brand.accentInk,
+    color: Brand.textOnDark,
     letterSpacing: -0.4,
     marginTop: 1,
     marginBottom: 8,
   },
   heroBtn: {
     alignSelf: 'flex-start',
-    backgroundColor: Brand.accentInk,
+    backgroundColor: Brand.accent,
     paddingVertical: 7,
     paddingHorizontal: 14,
     borderRadius: 999,
@@ -304,15 +306,15 @@ const styles = StyleSheet.create({
   heroBtnText: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 13,
-    color: Brand.accent,
+    color: Brand.accentInk,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
+    borderColor: 'rgba(255,184,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 13,
-    color: Brand.accentInk,
+    color: Brand.textOnDark,
   },
   searchField: {
     height: SEARCH_H,

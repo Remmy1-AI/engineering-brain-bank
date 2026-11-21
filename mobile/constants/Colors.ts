@@ -1,10 +1,12 @@
-/** Brain Bank v2 — light paper library (Notes / Goodnotes), one deep-blue accent.
- *  Not the boye.study black / gold web chrome.
+/** Brain Bank mobile — boye.study tokens + light paper body under black hero.
+ *  Exact web tokens from css/styles.css; paper canvas kept for content under the sticky hero.
  */
 
-const accent = '#1A56A8';
-const accentSoft = '#E8F0FA';
-const accentPressed = '#154785';
+const gold = '#FFB800';
+const goldLight = '#FFCC33';
+const goldDark = '#E09A00';
+const goldInk = '#000000';
+const crestRed = '#C62828';
 
 /** Exam Drill–style locked category colors (dots / labels only). */
 export const TypeColors = {
@@ -17,6 +19,7 @@ export const TypeColors = {
 } as const;
 
 export const Brand = {
+  // Light paper body (under hero / main screens)
   bg: '#F4F1EA',
   bgElevated: '#FFFCF7',
   bgCard: '#FFFFFF',
@@ -27,10 +30,27 @@ export const Brand = {
   text: '#1A1A1A',
   textMuted: '#5A5A5A',
   textDim: '#8A8A8A',
-  accent,
-  accentSoft,
-  accentPressed,
-  accentInk: '#FFFFFF',
+
+  // boye.study dark surfaces (sticky hero + dark chrome)
+  heroBg: '#050505',
+  bgDark: '#050505',
+  bgElevatedDark: '#0A0A0A',
+  bgCardDark: '#121212',
+  textOnDark: '#F5F5F5',
+  textMutedOnDark: '#B0B0B4',
+  textDimOnDark: '#7A7A80',
+  borderOnDark: 'rgba(255, 255, 255, 0.14)',
+  borderSubtleOnDark: 'rgba(255, 255, 255, 0.07)',
+
+  // Gold accents (CTA / active tab glide / links only)
+  accent: gold,
+  accentLight: goldLight,
+  accentPressed: goldDark,
+  accentSoft: 'rgba(255, 184, 0, 0.18)',
+  accentInk: goldInk,
+
+  crestRed,
+
   siteUrl: 'https://boye.study',
   parentBrand: 'ENGINEER WITH KB',
   appName: 'Brain Bank',
@@ -44,15 +64,15 @@ export default {
   light: {
     text: Brand.text,
     background: Brand.bg,
-    tint: accent,
+    tint: gold,
     tabIconDefault: Brand.textDim,
-    tabIconSelected: accent,
+    tabIconSelected: gold,
   },
   dark: {
-    text: Brand.text,
-    background: Brand.bg,
-    tint: accent,
-    tabIconDefault: Brand.textDim,
-    tabIconSelected: accent,
+    text: Brand.textOnDark,
+    background: Brand.bgDark,
+    tint: gold,
+    tabIconDefault: Brand.textDimOnDark,
+    tabIconSelected: gold,
   },
 };
