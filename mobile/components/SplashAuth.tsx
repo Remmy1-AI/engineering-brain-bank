@@ -16,7 +16,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Crest } from '@/components/Crest';
 import { Field, GhostButton, PrimaryButton } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
@@ -173,7 +172,6 @@ export function SplashAuth({
         showsVerticalScrollIndicator={false}>
         <View style={styles.centerBlock}>
           <Animated.View style={[styles.brandBlock, titleStyle]}>
-            <Crest size={phase === 'land' ? 52 : 40} />
             <Text style={styles.parent}>{Brand.parentBrand}</Text>
             <Animated.Text style={[styles.name, titleSizeStyle]}>{Brand.appName}</Animated.Text>
           </Animated.View>
@@ -372,7 +370,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   parent: {
-    marginTop: 12,
     fontFamily: 'DMSans_700Bold',
     fontSize: 11,
     letterSpacing: 1.4,

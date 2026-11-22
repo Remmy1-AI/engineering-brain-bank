@@ -1,10 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Crest } from '@/components/Crest';
 import { Brand } from '@/constants/Colors';
 
-/** Notes-style splash: name centered; credit at bottom with open space above. */
+/** Wordmark splash: Brain Bank centered; credit at bottom with open space above. No crest. */
 export function BrandSplash() {
   const insets = useSafeAreaInsets();
 
@@ -15,7 +14,6 @@ export function BrandSplash() {
         { paddingBottom: Math.max(insets.bottom, 32), paddingTop: insets.top },
       ]}>
       <View style={styles.center}>
-        <Crest size={52} />
         <Text style={styles.parent}>{Brand.parentBrand}</Text>
         <Text style={styles.name}>{Brand.appName}</Text>
         <Text style={styles.tagline}>{Brand.tagline}</Text>
@@ -43,7 +41,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   parent: {
-    marginTop: 14,
     fontFamily: 'DMSans_700Bold',
     fontSize: 11,
     letterSpacing: 1.4,

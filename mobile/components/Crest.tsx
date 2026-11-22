@@ -7,7 +7,7 @@ type Props = {
   size?: number;
 };
 
-/** Crest for splash + Profile About only — crest red + gold (boye.study). */
+/** Unused — mobile UI is wordmark-only (no crest/shield). Kept for possible web reuse. */
 export function Crest({ size = 48 }: Props) {
   const h = size * (72 / 64);
   return (
