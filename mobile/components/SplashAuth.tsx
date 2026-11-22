@@ -8,10 +8,9 @@ import {
   View,
 } from 'react-native';
 import Animated, {
-  Easing,
+  FadeIn,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,9 +32,8 @@ type Props = {
 
 /**
  * Splash → auth gate.
- * Land: Brain Bank centered, by Korle Boye at bottom.
- * Then title shrinks/slides up; phone sign-in + Sign up; signup form; OTP → Home.
- * Guest can continue without auth.
+ * One vertically centered column: wordmark → section → fields → CTA → links.
+ * by Korle Boye pinned to the bottom.
  */
 export function SplashAuth({
   initialPhase = 'land',
@@ -46,7 +44,7 @@ export function SplashAuth({
   const { requestOtp, verifyOtp, supabaseConfigured, completeSignIn } = useAuth();
 
   const [phase, setPhase] = useState<SplashAuthPhase>(
-    skipLand ? initialPhase : 'land'
+    skipLand ? (initialPhase === 'land' ? 'signin' : initialPhase) : 'land'
   );
   const [phone, setPhone] = useState('+233');
   const [code, setCode] = useState('');
@@ -55,57 +53,19 @@ export function SplashAuth({
   const [busy, setBusy] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  const titleSize = useSharedValue(40);
-  const formOpacity = useSharedValue(0);
-  const formY = useSharedValue(16);
-  const creditOpacity = useSharedValue(1);
-
-  function animateToForm() {
-    // Shrink title in place — keep wordmark + form as one centered stack (no park-at-top gap).
-    titleSize.value = withTiming(30, { duration: 480, easing: Easing.out(Easing.cubic) });
-    formOpacity.value = withDelay(
-      120,
-      withTiming(1, { duration: 360, easing: Easing.out(Easing.cubic) })
-    );
-    formY.value = withDelay(
-      120,
-      withTiming(0, { duration: 360, easing: Easing.out(Easing.cubic) })
-    );
-    creditOpacity.value = withTiming(0.55, { duration: 400 });
-  }
+  const creditOpacity = useSharedValue(skipLand ? 0.55 : 1);
 
   useEffect(() => {
-    if (skipLand) {
-      titleSize.value = 30;
-      formOpacity.value = 1;
-      formY.value = 0;
-      creditOpacity.value = 0.55;
-      setPhase(initialPhase === 'land' ? 'signin' : initialPhase);
-      return;
-    }
-    if (initialPhase !== 'land') {
-      const t = setTimeout(() => {
-        animateToForm();
-        setPhase(initialPhase);
-      }, 900);
-      return () => clearTimeout(t);
-    }
+    if (skipLand) return;
+    const next = initialPhase !== 'land' ? initialPhase : 'signin';
+    const delay = initialPhase !== 'land' ? 900 : 1400;
     const t = setTimeout(() => {
-      animateToForm();
-      setPhase('signin');
-    }, 1400);
+      setPhase(next);
+      creditOpacity.value = withTiming(0.55, { duration: 400 });
+    }, delay);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const titleSizeStyle = useAnimatedStyle(() => ({
-    fontSize: titleSize.value,
-  }));
-
-  const formStyle = useAnimatedStyle(() => ({
-    opacity: formOpacity.value,
-    transform: [{ translateY: formY.value }],
-  }));
 
   const creditStyle = useAnimatedStyle(() => ({
     opacity: creditOpacity.value,
@@ -150,195 +110,198 @@ export function SplashAuth({
   }
 
   const programme = departments.find((d) => d.id === programmeId);
-
   const showOtp = phase === 'otp' || phase === 'signup-otp';
   const showSignup = phase === 'signup' || phase === 'signup-otp';
-  const showSigninPhone = phase === 'signin' || phase === 'otp';
+  const showForm = phase !== 'land';
+  const titleSize = phase === 'land' ? 40 : 28;
 
   return (
     <View
       style={[
         styles.root,
         {
-          paddingTop: Math.max(insets.top, 16),
-          paddingBottom: Math.max(insets.bottom, 28),
+          paddingTop: Math.max(insets.top, 12),
+          paddingBottom: Math.max(insets.bottom, 24),
         },
       ]}>
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.centerBlock}>
+        showsVerticalScrollIndicator={false}
+        bounces={false}>
+        <View style={styles.stack}>
           <View style={styles.brandBlock}>
             <Text style={styles.parent}>{Brand.parentBrand}</Text>
-            <Animated.Text style={[styles.name, titleSizeStyle]}>{Brand.appName}</Animated.Text>
+            <Text style={[styles.name, { fontSize: titleSize }]}>{Brand.appName}</Text>
           </View>
 
-          <Animated.View style={[styles.form, formStyle]} pointerEvents={phase === 'land' ? 'none' : 'auto'}>
-            {showSignup ? (
-              <>
-                <Text style={styles.formEyebrow}>Create account</Text>
-                <Text style={styles.label}>Name</Text>
-                <Field
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Your name"
-                  autoCapitalize="words"
-                  editable={!showOtp}
-                />
-                <Text style={styles.label}>Programme</Text>
-                <View style={styles.programmeList}>
-                  {departments
-                    .filter((d) => d.id !== 'general')
-                    .map((d) => {
-                      const active = d.id === programmeId;
-                      return (
-                        <Pressable
-                          key={d.id}
-                          disabled={showOtp}
-                          onPress={() => setProgrammeId(d.id)}
-                          style={[
-                            styles.programmeChip,
-                            active && styles.programmeChipActive,
-                          ]}>
-                          <Text
+          {showForm ? (
+            <Animated.View entering={FadeIn.duration(280)} style={styles.form}>
+              {showSignup ? (
+                <>
+                  <Text style={styles.formEyebrow}>Create account</Text>
+                  <Text style={styles.label}>Name</Text>
+                  <Field
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Your name"
+                    autoCapitalize="words"
+                    editable={!showOtp}
+                  />
+                  <Text style={styles.label}>Programme</Text>
+                  <View style={styles.programmeList}>
+                    {departments
+                      .filter((d) => d.id !== 'general')
+                      .map((d) => {
+                        const active = d.id === programmeId;
+                        return (
+                          <Pressable
+                            key={d.id}
+                            disabled={showOtp}
+                            onPress={() => setProgrammeId(d.id)}
                             style={[
-                              styles.programmeChipText,
-                              active && styles.programmeChipTextActive,
+                              styles.programmeChip,
+                              active && styles.programmeChipActive,
                             ]}>
-                            {d.short}
-                          </Text>
-                        </Pressable>
-                      );
-                    })}
-                </View>
-                {programme ? (
-                  <Text style={styles.programmeHint}>{programme.name}</Text>
-                ) : null}
-                <Text style={styles.label}>Phone</Text>
-                <Field
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                  placeholder="+233XXXXXXXXX"
-                  autoComplete="tel"
-                  editable={!showOtp}
-                />
-              </>
-            ) : showSigninPhone ? (
-              <>
-                <Text style={styles.formEyebrow}>Sign in</Text>
-                <Text style={styles.label}>Phone number</Text>
-                <Field
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                  placeholder="+233XXXXXXXXX"
-                  autoComplete="tel"
-                  editable={!showOtp}
-                />
-              </>
-            ) : null}
+                            <Text
+                              style={[
+                                styles.programmeChipText,
+                                active && styles.programmeChipTextActive,
+                              ]}>
+                              {d.short}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                  </View>
+                  {programme ? (
+                    <Text style={styles.programmeHint}>{programme.name}</Text>
+                  ) : null}
+                  <Text style={styles.label}>Phone</Text>
+                  <Field
+                    value={phone}
+                    onChangeText={setPhone}
+                    keyboardType="phone-pad"
+                    placeholder="+233XXXXXXXXX"
+                    autoComplete="tel"
+                    editable={!showOtp}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.formEyebrow}>Sign in</Text>
+                  <Text style={styles.label}>Phone number</Text>
+                  <Field
+                    value={phone}
+                    onChangeText={setPhone}
+                    keyboardType="phone-pad"
+                    placeholder="+233XXXXXXXXX"
+                    autoComplete="tel"
+                    editable={!showOtp}
+                  />
+                </>
+              )}
 
-            {showOtp ? (
-              <>
-                <Text style={styles.label}>Verification code</Text>
-                <Field
-                  value={code}
-                  onChangeText={setCode}
-                  keyboardType="number-pad"
-                  placeholder={supabaseConfigured ? '6-digit code' : '123456'}
-                  maxLength={8}
-                />
-                <View style={{ marginTop: 16 }}>
-                  <PrimaryButton
-                    label="Verify & continue"
-                    onPress={onVerify}
-                    loading={busy}
+              {showOtp ? (
+                <>
+                  <Text style={styles.label}>Verification code</Text>
+                  <Field
+                    value={code}
+                    onChangeText={setCode}
+                    keyboardType="number-pad"
+                    placeholder={supabaseConfigured ? '6-digit code' : '123456'}
+                    maxLength={8}
                   />
-                </View>
-                <View style={styles.linkRow}>
-                  <GhostButton
-                    label="Resend code"
-                    onPress={() => sendCode(authMode)}
-                  />
-                  <GhostButton
-                    label="Change number"
-                    onPress={() => {
-                      setCode('');
-                      setPhase(authMode === 'signup' ? 'signup' : 'signin');
-                    }}
-                  />
-                </View>
-              </>
-            ) : phase === 'signin' ? (
-              <>
-                <View style={{ marginTop: 16 }}>
-                  <Pressable
-                    onPress={() => sendCode('signin')}
-                    disabled={busy}
-                    style={({ pressed }) => [
-                      styles.blackBtn,
-                      pressed && styles.blackBtnPressed,
-                      busy && { opacity: 0.5 },
-                    ]}>
-                    <Text style={styles.blackBtnText}>
-                      {busy ? 'Sending…' : 'Continue'}
-                    </Text>
-                  </Pressable>
-                </View>
-                <Pressable
-                  onPress={() => {
-                    setAuthMode('signup');
-                    setPhase('signup');
-                  }}
-                  style={styles.signupLink}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sign up">
-                  <Text style={styles.signupLinkMuted}>New here?</Text>
-                  <Text style={styles.signupLinkText}>Sign up</Text>
-                </Pressable>
-                <Pressable onPress={onFinished} style={styles.guestLink}>
-                  <Text style={styles.guestLinkText}>Browse as guest</Text>
-                </Pressable>
-              </>
-            ) : phase === 'signup' ? (
-              <>
-                <View style={{ marginTop: 16 }}>
+                  <View style={{ marginTop: 16 }}>
+                    <PrimaryButton
+                      label="Verify & continue"
+                      onPress={onVerify}
+                      loading={busy}
+                    />
+                  </View>
+                  <View style={styles.linkRow}>
+                    <GhostButton label="Resend code" onPress={() => sendCode(authMode)} />
+                    <GhostButton
+                      label="Change number"
+                      onPress={() => {
+                        setCode('');
+                        setPhase(authMode === 'signup' ? 'signup' : 'signin');
+                      }}
+                    />
+                  </View>
+                </>
+              ) : showSignup ? (
+                <>
+                  <View style={{ marginTop: 16 }}>
+                    <Pressable
+                      onPress={() => {
+                        if (!name.trim()) {
+                          Alert.alert('Name required', 'Enter your name to sign up.');
+                          return;
+                        }
+                        sendCode('signup');
+                      }}
+                      disabled={busy}
+                      style={({ pressed }) => [
+                        styles.blackBtn,
+                        pressed && styles.blackBtnPressed,
+                        busy && { opacity: 0.5 },
+                      ]}>
+                      <Text style={styles.blackBtnText}>
+                        {busy ? 'Sending…' : 'Send code'}
+                      </Text>
+                    </Pressable>
+                  </View>
                   <Pressable
                     onPress={() => {
-                      if (!name.trim()) {
-                        Alert.alert('Name required', 'Enter your name to sign up.');
-                        return;
-                      }
-                      sendCode('signup');
+                      setAuthMode('signin');
+                      setPhase('signin');
                     }}
-                    disabled={busy}
-                    style={({ pressed }) => [
-                      styles.blackBtn,
-                      pressed && styles.blackBtnPressed,
-                      busy && { opacity: 0.5 },
-                    ]}>
-                    <Text style={styles.blackBtnText}>
-                      {busy ? 'Sending…' : 'Send code'}
-                    </Text>
+                    style={styles.signupLink}>
+                    <Text style={styles.signupLinkMuted}>Have an account?</Text>
+                    <Text style={styles.signupLinkText}>Sign in</Text>
                   </Pressable>
-                </View>
-                <Pressable
-                  onPress={() => {
-                    setAuthMode('signin');
-                    setPhase('signin');
-                  }}
-                  style={styles.signupLink}>
-                  <Text style={styles.signupLinkMuted}>Have an account?</Text>
-                  <Text style={styles.signupLinkText}>Sign in</Text>
-                </Pressable>
-                <Pressable onPress={onFinished} style={styles.guestLink}>
-                  <Text style={styles.guestLinkText}>Browse as guest</Text>
-                </Pressable>
-              </>
-            ) : null}
-          </Animated.View>
+                  <Pressable onPress={onFinished} style={styles.guestLink}>
+                    <Text style={styles.guestLinkText}>Browse as guest</Text>
+                  </Pressable>
+                </>
+              ) : (
+                <>
+                  <View style={{ marginTop: 16 }}>
+                    <Pressable
+                      onPress={() => sendCode('signin')}
+                      disabled={busy}
+                      style={({ pressed }) => [
+                        styles.blackBtn,
+                        pressed && styles.blackBtnPressed,
+                        busy && { opacity: 0.5 },
+                      ]}>
+                      <Text style={styles.blackBtnText}>
+                        {busy ? 'Sending…' : 'Continue'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                  <Pressable
+                    onPress={() => {
+                      setAuthMode('signup');
+                      setPhase('signup');
+                    }}
+                    style={styles.signupLink}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sign up">
+                    <Text style={styles.signupLinkMuted}>New here?</Text>
+                    <Text style={styles.signupLinkText}>Sign up</Text>
+                  </Pressable>
+                  <Pressable onPress={onFinished} style={styles.guestLink}>
+                    <Text style={styles.guestLinkText}>Browse as guest</Text>
+                  </Pressable>
+                </>
+              )}
+            </Animated.View>
+          ) : (
+            <Animated.View entering={FadeIn.duration(200)} style={styles.landSpacer} />
+          )}
         </View>
       </ScrollView>
 
@@ -355,19 +318,24 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.bg,
   },
   scroll: {
+    flex: 1,
+  },
+  scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingBottom: 24,
+    paddingVertical: 12,
   },
-  centerBlock: {
-    alignItems: 'center',
+  /** Single column: wordmark → form. Tight gap. Centered as a unit. */
+  stack: {
     width: '100%',
-    gap: 20,
+    maxWidth: 400,
+    alignSelf: 'center',
+    gap: 12,
   },
   brandBlock: {
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   parent: {
     fontFamily: 'DMSans_700Bold',
@@ -378,15 +346,15 @@ const styles = StyleSheet.create({
   },
   name: {
     fontFamily: 'DMSans_700Bold',
-    fontSize: 40,
     color: Brand.text,
     letterSpacing: -0.6,
+    textAlign: 'center',
+  },
+  landSpacer: {
+    height: 8,
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    marginTop: 0,
-    alignSelf: 'center',
   },
   formEyebrow: {
     fontFamily: 'DMSans_700Bold',
@@ -394,14 +362,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1.1,
     textTransform: 'uppercase',
     color: Brand.textMuted,
-    marginBottom: 4,
-    marginTop: 0,
+    marginBottom: 2,
   },
   label: {
     fontFamily: 'DMSans_500Medium',
     fontSize: 13,
     color: Brand.textMuted,
-    marginTop: 14,
+    marginTop: 12,
     marginBottom: 6,
   },
   programmeList: {
@@ -454,7 +421,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
-    marginTop: 18,
+    marginTop: 16,
   },
   signupLinkMuted: {
     fontFamily: 'DMSans_400Regular',
@@ -468,8 +435,8 @@ const styles = StyleSheet.create({
   },
   guestLink: {
     alignItems: 'center',
-    marginTop: 16,
-    paddingVertical: 6,
+    marginTop: 14,
+    paddingVertical: 4,
   },
   guestLinkText: {
     fontFamily: 'DMSans_500Medium',
@@ -483,7 +450,7 @@ const styles = StyleSheet.create({
   },
   bottom: {
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 8,
   },
   credit: {
     fontFamily: 'DMSans_400Regular',
