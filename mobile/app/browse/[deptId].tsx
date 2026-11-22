@@ -4,14 +4,11 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { LetterMark, ListRow, Muted } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
-import {
-  getCoursesByDepartment,
-  getDepartment,
-  levels,
-} from '@/data/mockCatalog';
+import { useCatalog } from '@/context/CatalogContext';
 
 export default function DepartmentScreen() {
   const { deptId } = useLocalSearchParams<{ deptId: string }>();
+  const { getCoursesByDepartment, getDepartment, levels } = useCatalog();
   const dept = getDepartment(deptId);
   const [levelFilter, setLevelFilter] = useState<string | null>(null);
 
@@ -19,7 +16,7 @@ export default function DepartmentScreen() {
     const all = getCoursesByDepartment(deptId);
     if (!levelFilter) return all;
     return all.filter((c) => c.level === levelFilter);
-  }, [deptId, levelFilter]);
+  }, [deptId, levelFilter, getCoursesByDepartment]);
 
   return (
     <>
@@ -57,7 +54,7 @@ export default function DepartmentScreen() {
         </View>
 
         {courses.length === 0 ? (
-          <Text style={styles.empty}>No courses in this filter (mock data).</Text>
+          <Text style={styles.empty}>No courses in this filter.</Text>
         ) : (
           courses.map((c) => (
             <ListRow

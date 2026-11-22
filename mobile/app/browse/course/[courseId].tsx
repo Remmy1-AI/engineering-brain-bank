@@ -4,16 +4,17 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ListRow, Muted, TypePill } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
-import {
-  getCourse,
-  getDepartment,
-  getMaterialsByCourse,
-  getTypeMeta,
-  materialTypes,
-} from '@/data/mockCatalog';
+import { useCatalog } from '@/context/CatalogContext';
 
 export default function CourseScreen() {
   const { courseId } = useLocalSearchParams<{ courseId: string }>();
+  const {
+    getCourse,
+    getDepartment,
+    getMaterialsByCourse,
+    getTypeMeta,
+    materialTypes,
+  } = useCatalog();
   const course = getCourse(courseId);
   const materials = getMaterialsByCourse(courseId);
   const dept = course ? getDepartment(course.department) : undefined;

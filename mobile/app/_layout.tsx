@@ -15,6 +15,7 @@ import { BrandSplash } from '@/components/BrandSplash';
 import { SplashAuth } from '@/components/SplashAuth';
 import { Brand } from '@/constants/Colors';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { CatalogProvider } from '@/context/CatalogContext';
 import { LibraryProvider } from '@/context/LibraryContext';
 
 export { ErrorBoundary } from 'expo-router';
@@ -153,11 +154,13 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <LibraryProvider>
-        <ThemeProvider value={NavTheme}>
-          <RootNavigator />
-        </ThemeProvider>
-      </LibraryProvider>
+      <CatalogProvider>
+        <LibraryProvider>
+          <ThemeProvider value={NavTheme}>
+            <RootNavigator />
+          </ThemeProvider>
+        </LibraryProvider>
+      </CatalogProvider>
     </AuthProvider>
   );
 }

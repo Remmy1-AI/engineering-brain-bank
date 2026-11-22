@@ -14,13 +14,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, PrimaryButton } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
+import { useCatalog } from '@/context/CatalogContext';
 import { useLibrary } from '@/context/LibraryContext';
-import { getMaterial, materialTypes, type MaterialTypeId } from '@/data/mockCatalog';
+import type { MaterialTypeId } from '@/data/mockCatalog';
 
 const SCREEN_H = Dimensions.get('window').height;
 const HERO_H = Math.round(SCREEN_H * 0.22);
 
-function typeLabel(type: MaterialTypeId | string) {
+function typeLabel(
+  type: MaterialTypeId | string,
+  materialTypes: { id: string; name: string }[]
+) {
   return materialTypes.find((t) => t.id === type)?.name ?? type;
 }
 
@@ -46,6 +50,7 @@ export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
   const { isSignedIn } = useAuth();
   const { downloads, removeDownload } = useLibrary();
+  const { getMaterial, materialTypes } = useCatalog();
   const heroPadTop = Math.max(insets.top, 12);
 
   return (
@@ -113,7 +118,8 @@ export default function LibraryScreen() {
                         {m.title}
                       </Text>
                       <Text style={styles.rowMeta} numberOfLines={1}>
-                        {typeLabel(m.type)} · {m.course_code} · {mockSize(m.type)}
+                        {typeLabel(m.type, materialTypes)} · {m.course_code} ·{' '}
+                        {mockSize(m.type)}
                       </Text>
                     </Pressable>
                     <View style={styles.trailing}>

@@ -19,15 +19,12 @@ import {
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
+import { useCatalog } from '@/context/CatalogContext';
 import { useLibrary } from '@/context/LibraryContext';
-import {
-  getCourse,
-  getMaterial,
-  getTypeMeta,
-} from '@/data/mockCatalog';
 
 export default function MaterialScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { getCourse, getMaterial, getTypeMeta } = useCatalog();
   const material = getMaterial(id);
   const course = material ? getCourse(material.courseId) : undefined;
   const typeMeta = material ? getTypeMeta(material.type) : undefined;
