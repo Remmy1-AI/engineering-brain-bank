@@ -34,21 +34,24 @@ type AuthContextValue = {
   authGatePhase: 'signin' | 'signup' | null;
   /** Skip land splash animation (Profile re-open / signup deep link). */
   authGateSkipLand: boolean;
-  /** Send OTP — Supabase when configured, else mock accept any E.164-ish phone */
+  /**
+   * Send OTP — Supabase Phone when URL+anon configured (SMS via BulkClix hook).
+   * Else mock accept any E.164-ish phone.
+   */
   requestOtp: (phone: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   /** Verify OTP — Supabase when configured, else accept code "123456" */
   verifyOtp: (
     phone: string,
     token: string
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
-  /** Merge profile fields after signup OTP (stub / local). */
+  /** Merge profile fields after signup OTP (user_metadata when live). */
   completeSignIn: (profile: {
     phone: string;
     name?: string;
     programme?: string;
   }) => Promise<void>;
   signOut: () => Promise<void>;
-  /** Dev helper: flip signed-in without OTP (for Home Continue demos) */
+  /** Dev helper: flip signed-in without OTP (mock / __DEV__ only) */
   stubSignIn: (phone?: string) => Promise<void>;
 };
 
@@ -63,17 +66,35 @@ function normalizePhone(raw: string) {
   return trimmed;
 }
 
+function userFromSession(u: {
+  id: string;
+  phone?: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+}): AuthUser {
+  const meta = u.user_metadata || {};
+  return {
+    id: u.id,
+    phone: u.phone || u.email || 'signed-in',
+    name: typeof meta.name === 'string' ? meta.name : undefined,
+    programme: typeof meta.programme === 'string' ? meta.programme : undefined,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [authGateOpen, setAuthGateOpen] = useState(false);
-  const [authGatePhase, setAuthGatePhase] = useState<'signin' | 'signup' | null>(null);
+  const [authGatePhase, setAuthGatePhase] = useState<'signin' | 'signup' | null>(
+    null
+  );
   const [authGateSkipLand, setAuthGateSkipLand] = useState(false);
   const [bootResolved, setBootResolved] = useState(false);
   const supabaseConfigured = isSupabaseConfigured();
 
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
 
     (async () => {
       try {
@@ -81,11 +102,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (sb) {
           const { data } = await sb.auth.getSession();
           if (!cancelled && data.session?.user) {
-            setUser({
-              id: data.session.user.id,
-              phone: data.session.user.phone || data.session.user.email || 'signed-in',
-            });
+            setUser(userFromSession(data.session.user));
           }
+          const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
+            if (cancelled) return;
+            if (session?.user) {
+              setUser(userFromSession(session.user));
+            } else {
+              setUser(null);
+            }
+          });
+          unsubscribe = () => sub.subscription.unsubscribe();
         } else {
           const raw = await AsyncStorage.getItem(STORAGE_KEY);
           if (!cancelled && raw) {
@@ -101,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       cancelled = true;
+      unsubscribe?.();
     };
   }, []);
 
@@ -127,11 +155,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const requestOtp = useCallback(async (phoneRaw: string) => {
     const phone = normalizePhone(phoneRaw);
     if (!phone || phone.length < 10) {
-      return { ok: false as const, error: 'Enter a valid phone number with country code.' };
+      return {
+        ok: false as const,
+        error: 'Enter a valid phone number with country code.',
+      };
     }
 
     const sb = getSupabase();
     if (sb) {
+      // SMS delivery: Supabase Send SMS Hook → BulkClix (sender "Brain Bank")
       const { error } = await sb.auth.signInWithOtp({ phone });
       if (error) return { ok: false as const, error: error.message };
       return { ok: true as const };
@@ -161,7 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) return { ok: false as const, error: error.message };
         const u = data.user;
         if (!u) return { ok: false as const, error: 'No user returned.' };
-        setUser({ id: u.id, phone: u.phone || phone });
+        setUser(userFromSession({ ...u, phone: u.phone || phone }));
         return { ok: true as const };
       }
 
@@ -178,6 +210,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const completeSignIn = useCallback(
     async (profile: { phone: string; name?: string; programme?: string }) => {
       const phone = normalizePhone(profile.phone);
+      const sb = getSupabase();
+      if (sb) {
+        const { data, error } = await sb.auth.updateUser({
+          data: {
+            name: profile.name || null,
+            programme: profile.programme || null,
+          },
+        });
+        if (!error && data.user) {
+          setUser(
+            userFromSession({
+              ...data.user,
+              phone: data.user.phone || phone,
+              user_metadata: {
+                ...(data.user.user_metadata || {}),
+                name: profile.name,
+                programme: profile.programme,
+              },
+            })
+          );
+          return;
+        }
+        // Fall through to local merge if metadata update fails
+        setUser((prev) => ({
+          id: prev?.id || `live-${phone}`,
+          phone,
+          name: profile.name,
+          programme: profile.programme,
+        }));
+        return;
+      }
+
       const next: AuthUser = {
         id: user?.id || `stub-${phone}`,
         phone,
@@ -207,6 +271,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const stubSignIn = useCallback(
     async (phone = '+233241234567') => {
+      if (isSupabaseConfigured() && !__DEV__) {
+        return;
+      }
       await persistStub({ id: `stub-${phone}`, phone: normalizePhone(phone) });
       setAuthGateOpen(false);
     },

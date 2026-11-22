@@ -24,9 +24,8 @@ import {
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
+import { useCatalog } from '@/context/CatalogContext';
 import {
-  getMaterial,
-  materialTypes,
   mockDownloadsForUser,
   type MaterialTypeId,
 } from '@/data/mockCatalog';
@@ -35,7 +34,10 @@ const SCREEN_H = Dimensions.get('window').height;
 const HERO_H = Math.round(SCREEN_H * 0.22);
 const CONTINUE_CARD_W = 168;
 
-function typeLabel(type: MaterialTypeId | string) {
+function typeLabel(
+  type: MaterialTypeId | string,
+  materialTypes: { id: string; name: string }[]
+) {
   return materialTypes.find((t) => t.id === type)?.name ?? type;
 }
 
@@ -102,6 +104,7 @@ export default function ProfileScreen() {
     stubSignIn,
     openAuthGate,
   } = useAuth();
+  const { getMaterial, materialTypes, recentlyAdded, source } = useCatalog();
 
   const [phone, setPhone] = useState('+233');
   const [code, setCode] = useState('');
@@ -110,11 +113,14 @@ export default function ProfileScreen() {
   const [signingIn, setSigningIn] = useState(false);
 
   const continueItems = useMemo(() => {
+    if (source === 'live') {
+      return recentlyAdded.slice(0, 4);
+    }
     return mockDownloadsForUser
       .map((d) => getMaterial(d.materialId))
       .filter((m): m is NonNullable<typeof m> => Boolean(m))
       .slice(0, 4);
-  }, []);
+  }, [source, recentlyAdded, getMaterial]);
 
   async function onSendOtp() {
     setBusy(true);
@@ -251,7 +257,9 @@ export default function ProfileScreen() {
                     ]}
                     accessibilityRole="button"
                     accessibilityLabel={`Continue ${m.title}`}>
-                    <Text style={styles.continueType}>{typeLabel(m.type)}</Text>
+                    <Text style={styles.continueType}>
+                      {typeLabel(m.type, materialTypes)}
+                    </Text>
                     <Text style={styles.continueTitle} numberOfLines={2}>
                       {m.title}
                     </Text>

@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Field, GhostButton, PrimaryButton } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
-import { departments } from '@/data/mockCatalog';
+import { useCatalog } from '@/context/CatalogContext';
 
 export type SplashAuthPhase = 'land' | 'signin' | 'otp' | 'signup' | 'signup-otp';
 
@@ -42,6 +42,7 @@ export function SplashAuth({
 }: Props) {
   const insets = useSafeAreaInsets();
   const { requestOtp, verifyOtp, supabaseConfigured, completeSignIn } = useAuth();
+  const { departments } = useCatalog();
 
   const [phase, setPhase] = useState<SplashAuthPhase>(
     skipLand ? (initialPhase === 'land' ? 'signin' : initialPhase) : 'land'
@@ -49,9 +50,15 @@ export function SplashAuth({
   const [phone, setPhone] = useState('+233');
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [programmeId, setProgrammeId] = useState(departments[2]?.id ?? 'mechanical');
+  const [programmeId, setProgrammeId] = useState('mechanical');
   const [busy, setBusy] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+
+  useEffect(() => {
+    if (!departments.some((d) => d.id === programmeId) && departments[0]) {
+      setProgrammeId(departments.find((d) => d.id !== 'general')?.id ?? departments[0].id);
+    }
+  }, [departments, programmeId]);
 
   const creditOpacity = useSharedValue(skipLand ? 0.55 : 1);
 

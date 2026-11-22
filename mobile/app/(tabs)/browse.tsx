@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Field, LetterMark } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
-import { courses, departments } from '@/data/mockCatalog';
+import { useCatalog } from '@/context/CatalogContext';
 
 const SCREEN_W = Dimensions.get('window').width;
 const SCREEN_H = Dimensions.get('window').height;
@@ -25,17 +25,17 @@ const GRID_GAP = 12;
 const GRID_PAD = 16;
 const CARD_W = Math.floor((SCREEN_W - GRID_PAD * 2 - GRID_GAP) / 2);
 
-function courseCountFor(deptId: string) {
-  return courses.filter((c) => c.department === deptId).length;
-}
-
 /**
  * Browse = Libraries catalogue (UMAT-style):
  * black sticky header, overlapping search, 2-column department cards.
  */
 export default function BrowseScreen() {
   const insets = useSafeAreaInsets();
+  const { courses, departments } = useCatalog();
   const [query, setQuery] = useState('');
+
+  const courseCountFor = (deptId: string) =>
+    courses.filter((c) => c.department === deptId).length;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -46,7 +46,7 @@ export default function BrowseScreen() {
         d.short.toLowerCase().includes(q) ||
         d.code.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, departments]);
 
   const heroPadTop = Math.max(insets.top, 12);
   const stickyBottom = HERO_H + SEARCH_OVERLAP;

@@ -20,14 +20,7 @@ import {
 } from '@/components/ui';
 import { Brand } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
-import {
-  courses,
-  departments,
-  getCourse,
-  getMaterial,
-  mockActivity,
-  searchCatalog,
-} from '@/data/mockCatalog';
+import { useCatalog } from '@/context/CatalogContext';
 
 const SCREEN_H = Dimensions.get('window').height;
 /** Sticky top color slab — 22% of screen height */
@@ -57,31 +50,27 @@ function initialsFrom(isSignedIn: boolean, phone?: string | null) {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { isSignedIn, user } = useAuth();
+  const {
+    courses,
+    departments,
+    searchCatalog,
+    getCourse,
+    getMaterial,
+    recentlyAdded,
+    trending,
+  } = useCatalog();
   const [query, setQuery] = useState('');
 
-  const results = useMemo(() => searchCatalog(query), [query]);
+  const results = useMemo(() => searchCatalog(query), [query, searchCatalog]);
   const greeting = greetingForHour(new Date().getHours());
   const name = displayName(isSignedIn, user?.phone);
-  const continueMaterial = getMaterial('m2');
-  const continueCourse = continueMaterial ? getCourse(continueMaterial.courseId) : null;
+  const continueMaterial =
+    (isSignedIn && recentlyAdded[0]) || getMaterial('m2') || recentlyAdded[0];
+  const continueCourse = continueMaterial
+    ? getCourse(continueMaterial.courseId)
+    : null;
 
-  /** Deduped trending materials from mock campus activity (newest signal first). */
-  const trendingMaterials = useMemo(() => {
-    const seen = new Set<string>();
-    const rows: {
-      id: string;
-      material: NonNullable<ReturnType<typeof getMaterial>>;
-      when: string;
-    }[] = [];
-    for (const a of mockActivity) {
-      if (seen.has(a.materialId)) continue;
-      const m = getMaterial(a.materialId);
-      if (!m) continue;
-      seen.add(a.materialId);
-      rows.push({ id: a.id, material: m, when: a.when });
-    }
-    return rows;
-  }, []);
+  const trendingMaterials = trending;
 
   // Clear status bar / notch; content itself is bottom-aligned toward the search
   const heroPadTop = Math.max(insets.top, 12);
