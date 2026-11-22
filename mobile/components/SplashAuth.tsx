@@ -56,20 +56,19 @@ export function SplashAuth({
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
   const titleSize = useSharedValue(40);
-  const titleY = useSharedValue(0);
   const formOpacity = useSharedValue(0);
-  const formY = useSharedValue(24);
+  const formY = useSharedValue(16);
   const creditOpacity = useSharedValue(1);
 
   function animateToForm() {
-    titleSize.value = withTiming(28, { duration: 480, easing: Easing.out(Easing.cubic) });
-    titleY.value = withTiming(-56, { duration: 480, easing: Easing.out(Easing.cubic) });
+    // Shrink title in place — keep wordmark + form as one centered stack (no park-at-top gap).
+    titleSize.value = withTiming(30, { duration: 480, easing: Easing.out(Easing.cubic) });
     formOpacity.value = withDelay(
-      160,
+      120,
       withTiming(1, { duration: 360, easing: Easing.out(Easing.cubic) })
     );
     formY.value = withDelay(
-      160,
+      120,
       withTiming(0, { duration: 360, easing: Easing.out(Easing.cubic) })
     );
     creditOpacity.value = withTiming(0.55, { duration: 400 });
@@ -77,7 +76,10 @@ export function SplashAuth({
 
   useEffect(() => {
     if (skipLand) {
-      animateToForm();
+      titleSize.value = 30;
+      formOpacity.value = 1;
+      formY.value = 0;
+      creditOpacity.value = 0.55;
       setPhase(initialPhase === 'land' ? 'signin' : initialPhase);
       return;
     }
@@ -95,10 +97,6 @@ export function SplashAuth({
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const titleStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: titleY.value }],
-  }));
 
   const titleSizeStyle = useAnimatedStyle(() => ({
     fontSize: titleSize.value,
@@ -171,10 +169,10 @@ export function SplashAuth({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
         <View style={styles.centerBlock}>
-          <Animated.View style={[styles.brandBlock, titleStyle]}>
+          <View style={styles.brandBlock}>
             <Text style={styles.parent}>{Brand.parentBrand}</Text>
             <Animated.Text style={[styles.name, titleSizeStyle]}>{Brand.appName}</Animated.Text>
-          </Animated.View>
+          </View>
 
           <Animated.View style={[styles.form, formStyle]} pointerEvents={phase === 'land' ? 'none' : 'auto'}>
             {showSignup ? (
@@ -365,9 +363,11 @@ const styles = StyleSheet.create({
   centerBlock: {
     alignItems: 'center',
     width: '100%',
+    gap: 20,
   },
   brandBlock: {
     alignItems: 'center',
+    gap: 6,
   },
   parent: {
     fontFamily: 'DMSans_700Bold',
@@ -381,12 +381,11 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: Brand.text,
     letterSpacing: -0.6,
-    marginTop: 6,
   },
   form: {
     width: '100%',
     maxWidth: 400,
-    marginTop: 8,
+    marginTop: 0,
     alignSelf: 'center',
   },
   formEyebrow: {
@@ -396,7 +395,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: Brand.textMuted,
     marginBottom: 4,
-    marginTop: 8,
+    marginTop: 0,
   },
   label: {
     fontFamily: 'DMSans_500Medium',
