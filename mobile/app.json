@@ -44,7 +44,11 @@
     },
     "extra": {
       "supabaseUrl": "",
-      "supabaseAnonKey": ""
-    }
+      "supabaseAnonKey": "",
+      "eas": {
+        "projectId": "48298a4f-210b-4aa6-ad1a-affcd962aa05"
+      }
+    },
+    "owner": "remmy.s"
   }
 }
