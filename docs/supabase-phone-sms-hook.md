@@ -49,4 +49,6 @@ Then on a real device: app `signInWithOtp` → SMS from **Brain Bank** → `veri
 - Vercel env var changes only apply to **new** deployments. After adding or rotating `BOYE_BULKCLIX_API_KEY`, redeploy Production (or merge any commit to `main`).
 - Enable the hook with the Management API once the `GET` above reports `"bulkclix":"configured"`:
   `PATCH /v1/projects/{ref}/config/auth` with `hook_send_sms_enabled: true` and `hook_send_sms_uri`.
-- Dry-run check without a real phone: `POST` the hook with an empty body and expect `400`; a `503` with `bulkclix_not_configured` means the env var has not reached the deployment.
+- Every `POST` must carry a valid Supabase (Standard Webhooks) signature: unsigned or wrongly signed requests get `401`, and `503` means no signing secret is available.
+- The signing secret defaults to a value derived from `BOYE_BULKCLIX_API_KEY` (SHA-256 of a fixed prefix plus the key), so Vercel needs no extra env var. Supabase `hook_send_sms_secrets` must hold the matching `v1,whsec_<base64>` value. **If the BulkClix key is rotated, re-set the Supabase hook secret** (or set `BOYE_SUPABASE_AUTH_HOOK_SECRET` on Vercel to a fixed `v1,whsec_<base64>` value and use the same one in Supabase).
+- Dry-run check without a real phone: send a correctly signed `POST` with no `otp` and expect `400` (auth passed, nothing sent).
