@@ -6,12 +6,15 @@
  * Secrets (server / Vercel / Cloud Agent only — never in Expo):
  *   BOYE_BULKCLIX_API_KEY          required
  *   BOYE_BULKCLIX_SENDER_ID        optional UUID override
- *   BOYE_SUPABASE_AUTH_HOOK_SECRET optional (or SUPABASE_AUTH_HOOK_SECRET)
+ *   BOYE_SUPABASE_AUTH_HOOK_SECRET optional override ("v1,whsec_<base64>"); otherwise the
+ *                                  signing secret is derived from BOYE_BULKCLIX_API_KEY
  *
+ * Every POST must carry a valid Supabase (Standard Webhooks) signature.
  * Dashboard: Authentication → Hooks → Send SMS → this HTTPS URL.
  * Mobile still calls supabase.auth.signInWithOtp / verifyOtp (anon key only).
  */
 import { bulkclixEnv, sendBulkclixSms } from "../lib/bulkclix.js";
+import { verifyHookRequest } from "../lib/sms-hook-auth.js";
 
 export const config = { runtime: "edge" };
 
@@ -42,25 +45,6 @@ function extractPhoneAndOtp(payload) {
   return { phone: String(phone || ""), otp: String(otp || "") };
 }
 
-function hookSecretOk(req) {
-  const expected = (
-    process.env.BOYE_SUPABASE_AUTH_HOOK_SECRET ||
-    process.env.SUPABASE_AUTH_HOOK_SECRET ||
-    ""
-  ).trim();
-  // If no secret configured yet, accept (dev) but require secret in production docs.
-  if (!expected) return true;
-  const auth = req.headers.get("authorization") || "";
-  const bearer = auth.toLowerCase().startsWith("bearer ")
-    ? auth.slice(7).trim()
-    : "";
-  const headerSecret =
-    req.headers.get("x-supabase-signature") ||
-    req.headers.get("x-hook-secret") ||
-    bearer;
-  return Boolean(headerSecret && headerSecret === expected);
-}
-
 export default async function handler(req) {
   if (req.method === "GET") {
     const env = bulkclixEnv();
@@ -76,13 +60,18 @@ export default async function handler(req) {
     return json({ error: "Method not allowed" }, 405);
   }
 
-  if (!hookSecretOk(req)) {
-    return json({ error: "Unauthorized" }, 401);
+  const rawBody = await req.text();
+  const verified = await verifyHookRequest(req.headers, rawBody);
+  if (!verified.ok) {
+    return json(
+      { error: "Unauthorized" },
+      verified.reason === "no_signing_secret" ? 503 : 401
+    );
   }
 
   let payload;
   try {
-    payload = await req.json();
+    payload = JSON.parse(rawBody);
   } catch (_) {
     return json({ error: "Invalid JSON" }, 400);
   }
