@@ -43,3 +43,10 @@ curl -sS https://boye.study/api/supabase-sms-hook
 ```
 
 Then on a real device: app `signInWithOtp` → SMS from **Brain Bank** → `verifyOtp`.
+
+## Notes
+
+- Vercel env var changes only apply to **new** deployments. After adding or rotating `BOYE_BULKCLIX_API_KEY`, redeploy Production (or merge any commit to `main`).
+- Enable the hook with the Management API once the `GET` above reports `"bulkclix":"configured"`:
+  `PATCH /v1/projects/{ref}/config/auth` with `hook_send_sms_enabled: true` and `hook_send_sms_uri`.
+- Dry-run check without a real phone: `POST` the hook with an empty body and expect `400`; a `503` with `bulkclix_not_configured` means the env var has not reached the deployment.
